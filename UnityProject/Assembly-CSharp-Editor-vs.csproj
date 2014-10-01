@@ -5,11 +5,11 @@
 	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
 	<ProductVersion>10.0.20506</ProductVersion>
 	<SchemaVersion>2.0</SchemaVersion>
-	<ProjectGuid>{5B580621-09B4-68CB-B5F4-5B9DD210A60F}</ProjectGuid>
+	<ProjectGuid>{3CC9D2C0-C461-07D9-EDF3-4FFB4DE5C299}</ProjectGuid>
 	<OutputType>Library</OutputType>
 	<AppDesignerFolder>Properties</AppDesignerFolder>
 	<RootNamespace></RootNamespace>
-	<AssemblyName>Assembly-CSharp</AssemblyName>
+	<AssemblyName>Assembly-CSharp-Editor</AssemblyName>
 	<TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
 	<FileAlignment>512</FileAlignment>
 	<BaseDirectory>Assets</BaseDirectory>
@@ -46,19 +46,19 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Controls.cs" />
-     <Compile Include="Assets\GameManager.cs" />
-     <Compile Include="Assets\TekBase.cs" />
-     <Compile Include="Assets\TekBasePart.cs" />
-     <Compile Include="Assets\TopDownCamera.cs" />
-     <Compile Include="Assets\TopDownController.cs" />
-     <Compile Include="Assets\TopDownMovement.cs" />
-     <Compile Include="Assets\TopDownZoom.cs" />
-     <Compile Include="Assets\_ProgrammerInfo.cs" />
+     <Compile Include="Assets\Editor\NewKeyboardShortkuts.cs" />
+     <Compile Include="Assets\Editor\TransformInspector.cs" />
      <None Include="Assets\Shaders\VertexColorIllum.shader" />
      <None Include="Assets\Shaders\VertexColorTransparent.shader" />
      <None Include="Assets\Shaders\VertexColorDetail.shader" />
      <None Include="Assets\Shaders\VertexColor.shader" />
+ <Reference Include="UnityEditor.Graphs">
+ <HintPath>G:/Programmieren/Unity/Editor-4.5.2/Data/Managed/UnityEditor.Graphs.dll</HintPath>
+ </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Assembly-CSharp-vs.csproj">
+      <Project>{5B580621-09B4-68CB-B5F4-5B9DD210A60F}</Project>      <Name>Assembly-CSharp-vs</Name>    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

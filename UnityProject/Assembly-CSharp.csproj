@@ -47,7 +47,13 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Controls.cs" />
+     <Compile Include="Assets\GameManager.cs" />
+     <Compile Include="Assets\TekBase.cs" />
+     <Compile Include="Assets\TekBasePart.cs" />
      <Compile Include="Assets\TopDownCamera.cs" />
+     <Compile Include="Assets\TopDownController.cs" />
+     <Compile Include="Assets\TopDownMovement.cs" />
+     <Compile Include="Assets\TopDownZoom.cs" />
      <Compile Include="Assets\_ProgrammerInfo.cs" />
      <None Include="Assets\Shaders\VertexColorIllum.shader" />
      <None Include="Assets\Shaders\VertexColorTransparent.shader" />
