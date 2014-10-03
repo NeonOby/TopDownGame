@@ -8,6 +8,22 @@ public class BoxSelection : MonoBehaviour {
 
     public static Vector3 StartMousePos = Vector3.zero;
     public static Vector3 EndMousePos = Vector3.zero;
+
+    public string RightClickEffectPool = "RightClickEffect";
+
+    void Start()
+    {
+        SimpleAI.SimpleAIDied += OnSimpleAIDied;
+    }
+
+    void OnSimpleAIDied(SimpleAI sender)
+    {
+        if (selectedGridders.Contains(sender))
+        {
+            selectedGridders.Remove(sender);
+        }
+    }
+
 	// Update is called once per frame
 	void Update () 
     {
@@ -36,6 +52,8 @@ public class BoxSelection : MonoBehaviour {
             {
                 selectedGridders[i].SetTargetPos(targetPos);
             }
+
+            GameObjectPool.Instance.Spawn(RightClickEffectPool, targetPos, Quaternion.identity);
         }
 	}
 
@@ -60,6 +78,7 @@ public class BoxSelection : MonoBehaviour {
     {
         Vector3 targetScreenPos = Camera.main.WorldToScreenPoint(target.position);
         targetScreenPos.y = Screen.height - targetScreenPos.y;
+
         return rect.Contains(targetScreenPos);
     }
 

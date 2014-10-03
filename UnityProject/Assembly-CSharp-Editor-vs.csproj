@@ -48,10 +48,10 @@
   <ItemGroup>
      <Compile Include="Assets\Editor\NewKeyboardShortkuts.cs" />
      <Compile Include="Assets\Editor\TransformInspector.cs" />
-     <None Include="Assets\Shaders\VertexColorIllum.shader" />
-     <None Include="Assets\Shaders\VertexColorTransparent.shader" />
-     <None Include="Assets\Shaders\VertexColorDetail.shader" />
-     <None Include="Assets\Shaders\VertexColor.shader" />
+     <None Include="Assets\Resources\Shaders\VertexColorIllum.shader" />
+     <None Include="Assets\Resources\Shaders\VertexColorTransparent.shader" />
+     <None Include="Assets\Resources\Shaders\VertexColorDetail.shader" />
+     <None Include="Assets\Resources\Shaders\VertexColor.shader" />
  <Reference Include="UnityEditor.Graphs">
  <HintPath>G:/Programmieren/Unity/Editor-4.5.2/Data/Managed/UnityEditor.Graphs.dll</HintPath>
  </Reference>

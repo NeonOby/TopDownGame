@@ -46,19 +46,24 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\BoxSelection.cs" />
-     <Compile Include="Assets\Controls.cs" />
-     <Compile Include="Assets\GameManager.cs" />
-     <Compile Include="Assets\SimpleAI.cs" />
-     <Compile Include="Assets\TopDownCamera.cs" />
-     <Compile Include="Assets\TopDownController.cs" />
-     <Compile Include="Assets\TopDownMovement.cs" />
-     <Compile Include="Assets\TopDownZoom.cs" />
+     <Compile Include="Assets\DebugSpawner.cs" />
+     <Compile Include="Assets\Resources\GameObjectPool\GameObjectPool.cs" />
+     <Compile Include="Assets\Resources\GameObjectPool\GameObjectPoolCreate.cs" />
+     <Compile Include="Assets\Resources\Scripts\BoxSelection.cs" />
+     <Compile Include="Assets\Resources\Scripts\Controls.cs" />
+     <Compile Include="Assets\Resources\Scripts\GameManager.cs" />
+     <Compile Include="Assets\Resources\Scripts\SimpleAI.cs" />
+     <Compile Include="Assets\Resources\Scripts\TopDownCamera.cs" />
+     <Compile Include="Assets\Resources\Scripts\TopDownController.cs" />
+     <Compile Include="Assets\Resources\Scripts\TopDownMovement.cs" />
+     <Compile Include="Assets\Resources\Scripts\TopDownZoom.cs" />
+     <Compile Include="Assets\SimpleBullet.cs" />
+     <Compile Include="Assets\TimedEffect.cs" />
      <Compile Include="Assets\_ProgrammerInfo.cs" />
-     <None Include="Assets\Shaders\VertexColorIllum.shader" />
-     <None Include="Assets\Shaders\VertexColorTransparent.shader" />
-     <None Include="Assets\Shaders\VertexColorDetail.shader" />
-     <None Include="Assets\Shaders\VertexColor.shader" />
+     <None Include="Assets\Resources\Shaders\VertexColorIllum.shader" />
+     <None Include="Assets\Resources\Shaders\VertexColorTransparent.shader" />
+     <None Include="Assets\Resources\Shaders\VertexColorDetail.shader" />
+     <None Include="Assets\Resources\Shaders\VertexColor.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
