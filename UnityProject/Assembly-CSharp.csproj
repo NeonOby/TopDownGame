@@ -39,17 +39,17 @@
 	<Reference Include="System.Core" />
 	<Reference Include="System.Xml.Linq" />
 	<Reference Include="UnityEngine">
-	  <HintPath>C:/Program Files (x86)/Unity/Editor4.5.2/Data/Managed/UnityEngine.dll</HintPath>
+	  <HintPath>G:/Programmieren/Unity/Editor-4.5.2/Data/Managed/UnityEngine.dll</HintPath>
 	</Reference>
 	<Reference Include="UnityEditor">
-	  <HintPath>C:/Program Files (x86)/Unity/Editor4.5.2/Data/Managed/UnityEditor.dll</HintPath>
+	  <HintPath>G:/Programmieren/Unity/Editor-4.5.2/Data/Managed/UnityEditor.dll</HintPath>
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\BoxSelection.cs" />
      <Compile Include="Assets\Controls.cs" />
      <Compile Include="Assets\GameManager.cs" />
-     <Compile Include="Assets\TekBase.cs" />
-     <Compile Include="Assets\TekBasePart.cs" />
+     <Compile Include="Assets\SimpleAI.cs" />
      <Compile Include="Assets\TopDownCamera.cs" />
      <Compile Include="Assets\TopDownController.cs" />
      <Compile Include="Assets\TopDownMovement.cs" />

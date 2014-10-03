@@ -9,7 +9,7 @@ public class TopDownMovement
     public float Speed = 8.0f;
     public float Damping = 10.0f;
 
-    private Vector3 wantedPosition;
+    private Vector3 wantedMovement;
 
     private Transform transform;
 
@@ -17,7 +17,7 @@ public class TopDownMovement
     {
         get
         {
-            return wantedPosition - transform.position;
+            return wantedMovement - transform.position;
         }
     }
 
@@ -25,11 +25,12 @@ public class TopDownMovement
     {
         transform = target;
 
-        wantedPosition = transform.position;
+        wantedMovement = transform.position;
     }
 
-    public void Update(float speedMult = 0.0f)
+    public void Update(float speedMult = 1.0f)
     {
+
         float horizontalInput = 0;
         float verticalInput = 0;
 
@@ -50,12 +51,11 @@ public class TopDownMovement
                 verticalInput = 1;
         }
 
-        horizontalInput *= speedMult;
-        verticalInput *= speedMult;
+        wantedMovement += (Vector3.right * horizontalInput + Vector3.forward * verticalInput) * Speed * Time.deltaTime * speedMult;
 
-        wantedPosition += (Vector3.right * horizontalInput + Vector3.forward * verticalInput).normalized * Speed * Time.deltaTime;
-
-        transform.position = Vector3.Lerp(transform.position, wantedPosition, Time.deltaTime * Damping);
+        Vector3 currentMovement = wantedMovement * Time.deltaTime * Damping;
+        wantedMovement -= currentMovement;
+        transform.position += currentMovement;
     }
 
     

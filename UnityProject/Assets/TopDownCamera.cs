@@ -17,8 +17,6 @@ public class TargetFollower
         transform = owner;
     }
 
-
-
     public void SetTarget(Transform newTarget)
     {
         target = newTarget;
@@ -49,6 +47,7 @@ public class TopDownCamera : MonoBehaviour
     public TargetFollower targetFollower;
 
     public float ZoomHeightSpeedMult = 2.0f;
+    public float ZoomHeightZoomSpeedMult = 2.0f;
 
 	void Start () 
     {
@@ -59,8 +58,7 @@ public class TopDownCamera : MonoBehaviour
 
 	void Update () 
     {
-
-        zoom.Update();
+        zoom.Update(1f + zoom.Percentage * ZoomHeightZoomSpeedMult);
         targetFollower.Difference.y = zoom.Height;
 
         if (FollowTarget)
@@ -69,7 +67,7 @@ public class TopDownCamera : MonoBehaviour
         }
         else
         {
-            movement.Update(zoom.procentage * ZoomHeightSpeedMult);
+            movement.Update(1f + zoom.Percentage * ZoomHeightSpeedMult);
         }
 
 	}

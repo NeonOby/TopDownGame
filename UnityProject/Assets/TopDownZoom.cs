@@ -9,7 +9,7 @@ public class TopDownZoom
     public bool Smooth = false;
     public float Damping = 5.0f;
 
-    private float wantedHeight = 0f;
+    public float wantedMovement = 0f;
 
     private Transform transform;
 
@@ -22,35 +22,28 @@ public class TopDownZoom
     {
         get
         {
-            return wantedHeight;
+            return transform.position.y;
         }
     }
 
-    public float procentage
+    public float Percentage
     {
         get
         {
-            return ((wantedHeight - MinMaxHeight.x) / (MinMaxHeight.y - MinMaxHeight.x));
+            return ((transform.position.y - MinMaxHeight.x) / (MinMaxHeight.y - MinMaxHeight.x));
         }
     }
 
-    public void SetWantedHeight(float height)
+    public void Update(float speedMult = 1.0f)
     {
-        wantedHeight = height;
-    }
+        float change = -Input.GetAxis("Mouse ScrollWheel") * Speed * Time.deltaTime * speedMult;
+        float newY = Mathf.Clamp(transform.position.y + wantedMovement + change, MinMaxHeight.x, MinMaxHeight.y);
 
-    public void Update()
-    {
-        float change = -Input.GetAxis("Mouse ScrollWheel") * Speed * Time.deltaTime;
-        wantedHeight = Mathf.Clamp(wantedHeight + change, MinMaxHeight.x, MinMaxHeight.y);
-        
-        if (Smooth)
-        {
-            transform.position = Vector3.Lerp(transform.position, new Vector3(transform.position.x, wantedHeight, transform.position.z), Time.deltaTime * Damping);
-        }
-        else
-        {
-            transform.position = new Vector3(transform.position.x, wantedHeight, transform.position.z);
-        }
+        wantedMovement = newY - transform.position.y;
+
+        float currentMovement = wantedMovement * Time.deltaTime * Damping;
+
+        wantedMovement -= currentMovement;
+        transform.position += Vector3.up * currentMovement;
     }
 }
