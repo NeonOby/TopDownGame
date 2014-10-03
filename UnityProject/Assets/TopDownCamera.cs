@@ -17,6 +17,8 @@ public class TargetFollower
         transform = owner;
     }
 
+
+
     public void SetTarget(Transform newTarget)
     {
         target = newTarget;
