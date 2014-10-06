@@ -39,19 +39,28 @@
 	<Reference Include="System.Core" />
 	<Reference Include="System.Xml.Linq" />
 	<Reference Include="UnityEngine">
-	  <HintPath>C:/Program Files (x86)/Unity/Editor4.5.2/Data/Managed/UnityEngine.dll</HintPath>
+	  <HintPath>G:/Programmieren/Unity/Editor-4.5.2/Data/Managed/UnityEngine.dll</HintPath>
 	</Reference>
 	<Reference Include="UnityEditor">
-	  <HintPath>C:/Program Files (x86)/Unity/Editor4.5.2/Data/Managed/UnityEditor.dll</HintPath>
+	  <HintPath>G:/Programmieren/Unity/Editor-4.5.2/Data/Managed/UnityEditor.dll</HintPath>
 	</Reference>
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\DebugSpawner.cs" />
+     <Compile Include="Assets\Despawner.cs" />
      <Compile Include="Assets\Resources\GameObjectPool\GameObjectPool.cs" />
      <Compile Include="Assets\Resources\GameObjectPool\GameObjectPoolCreate.cs" />
      <Compile Include="Assets\Resources\Scripts\BoxSelection.cs" />
      <Compile Include="Assets\Resources\Scripts\Controls.cs" />
      <Compile Include="Assets\Resources\Scripts\GameManager.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\Chunk.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\Entity.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\Level.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\LevelGenerator.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\QuaternionRotation.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\SaveGame.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\SaveGameManager.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\Vector3Position.cs" />
      <Compile Include="Assets\Resources\Scripts\SimpleAI.cs" />
      <Compile Include="Assets\Resources\Scripts\TopDownCamera.cs" />
      <Compile Include="Assets\Resources\Scripts\TopDownController.cs" />
@@ -64,6 +73,9 @@
      <None Include="Assets\Resources\Shaders\VertexColorTransparent.shader" />
      <None Include="Assets\Resources\Shaders\VertexColorDetail.shader" />
      <None Include="Assets\Resources\Shaders\VertexColor.shader" />
+ <Reference Include="Newtonsoft.Json">
+ <HintPath>C:/Users/ADoby/Documents/GitHub/TopDownGame/UnityProject/Assets/Plugins/Newtonsoft.Json.dll</HintPath>
+ </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -15,6 +15,8 @@ public class SimpleAI : MonoBehaviour
         }
     }
 
+    public bool Enabled = false;
+
     private NavMeshAgent agent;
 
     public Transform currentTarget;
@@ -23,17 +25,28 @@ public class SimpleAI : MonoBehaviour
     public float MinSpeed = 0.5f; //Backwards
     public float MaxSpeed = 5.0f; //Straight
 
+    public void DespawnAllPerPool(string pool)
+    {
+        if (pool != poolName)
+        {
+            return;
+        }
+        GameObjectPool.Instance.Despawn(poolName, gameObject);
+    }
+
 	// Use this for initialization
 	void Start () 
     {
         agent = GetComponent<NavMeshAgent>();
-        if(agent ==null)
+        if(agent == null)
         {
             enabled = false;
             return;
         }
         agent.updateRotation = false;
         agent.speed = 0f;
+
+        GameObjectPool.DespawnAllPerPool += DespawnAllPerPool;
 	}
 
     public void SetTarget(Transform newTarget)
@@ -43,6 +56,8 @@ public class SimpleAI : MonoBehaviour
 
     public void SetTargetPos(Vector3 newTargetPos, bool removeTarget = false)
     {
+        if (!Enabled)
+            return;
         targetPos = newTargetPos;
         agent.SetDestination(targetPos);
         if (removeTarget) currentTarget = null;
@@ -64,6 +79,9 @@ public class SimpleAI : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
+        if (!Enabled)
+            return;
+
         UpdateTarget();
         UpdateTargetPos();
 
@@ -156,6 +174,8 @@ public class SimpleAI : MonoBehaviour
     public void Reset()
     {
         CurrentHits = 0;
+        Enabled = true;
+        collider.enabled = true;
     }
 
     public void Hit()
@@ -166,5 +186,11 @@ public class SimpleAI : MonoBehaviour
             TriggerSimpleAIDied(this);
             GameObjectPool.Instance.Despawn(poolName, gameObject);
         }
+    }
+
+    public void Disable()
+    {
+        Enabled = false;
+        collider.enabled = false;
     }
 }

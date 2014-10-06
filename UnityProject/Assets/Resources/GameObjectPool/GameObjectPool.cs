@@ -5,6 +5,23 @@ using System.Collections.Generic;
 
 	public class GameObjectPool
 	{
+
+        public delegate void GameObjectPoolEvents();
+        public static event GameObjectPoolEvents DespawnAll;
+
+        public delegate void GameObjectPoolEventsPerPool(string poolName);
+        public static event GameObjectPoolEventsPerPool DespawnAllPerPool;
+
+        private static bool Deactivate = true;
+
+        public static Vector3 disabledPosition = new Vector3(0, -10000, 0);
+
+        public static void TriggerDespawn(string poolName)
+        {
+            if (DespawnAllPerPool != null)
+                DespawnAllPerPool(poolName);
+        }
+
 		private static GameObjectPool instance;
 
 		public static GameObjectPool Instance{
@@ -27,8 +44,13 @@ using System.Collections.Generic;
 			}
 
 			Pool pool = pools[poolName];
-			go.SetActive(false);
-			pool.Enqueue(go);
+            if(Deactivate)
+			    go.SetActive(false);
+
+            go.SendMessage("Disable", SendMessageOptions.DontRequireReceiver);
+
+            go.transform.position = disabledPosition;
+            pool.Enqueue(go);
 		}
 
 		//Gives you an instance of a prefab
@@ -103,7 +125,8 @@ using System.Collections.Generic;
 			go.transform.localRotation = Quaternion.Euler(rotation);
 			go.transform.localScale = scale;
 			
-			go.SetActive(true);
+            if(Deactivate)
+			    go.SetActive(true);
 
             go.SendMessage("SetPoolName", poolName, SendMessageOptions.DontRequireReceiver);
             go.SendMessage("Reset", SendMessageOptions.DontRequireReceiver);

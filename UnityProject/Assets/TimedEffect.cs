@@ -8,9 +8,12 @@ public class TimedEffect : MonoBehaviour
     private float LifeTimer = 0f;
     private string poolName = "";
 
+    public bool Enabled = false;
+
 	void Reset () 
     {
         LifeTimer = 0f;
+        Enabled = true;
 	}
 
     public void SetPoolName(string value)
@@ -18,9 +21,17 @@ public class TimedEffect : MonoBehaviour
         poolName = value;
     }
 
+    public void Disable()
+    {
+        Enabled = false;
+    }
+
 	// Update is called once per frame
 	void Update () 
     {
+        if (!Enabled)
+            return;
+
         LifeTimer += Time.deltaTime;
         if (LifeTimer >= LifeTime)
         {
