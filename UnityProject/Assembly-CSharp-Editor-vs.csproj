@@ -52,11 +52,11 @@
      <None Include="Assets\Resources\Shaders\VertexColorTransparent.shader" />
      <None Include="Assets\Resources\Shaders\VertexColorDetail.shader" />
      <None Include="Assets\Resources\Shaders\VertexColor.shader" />
- <Reference Include="UnityEditor.Graphs">
- <HintPath>G:/Programmieren/Unity/Editor-4.5.2/Data/Managed/UnityEditor.Graphs.dll</HintPath>
- </Reference>
  <Reference Include="Newtonsoft.Json">
  <HintPath>C:/Users/ADoby/Documents/GitHub/TopDownGame/UnityProject/Assets/Plugins/Newtonsoft.Json.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.Graphs">
+ <HintPath>G:/Programmieren/Unity/Editor-4.5.2/Data/Managed/UnityEditor.Graphs.dll</HintPath>
  </Reference>
   </ItemGroup>
   <ItemGroup>

@@ -4,10 +4,10 @@ using System;
 
 public class LevelGenerator : MonoBehaviour
 {
-    public static float ChunkSize = 4;
+    public static int ChunkSize = 4;
     public static int ChunkLoadDistance = 5;
 
-    public Level level = null;
+    public static Level level = null;
 
     public string[] DespawnPoolsOnLoad;
 
@@ -83,8 +83,8 @@ public class LevelGenerator : MonoBehaviour
         Chunk newChunk = new Chunk();
         newChunk.posX = relX;
         newChunk.posZ = relZ;
-        float startX = relX * ChunkSize;
-        float startZ = relZ * ChunkSize;
+        int startX = relX * ChunkSize;
+        int startZ = relZ * ChunkSize;
 
         Vector3 zeroPos = Vector3.zero;
         Vector3 currentPos = new Vector3(startX, 0, startZ);
@@ -99,6 +99,10 @@ public class LevelGenerator : MonoBehaviour
         {
             for (int z = 0; z < ChunkSize; z++)
             {
+                newChunk.SetCell(x, z, new Cell());
+                newChunk.GetCell(x, z).X = startX + x;
+                newChunk.GetCell(x, z).Z = startZ + z;
+
                 currentPos.x = startX + x;
                 currentPos.z = startZ + z;
 
@@ -115,6 +119,10 @@ public class LevelGenerator : MonoBehaviour
                     entity.PoolName = "Gridder";
                     entity.Position.Value = currentPos;
                     newChunk.AddEntity(entity);
+                }
+                else
+                {
+                    newChunk.GetCell(x, z).Walkable = true;
                 }
             }
         }

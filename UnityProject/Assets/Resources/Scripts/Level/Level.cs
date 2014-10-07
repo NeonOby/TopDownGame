@@ -24,9 +24,26 @@ public class Level
         chunks.Clear();
     }
 
+    public Cell GetCell(int x, int z)
+    {
+        int chunkX = (int)(x / LevelGenerator.ChunkSize);
+        int chunkZ = (int)(z / LevelGenerator.ChunkSize);
+
+        
+        if (!ContainsChunk(chunkX, chunkZ))
+            return new Cell() { Type = CellType.VOID };
+
+        return chunks[GetKey(chunkX, chunkZ)].GetCell(x % LevelGenerator.ChunkSize, z % LevelGenerator.ChunkSize);
+    }
+
+    public string GetKey(int x, int z)
+    {
+        return System.String.Format("{0}{1}{2}", x, split, z);
+    }
+
     public void AddChunk(int x, int z, Chunk chunk)
     {
-        AddChunk(System.String.Format("{0}{1}{2}", x, split, z), chunk);
+        AddChunk(GetKey(x, z), chunk);
     }
     private void AddChunk(string key, Chunk chunk)
     {
@@ -59,10 +76,6 @@ public class Level
             if (!float.TryParse(args[1], out chunkZ))
                 continue;
 
-            //chunkX += 0.5f;
-            //chunkZ += 0.5f;
-
-
             if (PosDistance(camX, camZ, (int)chunkX, (int)chunkZ) < LevelGenerator.ChunkLoadDistance)
             {
                 chunkInfo.Value.Load();
@@ -76,7 +89,7 @@ public class Level
 
     public bool ContainsChunk(int x, int z)
     {
-        return ContainsChunk(System.String.Format("{0}{1}{2}", x, split, z));
+        return ContainsChunk(GetKey(x, z));
     }
     private bool ContainsChunk(string key)
     {

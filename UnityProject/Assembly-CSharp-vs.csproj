@@ -53,10 +53,12 @@
      <Compile Include="Assets\Resources\Scripts\BoxSelection.cs" />
      <Compile Include="Assets\Resources\Scripts\Controls.cs" />
      <Compile Include="Assets\Resources\Scripts\GameManager.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\Cell.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\Chunk.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\Entity.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\Level.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\LevelGenerator.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\Path.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\QuaternionRotation.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\SaveGame.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\SaveGameManager.cs" />
@@ -67,6 +69,7 @@
      <Compile Include="Assets\Resources\Scripts\TopDownMovement.cs" />
      <Compile Include="Assets\Resources\Scripts\TopDownZoom.cs" />
      <Compile Include="Assets\SimpleBullet.cs" />
+     <Compile Include="Assets\SimpleNavigation.cs" />
      <Compile Include="Assets\TimedEffect.cs" />
      <Compile Include="Assets\_ProgrammerInfo.cs" />
      <None Include="Assets\Resources\Shaders\VertexColorIllum.shader" />

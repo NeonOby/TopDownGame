@@ -23,6 +23,9 @@ public class Chunk
     //This should make it possible to implement an easy A* into the levelgeneration system.
 
     [JsonProperty]
+    public Cell[,] cells;
+
+    [JsonProperty]
     public List<Entity> entities = new List<Entity>();
 
     private List<GameObjectInfo> spawnedObjects = new List<GameObjectInfo>();
@@ -30,11 +33,31 @@ public class Chunk
     [JsonProperty]
     public int posX = 0, posZ = 0;
 
+    public Chunk()
+    {
+        cells = new Cell[LevelGenerator.ChunkSize, LevelGenerator.ChunkSize];
+    }
+
     public void AddEntity(Entity entity)
     {
         entities.Add(entity);
     }
 
+    public Cell GetCell(int x, int z)
+    {
+        if (x < 0 || x > cells.GetLength(0) || z < 0 || z > cells.GetLength(1))
+            return new Cell() { Type = CellType.VOID };
+        return cells[x, z];
+    }
+
+    public void SetCell(int x, int z, Cell cell)
+    {
+        if (x < 0 || x > cells.GetLength(0) || z < 0 || z > cells.GetLength(1))
+            return;
+        cells[x, z] = cell;
+    }
+
+    #region DEBUG
     private GameObjectInfo chunkInfoInfo = new GameObjectInfo("", null);
 
     private int currentState = -1;
@@ -54,7 +77,7 @@ public class Chunk
         chunkInfoInfo = new GameObjectInfo(poolName, go);
     }
 
-    public void Load()
+    private void ShowLoadedGrid()
     {
         if (currentState == -1)
         {
@@ -69,6 +92,28 @@ public class Chunk
             }
         }
         currentState = 1;
+    }
+    private void ShowUnLoadedGrid()
+    {
+        if (currentState == -1)
+        {
+            SpawnChunkInfo(unloadedPool);
+        }
+        else
+        {
+            if (currentState == 1)
+            {
+                DespawnChunkInfo(chunkInfoInfo);
+                SpawnChunkInfo(unloadedPool);
+            }
+        }
+        currentState = 0;
+    }
+    #endregion
+
+    public void Load()
+    {
+        ShowLoadedGrid();
 
         if (Loaded)
             return;
@@ -91,19 +136,7 @@ public class Chunk
 
     public void Unload()
     {
-        if (currentState == -1)
-        {
-            SpawnChunkInfo(unloadedPool);
-        }
-        else
-        {
-            if (currentState == 1)
-            {
-                DespawnChunkInfo(chunkInfoInfo);
-                SpawnChunkInfo(unloadedPool);
-            }
-        }
-        currentState = 0;
+        ShowUnLoadedGrid();
 
         if (!Loaded)
             return;

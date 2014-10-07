@@ -7,7 +7,5 @@ public class Entity
 
     public Vector3Position Position = new Vector3Position();
     public QuaternionRotation Rotation = new QuaternionRotation();
-
-
 }
 
