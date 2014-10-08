@@ -45,9 +45,6 @@ public class Chunk
 
     public Cell GetCell(int x, int z)
     {
-        //x = x < 0 ? LevelGenerator.ChunkSize + x : x;
-        //z = z < 0 ? LevelGenerator.ChunkSize + z : z;
-        //Debug.Log(System.String.Format("Trying To get: {0} {1}", x, z));
         if (x < 0 || x > cells.GetUpperBound(0) || z < 0 || z > cells.GetUpperBound(1))
             return null;
         

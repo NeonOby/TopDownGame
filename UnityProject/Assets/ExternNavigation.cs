@@ -11,14 +11,18 @@ public class Path
     public Cell GetCell(int index)
     {
         Cell cell;
-        cell = grid[path[index].X, path[index].Y];
+        int x = path[index].X;
+        int y = path[index].Y;
+        cell = grid[x, y];
         return cell;
     }
 
     public Cell GetParentCell(int index)
     {
         Cell cell;
-        cell = grid[path[index].PX, path[index].PY];
+        int x = path[index].PX;
+        int y = path[index].PY;
+        cell = grid[x, y];
         return cell;
     }
 }
@@ -28,12 +32,15 @@ public class ExternNavigation : MonoBehaviour
 
     private Path currentPath = new Path();
 
-    public List<PathFinderNode> GetPath(int startX, int startZ, int endX, int endZ)
+    public List<PathFinderNode> GetPath(float startX, float startZ, float endX, float endZ)
     {
         if (LevelGenerator.level == null)
             return null;
 
         if (LevelGenerator.level.PositionOutOfLevel(endX, endZ))
+            return null;
+
+        if (!LevelGenerator.level.ContainsChunk(endX, endZ))
             return null;
 
         PathFinderFast fast;
@@ -42,8 +49,8 @@ public class ExternNavigation : MonoBehaviour
         endX -= LevelGenerator.level.lowestX * LevelGenerator.ChunkSize;
         endZ -= LevelGenerator.level.lowestZ * LevelGenerator.ChunkSize;
 
-        Point start = new Point(startX, startZ);
-        Point end = new Point(endX, endZ);
+        Point start = new Point((int)startX, (int)startZ);
+        Point end = new Point((int)endX, (int)endZ);
 
         currentPath.grid = LevelGenerator.level.GetCurrentGrid();
         fast = new PathFinderFast(currentPath.grid);
@@ -73,16 +80,16 @@ public class ExternNavigation : MonoBehaviour
 
             Vector3 targetPos = ray.origin + ray.direction * distance;
 
-            currentPath.path = GetPath(0, 0, (int)targetPos.x, (int)targetPos.z);
+            currentPath.path = GetPath(0, 0, targetPos.x, targetPos.z);
             //Debug.Log("Path Finished: " + (currentPath == null ? "Not Found" : "Found"));
         }
         if (currentPath != null && currentPath.path != null)
         {
             for (int i = 0; i < currentPath.path.Count; i++)
             {
-                Vector3 currentPos = currentPath.GetCell(i).Position();
+                Vector3 currentPos = currentPath.GetCell(i).Position() + Vector3.right * 0.5f + Vector3.forward * 0.5f;
                 currentPos.y = 1;
-                Vector3 positionBefore = currentPath.GetParentCell(i).Position();
+                Vector3 positionBefore = currentPath.GetParentCell(i).Position() + Vector3.right * 0.5f + Vector3.forward * 0.5f;
                 positionBefore.y = 1;
                 Debug.DrawLine(positionBefore, currentPos);
             }

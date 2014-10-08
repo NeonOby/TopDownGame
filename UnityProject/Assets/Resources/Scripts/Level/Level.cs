@@ -30,24 +30,16 @@ public class Level
 
     public Cell GetCell(float x, float z)
     {
-        int cellX = (int)(x < 0 ? x - LevelGenerator.ChunkSize : x);
-        int cellZ = (int)(z < 0 ? z - LevelGenerator.ChunkSize : z);
+        Point cellPoint = GetCellPoint(x, z);
+        Point chunkPoint = GetChunkPoint(x, z);
 
-        int chunkX = (int)(cellX / LevelGenerator.ChunkSize);
-        int chunkZ = (int)(cellZ / LevelGenerator.ChunkSize);
-
-        if (!ContainsChunk(chunkX, chunkZ))
+        if (!ContainsChunk(chunkPoint.X, chunkPoint.Y))
         {
-            //Debug.Log(String.Format("Chunk: {0}:{1} NOT found", chunkX, chunkZ));
             return null;
         }
-        cellX = cellX % LevelGenerator.ChunkSize;
-        cellZ = cellZ % LevelGenerator.ChunkSize;
-        cellX = x < 0 ? LevelGenerator.ChunkSize + cellX-1 : cellX;
-        cellZ = z < 0 ? LevelGenerator.ChunkSize + cellZ-1 : cellZ;
 
         //Debug.Log(String.Format("Chunk: {0}:{1} found, looking for {2}:{3}", chunkX, chunkZ, cellX, cellZ));
-        return chunks[GetKey(chunkX, chunkZ)].GetCell(cellX, cellZ);
+        return chunks[GetKey(chunkPoint.X, chunkPoint.Y)].GetCell(cellPoint.X, cellPoint.Y);
     }
 
     int NextPowerOfTwo(int x)
@@ -82,9 +74,6 @@ public class Level
         int lowestZCells = lowestZ * LevelGenerator.ChunkSize;
 
         Cell[,] grid = new Cell[width, height];
-
-        Debug.Log(String.Format("Min: {0}:{1} Max: {2}:{3}", lowestXCells, lowestZCells, (width + lowestXCells), (height + lowestZCells)));
-
         for (int x = 0; x < width; x++)
         {
             for (int z = 0; z < height; z++)
@@ -158,6 +147,30 @@ public class Level
         }
     }
 
+    public Point GetCellPoint(float x, float z)
+    {
+        Point point = new Point((int)x, (int)z);
+        point.X = point.X % LevelGenerator.ChunkSize;
+        point.Y = point.Y % LevelGenerator.ChunkSize;
+        point.X = x < 0 ? LevelGenerator.ChunkSize + point.X-1 : point.X;
+        point.Y = z < 0 ? LevelGenerator.ChunkSize + point.Y-1 : point.Y;
+        return point;
+    }
+    public Point GetChunkPoint(float x, float z)
+    {
+        Point point = new Point((int)x, (int)z);
+        point.X = (int)(x / LevelGenerator.ChunkSize);
+        point.Y = (int)(z / LevelGenerator.ChunkSize);
+        point.X = x < 0 ? point.X - 1 : point.X;
+        point.Y = z < 0 ? point.Y - 1 : point.Y;
+        return point;
+    }
+
+    public bool ContainsChunk(float x, float z)
+    {
+        Point p = GetChunkPoint(x, z);
+        return ContainsChunk(p.X, p.Y);
+    }
     public bool ContainsChunk(int x, int z)
     {
         return ContainsChunk(GetKey(x, z));
