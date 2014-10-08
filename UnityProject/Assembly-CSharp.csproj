@@ -46,8 +46,16 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Algorithms\AuthorAttribute.cs" />
+     <Compile Include="Assets\Algorithms\HighResolutionTime.cs" />
+     <Compile Include="Assets\Algorithms\IPathFinder.cs" />
+     <Compile Include="Assets\Algorithms\PathFinder.cs" />
+     <Compile Include="Assets\Algorithms\PathFinderFast.cs" />
+     <Compile Include="Assets\Algorithms\Point.cs" />
+     <Compile Include="Assets\Algorithms\PriorityQueueB.cs" />
      <Compile Include="Assets\DebugSpawner.cs" />
      <Compile Include="Assets\Despawner.cs" />
+     <Compile Include="Assets\ExternNavigation.cs" />
      <Compile Include="Assets\Resources\GameObjectPool\GameObjectPool.cs" />
      <Compile Include="Assets\Resources\GameObjectPool\GameObjectPoolCreate.cs" />
      <Compile Include="Assets\Resources\Scripts\BoxSelection.cs" />
@@ -58,7 +66,6 @@
      <Compile Include="Assets\Resources\Scripts\Level\Entity.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\Level.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\LevelGenerator.cs" />
-     <Compile Include="Assets\Resources\Scripts\Level\Path.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\QuaternionRotation.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\SaveGame.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\SaveGameManager.cs" />
@@ -68,6 +75,7 @@
      <Compile Include="Assets\Resources\Scripts\TopDownController.cs" />
      <Compile Include="Assets\Resources\Scripts\TopDownMovement.cs" />
      <Compile Include="Assets\Resources\Scripts\TopDownZoom.cs" />
+     <Compile Include="Assets\RightClickTester.cs" />
      <Compile Include="Assets\SimpleBullet.cs" />
      <Compile Include="Assets\SimpleNavigation.cs" />
      <Compile Include="Assets\TimedEffect.cs" />

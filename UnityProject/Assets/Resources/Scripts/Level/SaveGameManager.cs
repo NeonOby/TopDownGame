@@ -74,7 +74,7 @@ public class SaveGameManager : MonoBehaviour
         {
             currentSaveGame = new SaveGame();
             currentSaveGame.CameraPosition.Value = Camera.main.transform.position;
-            currentSaveGame.level = levelGen.level;
+            currentSaveGame.level = LevelGenerator.level;
             Save("this", currentSaveGame);
         }
         if (GUILayout.Button("Generate Level"))

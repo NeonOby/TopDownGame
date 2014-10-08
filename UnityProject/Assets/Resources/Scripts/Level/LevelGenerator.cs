@@ -4,8 +4,8 @@ using System;
 
 public class LevelGenerator : MonoBehaviour
 {
-    public static int ChunkSize = 4;
-    public static int ChunkLoadDistance = 5;
+    public static int ChunkSize = 8;
+    public static int ChunkLoadDistance = 4;
 
     public static Level level = null;
 
@@ -94,17 +94,19 @@ public class LevelGenerator : MonoBehaviour
         float relChance = distance * chancePerDistance;
         float absChance = 0f;
 
+
+
         Entity entity;
         for (int x = 0; x < ChunkSize; x++)
         {
             for (int z = 0; z < ChunkSize; z++)
             {
-                newChunk.SetCell(x, z, new Cell());
-                newChunk.GetCell(x, z).X = startX + x;
-                newChunk.GetCell(x, z).Z = startZ + z;
-
                 currentPos.x = startX + x;
                 currentPos.z = startZ + z;
+
+                newChunk.SetCell(x, z, new Cell());
+                newChunk.GetCell(x, z).X = (int)currentPos.x;
+                newChunk.GetCell(x, z).Z = (int)currentPos.z;
 
                 distance = Vector3.Distance(zeroPos, currentPos);
                 if (distance - safeDistance < safeDistance)
@@ -115,14 +117,11 @@ public class LevelGenerator : MonoBehaviour
                 //Versuche auf jedem meter dinge zu erstellen
                 if (level.random.NextDouble() < Mathf.Min(relChance * absChance, maxChance))
                 {
+                    newChunk.GetCell(x, z).Walkable = false;
                     entity = new Entity();
                     entity.PoolName = "Gridder";
                     entity.Position.Value = currentPos;
                     newChunk.AddEntity(entity);
-                }
-                else
-                {
-                    newChunk.GetCell(x, z).Walkable = true;
                 }
             }
         }

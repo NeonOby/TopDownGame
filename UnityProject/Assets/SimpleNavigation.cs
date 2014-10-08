@@ -24,6 +24,15 @@ public class PriorityQueue<P, V>
             list.Remove(pair.Key);
         return v;
     }
+    public bool Contains(V value)
+    {
+        foreach (var item in list)
+        {
+            if (item.Value.Contains(value))
+                return true;
+        }
+        return false;
+    }
     public bool IsEmpty
     {
         get { return !list.Any(); }
@@ -38,13 +47,17 @@ public class PathToGenerate
 
     public SimpleNavigation.PathFinished CallBack;
 
-    public void AddOpen(CellInfo cell)
+    public void AddOpen(CellInfo cellInfo)
     {
-        openQueue.Enqueue(0, cell);
+        openQueue.Enqueue(cellInfo.Cost, cellInfo);
     }
-    public Cell GetFirstOpen()
+    public CellInfo GetFirstOpen()
     {
         return openQueue.Dequeue();
+    }
+    public bool ContainsOpen(CellInfo cellInfo)
+    {
+        return openQueue.Contains(cellInfo);
     }
     public bool EmptyOpen()
     {
@@ -55,18 +68,50 @@ public class PathToGenerate
     {
         closedQueue.Add(cell);
     }
-    public bool ContainsClosed(CellInfo cell)
+    public bool ContainsClosed(Cell cell)
     {
-        return closedQueue.Contains(cell);
+        for (int i = 0; i < closedQueue.Count; i++)
+        {
+            if (closedQueue[i].cell == cell)
+                return true;
+        }
+        return false;
     }
 
     public PriorityQueue<double, CellInfo> openQueue = new PriorityQueue<double, CellInfo>();
     public List<CellInfo> closedQueue = new List<CellInfo>();
 }
 
-public class CellInfo : Cell
+public class CellInfo
 {
+    public Cell cell;
+    public int X
+    {
+        get
+        {
+            return cell.X;
+        }
+    }
+    public int Z
+    {
+        get
+        {
+            return cell.Z;
+        }
+    }
+
     public CellInfo Parent;
+
+    public float CostFromStartToThisCell = 0f;
+    public float HeuristicFromThisCellToEnd = 0f;
+
+    public float Cost
+    {
+        get
+        {
+            return CostFromStartToThisCell + HeuristicFromThisCellToEnd;
+        }
+    }
 }
 
 public class SimpleNavigation : MonoBehaviour 
@@ -86,11 +131,12 @@ public class SimpleNavigation : MonoBehaviour
     public void GetPath(Cell start, Cell end, PathFinished callBack)
     {
         PathToGenerate newGenerator = new PathToGenerate();
-        newGenerator.Start = (CellInfo)start;
-        newGenerator.End = (CellInfo)end;
+        newGenerator.Start = new CellInfo() { cell = start };
+        newGenerator.End = new CellInfo() { cell = end };
         newGenerator.CallBack = callBack;
         newGenerator.CurrentPath = new Path();
 
+        UpdatePath_ComputeHeuristic(newGenerator, newGenerator.Start);
         newGenerator.AddOpen(newGenerator.Start);
 
         pathsToGenerate.Add(newGenerator);
@@ -107,20 +153,85 @@ public class SimpleNavigation : MonoBehaviour
         }
     }
 
-    public bool UpdatePath(PathToGenerate pathGenerator)
+    public Path GeneratePath(CellInfo end)
     {
-        Cell currentCell = pathGenerator.GetFirstOpen();
+        Path path = new Path();
+        //TODO Generation
+        return path;
+    }
 
-        if (currentCell == pathGenerator.End)
+    public float DistanceBetween(Cell cell1, Cell cell2)
+    {
+        return Level.PosDistance(cell1.X, cell1.Z, cell2.X, cell2.Z);
+    }
+
+    public bool UpdatePath(PathToGenerate pathGen)
+    {
+        CellInfo currentCell = pathGen.GetFirstOpen();
+
+        if (currentCell.cell == pathGen.End.cell)
         {
-            if(pathGenerator.CallBack != null)
-                pathGenerator.CallBack(pathGenerator.CurrentPath);
-            return true;
+            pathGen.CurrentPath = GeneratePath(pathGen.End);
+            if(pathGen.CallBack != null)
+                pathGen.CallBack(pathGen.CurrentPath);
+            return true; //Finished with path
         }
 
-        if (pathGenerator.EmptyOpen())
+        pathGen.AddClosed(currentCell);
+
+        UpdatePath_CellDirections(pathGen, currentCell);
+
+        if (pathGen.EmptyOpen())
             return true; //Finished but no path
 
         return false;
+    }
+
+    public void UpdatePath_ComputeHeuristic(PathToGenerate pathGen, CellInfo cellInfo)
+    {
+        cellInfo.HeuristicFromThisCellToEnd = DistanceBetween(cellInfo.cell, pathGen.End.cell);
+    }
+
+    //If we want to go directional we can add this here with penalty
+    //Just add ", 0.5f" to CellDirection Method
+    public void UpdatePath_CellDirections(PathToGenerate pathGen, CellInfo cellInfo)
+    {
+        Cell top = LevelGenerator.level.GetCell(cellInfo.X, cellInfo.Z + 1);
+        Cell bottom = LevelGenerator.level.GetCell(cellInfo.X, cellInfo.Z - 1);
+        Cell right = LevelGenerator.level.GetCell(cellInfo.X + 1, cellInfo.Z);
+        Cell left = LevelGenerator.level.GetCell(cellInfo.X - 1, cellInfo.Z);
+
+        UpdatePath_CellDirection(pathGen, cellInfo, top);
+        UpdatePath_CellDirection(pathGen, cellInfo, bottom);
+        UpdatePath_CellDirection(pathGen, cellInfo, right);
+        UpdatePath_CellDirection(pathGen, cellInfo, left);
+    }
+
+    public void UpdatePath_CellDirection(PathToGenerate pathGen, CellInfo cellInfo, Cell nextCell, float penalty = 0f)
+    {
+        if (nextCell == null)
+            return;
+
+        if (pathGen.ContainsClosed(nextCell))
+            return;
+
+        CellInfo nextCellInfo = new CellInfo() { cell = nextCell };
+        UpdatePath_ComputeHeuristic(pathGen, nextCellInfo);
+
+        float EdgeCost = 1.0f + penalty;
+
+        float CostUntilNow = cellInfo.CostFromStartToThisCell + EdgeCost;
+
+        if (pathGen.ContainsOpen(nextCellInfo) && CostUntilNow >= nextCellInfo.CostFromStartToThisCell)
+        {
+            //This means that we have checked this node sometime before
+            //AND the cost to get from the start to it is higher than the current path
+            return;
+        }
+
+        float HeuristicCostForThisCell = CostUntilNow + nextCellInfo.HeuristicFromThisCellToEnd;
+        nextCellInfo.Parent = cellInfo;
+        nextCellInfo.CostFromStartToThisCell = CostUntilNow;
+
     }
 }

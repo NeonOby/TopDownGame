@@ -1,16 +1,20 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-
+using System.Linq;
+using System;
 [System.Serializable]
 public class Level 
 {
-    private char split = '.';
+    public static char split = '.';
 
     public System.Random random;
 
     public Dictionary<string, Chunk> chunks;
 
     public int Seed = 0;
+
+    public int lowestX = 0, highestX = 0;
+    public int lowestZ = 0, highestZ = 0;
 
     public Level(int seed)
     {
@@ -24,16 +28,74 @@ public class Level
         chunks.Clear();
     }
 
-    public Cell GetCell(int x, int z)
+    public Cell GetCell(float x, float z)
     {
-        int chunkX = (int)(x / LevelGenerator.ChunkSize);
-        int chunkZ = (int)(z / LevelGenerator.ChunkSize);
+        int cellX = (int)(x < 0 ? x - LevelGenerator.ChunkSize : x);
+        int cellZ = (int)(z < 0 ? z - LevelGenerator.ChunkSize : z);
 
-        
+        int chunkX = (int)(cellX / LevelGenerator.ChunkSize);
+        int chunkZ = (int)(cellZ / LevelGenerator.ChunkSize);
+
         if (!ContainsChunk(chunkX, chunkZ))
-            return new Cell() { Type = CellType.VOID };
+        {
+            //Debug.Log(String.Format("Chunk: {0}:{1} NOT found", chunkX, chunkZ));
+            return null;
+        }
+        cellX = cellX % LevelGenerator.ChunkSize;
+        cellZ = cellZ % LevelGenerator.ChunkSize;
+        cellX = x < 0 ? LevelGenerator.ChunkSize + cellX-1 : cellX;
+        cellZ = z < 0 ? LevelGenerator.ChunkSize + cellZ-1 : cellZ;
 
-        return chunks[GetKey(chunkX, chunkZ)].GetCell(x % LevelGenerator.ChunkSize, z % LevelGenerator.ChunkSize);
+        //Debug.Log(String.Format("Chunk: {0}:{1} found, looking for {2}:{3}", chunkX, chunkZ, cellX, cellZ));
+        return chunks[GetKey(chunkX, chunkZ)].GetCell(cellX, cellZ);
+    }
+
+    int NextPowerOfTwo(int x)
+    {
+        int power = 1;
+        while (power < x)
+            power *= 2;
+        return power;
+    }
+
+    public bool PositionOutOfLevel(float x, float z)
+    {
+        if (x <= lowestX * LevelGenerator.ChunkSize || x >= (highestX) * LevelGenerator.ChunkSize)
+            return true;
+        if (z <= lowestZ * LevelGenerator.ChunkSize || z >= (highestZ) * LevelGenerator.ChunkSize)
+            return true;
+
+        return false;
+    }
+
+    public Cell[,] GetCurrentGrid()
+    {
+        int width = (highestX) - (lowestX);
+        int height = (highestZ) - (lowestZ);
+        width *= LevelGenerator.ChunkSize;
+        height *= LevelGenerator.ChunkSize;
+
+        width = NextPowerOfTwo(width);
+        height = NextPowerOfTwo(height);
+
+        int lowestXCells = lowestX * LevelGenerator.ChunkSize;
+        int lowestZCells = lowestZ * LevelGenerator.ChunkSize;
+
+        Cell[,] grid = new Cell[width, height];
+
+        Debug.Log(String.Format("Min: {0}:{1} Max: {2}:{3}", lowestXCells, lowestZCells, (width + lowestXCells), (height + lowestZCells)));
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int z = 0; z < height; z++)
+            {
+                Cell cell = GetCell(x + lowestXCells, z + lowestZCells);
+                if (cell == null)
+                    cell = new Cell() { Walkable = false };
+                grid[x, z] = cell;
+            }
+        }
+        return grid;
     }
 
     public string GetKey(int x, int z)
@@ -43,6 +105,15 @@ public class Level
 
     public void AddChunk(int x, int z, Chunk chunk)
     {
+        if (x < lowestX)
+            lowestX = x;
+        if (x > highestX)
+            highestX = x+1;
+        if (z < lowestZ)
+            lowestZ = z;
+        if (z > highestZ)
+            highestZ = z+1;
+        
         AddChunk(GetKey(x, z), chunk);
     }
     private void AddChunk(string key, Chunk chunk)
