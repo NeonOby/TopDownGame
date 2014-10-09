@@ -37,8 +37,10 @@ public class ExternNavigation : MonoBehaviour
         if (LevelGenerator.level == null)
             return null;
 
+        /*
         if (LevelGenerator.level.PositionOutOfLevel(endX, endZ))
             return null;
+        */
 
         if (!LevelGenerator.level.ContainsChunk(endX, endZ))
             return null;
@@ -51,6 +53,7 @@ public class ExternNavigation : MonoBehaviour
 
         Point start = new Point((int)startX, (int)startZ);
         Point end = new Point((int)endX, (int)endZ);
+   
 
         currentPath.grid = LevelGenerator.level.GetCurrentGrid();
         fast = new PathFinderFast(currentPath.grid);

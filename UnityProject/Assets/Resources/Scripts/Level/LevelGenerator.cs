@@ -4,8 +4,8 @@ using System;
 
 public class LevelGenerator : MonoBehaviour
 {
-    public static int ChunkSize = 8;
-    public static int ChunkLoadDistance = 4;
+    public static int ChunkSize = 4;
+    public static int ChunkLoadDistance = 2;
 
     public static Level level = null;
 
@@ -28,22 +28,23 @@ public class LevelGenerator : MonoBehaviour
         if (ChunkUpdateTimer > ChunkUpdateTime)
         {
             ChunkUpdateTimer = 0f;
-            CheckForEmptyChunks();
+            //CheckForEmptyChunks();
             level.UpdateChunks();
         }
     }
 
-    public void CheckForEmptyChunks()
+    [Obsolete]
+    private void CheckForEmptyChunks()
     {
         float CameraPosX = Camera.main.transform.position.x;
         float CameraPosZ = Camera.main.transform.position.z;
 
-        int centerX = (int)(CameraPosX / ChunkSize);
-        int centerZ = (int)(CameraPosZ / ChunkSize);
+        float centerX = (CameraPosX / ChunkSize)+1;
+        float centerZ = (CameraPosZ / ChunkSize)+1;
 
-        for (int x = centerX - ChunkLoadDistance; x <= centerX + ChunkLoadDistance; x++)
+        for (int x = (Mathf.RoundToInt(centerX) - ChunkLoadDistance)-1; x <= Mathf.RoundToInt(centerX) + ChunkLoadDistance; x++)
         {
-            for (int z = centerZ - ChunkLoadDistance; z <= centerZ + ChunkLoadDistance; z++)
+            for (int z = (Mathf.RoundToInt(centerZ) - ChunkLoadDistance)-1; z <= Mathf.RoundToInt(centerZ) + ChunkLoadDistance; z++)
             {
                 if (Level.PosDistance(centerX, centerZ, x, z) >= ChunkLoadDistance)
                     continue;
@@ -68,17 +69,17 @@ public class LevelGenerator : MonoBehaviour
         }
 
         level = newLevel;
-        CheckForEmptyChunks();
+        //CheckForEmptyChunks();
         level.UpdateChunks();
     }
 
-    private float safeDistance = 16f;
-    private float chancePerDistance = 0.0001f;
-    private float strengthPerDistance = 0.5f;
+    private static float safeDistance = 16f;
+    private static float chancePerDistance = 0.0001f;
+    private static float strengthPerDistance = 0.5f;
 
-    private float maxChance = 0.1f;
+    private static float maxChance = 0.1f;
 
-    public Chunk GenerateChunk(int seed, int relX, int relZ)
+    public static Chunk GenerateChunk(int seed, int relX, int relZ)
     {
         Chunk newChunk = new Chunk();
         newChunk.posX = relX;
