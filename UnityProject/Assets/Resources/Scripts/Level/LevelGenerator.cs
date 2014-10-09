@@ -95,19 +95,20 @@ public class LevelGenerator : MonoBehaviour
         float relChance = distance * chancePerDistance;
         float absChance = 0f;
 
-
-
         Entity entity;
         for (int x = 0; x < ChunkSize; x++)
         {
             for (int z = 0; z < ChunkSize; z++)
             {
-                currentPos.x = startX + x;
-                currentPos.z = startZ + z;
+                currentPos.x = relX < 0 ? startX + x : startX + x;
+                currentPos.z = relZ < 0 ? startZ + z : startZ + z;
+
+                currentPos.x += 0.5f;
+                currentPos.z += 0.5f;
 
                 newChunk.SetCell(x, z, new Cell());
-                newChunk.GetCell(x, z).X = (int)currentPos.x;
-                newChunk.GetCell(x, z).Z = (int)currentPos.z;
+                newChunk.GetCell(x, z).X = currentPos.x;
+                newChunk.GetCell(x, z).Z = currentPos.z;
 
                 distance = Vector3.Distance(zeroPos, currentPos);
                 if (distance - safeDistance < safeDistance)

@@ -38,7 +38,7 @@ public class Level
             return null;
         }
 
-        //Debug.Log(String.Format("Chunk: {0}:{1} found, looking for {2}:{3}", chunkX, chunkZ, cellX, cellZ));
+        //Debug.Log(String.Format("Pos: {0}:{1} found, looking for {2}:{3}", x, z, cellPoint.X, cellPoint.Y));
         return chunks[GetKey(chunkPoint.X, chunkPoint.Y)].GetCell(cellPoint.X, cellPoint.Y);
     }
 
@@ -73,7 +73,7 @@ public class Level
         int lowestXCells = lowestX * LevelGenerator.ChunkSize;
         int lowestZCells = lowestZ * LevelGenerator.ChunkSize;
 
-        Debug.Log(String.Format("GridGenerated: MinX:{0} MaxX:{1} MinZ:{2} MaxZ:{3}", lowestXCells, lowestZCells, lowestXCells + width, lowestZCells + height));
+        //Debug.Log(String.Format("GridGenerated: MinX:{0} MaxX:{1} MinZ:{2} MaxZ:{3}", lowestXCells, lowestZCells, lowestXCells + width, lowestZCells + height));
 
         Cell[,] grid = new Cell[width, height];
         for (int x = 0; x < width; x++)
@@ -117,6 +117,8 @@ public class Level
         chunks.Add(key, chunk);
     }
 
+    List<Chunk> loadedChunks = new List<Chunk>();
+
     public void UpdateChunks()
     {
         float CameraPosX = Camera.main.transform.position.x;
@@ -125,7 +127,15 @@ public class Level
         float centerX = (CameraPosX / LevelGenerator.ChunkSize);
         float centerZ = (CameraPosZ / LevelGenerator.ChunkSize);
 
-        float chunkX = 0, chunkZ = 0;
+        Chunk[] tmpChunks = loadedChunks.ToArray();
+        for (int i = 0; i < tmpChunks.Length; i++)
+        {
+            if (Level.PosDistance(centerX, centerZ, tmpChunks[i].posX, tmpChunks[i].posZ) >= LevelGenerator.ChunkLoadDistance)
+            {
+                tmpChunks[i].Unload();
+                loadedChunks.Remove(tmpChunks[i]);
+            }
+        }
 
         for (int x = (Mathf.RoundToInt(centerX) - LevelGenerator.ChunkLoadDistance) - 1; x <= Mathf.RoundToInt(centerX) + LevelGenerator.ChunkLoadDistance; x++)
         {
@@ -133,36 +143,19 @@ public class Level
             {
                 if (Level.PosDistance(centerX, centerZ, x, z) >= LevelGenerator.ChunkLoadDistance)
                     continue;
+
+                Chunk currentChunk;
                 if (!ContainsChunk(x, z))
                 {
-                    AddChunk(x, z, LevelGenerator.GenerateChunk(Seed, x, z));
+                    currentChunk = LevelGenerator.GenerateChunk(Seed, x, z);
+                    AddChunk(x, z, currentChunk);
                 }
-
-            }
-        }
-
-        foreach (var chunkInfo in chunks)
-        {
-            string chunkKey = chunkInfo.Key;
-            string[] args = chunkKey.Split(split);
-            if (args.Length != 2)
-                continue;
-            if (!float.TryParse(args[0], out chunkX))
-                continue;
-            if (!float.TryParse(args[1], out chunkZ))
-                continue;
-
-            if (PosDistance(centerX, centerZ, chunkX, chunkZ) < LevelGenerator.ChunkLoadDistance)
-            {
-                if (!ContainsChunk((int)chunkX, (int)chunkZ))
+                else
                 {
-                    AddChunk((int)chunkX, (int)chunkZ, LevelGenerator.GenerateChunk(Seed, (int)chunkX, (int)chunkZ));
+                    currentChunk = chunks[GetKey(x, z)];
                 }
-                chunkInfo.Value.Load();
-            }
-            else
-            {
-                chunkInfo.Value.Unload();
+                currentChunk.Load();
+                loadedChunks.Add(currentChunk);
             }
         }
     }
@@ -172,10 +165,8 @@ public class Level
         Point point = new Point((int)x, (int)z);
         point.X = point.X % LevelGenerator.ChunkSize;
         point.Y = point.Y % LevelGenerator.ChunkSize;
-        point.X = x < 0 ? LevelGenerator.ChunkSize + point.X : point.X;
-        point.Y = z < 0 ? LevelGenerator.ChunkSize + point.Y : point.Y;
-        point.X = point.X == LevelGenerator.ChunkSize ? point.X - 1 : point.X;
-        point.Y = point.Y == LevelGenerator.ChunkSize ? point.Y - 1 : point.Y;
+        point.X = x < 0 ? (LevelGenerator.ChunkSize - 1) - Mathf.Abs(point.X) : point.X;
+        point.Y = z < 0 ? (LevelGenerator.ChunkSize - 1) - Mathf.Abs(point.Y) : point.Y;
         return point;
     }
     public Point GetChunkPoint(float x, float z)

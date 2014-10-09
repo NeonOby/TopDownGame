@@ -39,10 +39,10 @@
 	<Reference Include="System.Core" />
 	<Reference Include="System.Xml.Linq" />
 	<Reference Include="UnityEngine">
-	  <HintPath>C:/Program Files (x86)/Unity/Editor4.5.2/Data/Managed/UnityEngine.dll</HintPath>
+	  <HintPath>G:/Programmieren/Unity/Editor-4.5.2/Data/Managed/UnityEngine.dll</HintPath>
 	</Reference>
 	<Reference Include="UnityEditor">
-	  <HintPath>C:/Program Files (x86)/Unity/Editor4.5.2/Data/Managed/UnityEditor.dll</HintPath>
+	  <HintPath>G:/Programmieren/Unity/Editor-4.5.2/Data/Managed/UnityEditor.dll</HintPath>
 	</Reference>
   </ItemGroup>
   <ItemGroup>
@@ -53,32 +53,36 @@
      <Compile Include="Assets\Algorithms\PathFinderFast.cs" />
      <Compile Include="Assets\Algorithms\Point.cs" />
      <Compile Include="Assets\Algorithms\PriorityQueueB.cs" />
-     <Compile Include="Assets\DebugSpawner.cs" />
-     <Compile Include="Assets\Despawner.cs" />
-     <Compile Include="Assets\ExternNavigation.cs" />
      <Compile Include="Assets\Resources\GameObjectPool\GameObjectPool.cs" />
      <Compile Include="Assets\Resources\GameObjectPool\GameObjectPoolCreate.cs" />
      <Compile Include="Assets\Resources\Scripts\BoxSelection.cs" />
      <Compile Include="Assets\Resources\Scripts\Controls.cs" />
+     <Compile Include="Assets\Resources\Scripts\DebugSpawner.cs" />
+     <Compile Include="Assets\Resources\Scripts\Despawner.cs" />
      <Compile Include="Assets\Resources\Scripts\GameManager.cs" />
-     <Compile Include="Assets\Resources\Scripts\Level\Cell.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\Chunk.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\Entity.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\Level.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\LevelGenerator.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\Navigation\Cell.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\Navigation\ExternNavigation.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\Navigation\PathFind\IHasNeighbours.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\Navigation\PathFind\Path.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\Navigation\PathFind\PathFind.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\Navigation\PathFind\PriorityQueue.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\Navigation\SimpleNavigation.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\QuaternionRotation.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\SaveGame.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\SaveGameManager.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\Vector3Position.cs" />
+     <Compile Include="Assets\Resources\Scripts\RightClickTester.cs" />
      <Compile Include="Assets\Resources\Scripts\SimpleAI.cs" />
+     <Compile Include="Assets\Resources\Scripts\SimpleBullet.cs" />
+     <Compile Include="Assets\Resources\Scripts\TimedEffect.cs" />
      <Compile Include="Assets\Resources\Scripts\TopDownCamera.cs" />
      <Compile Include="Assets\Resources\Scripts\TopDownController.cs" />
      <Compile Include="Assets\Resources\Scripts\TopDownMovement.cs" />
      <Compile Include="Assets\Resources\Scripts\TopDownZoom.cs" />
-     <Compile Include="Assets\RightClickTester.cs" />
-     <Compile Include="Assets\SimpleBullet.cs" />
-     <Compile Include="Assets\SimpleNavigation.cs" />
-     <Compile Include="Assets\TimedEffect.cs" />
      <Compile Include="Assets\_ProgrammerInfo.cs" />
      <None Include="Assets\Resources\Shaders\VertexColorIllum.shader" />
      <None Include="Assets\Resources\Shaders\VertexColorTransparent.shader" />

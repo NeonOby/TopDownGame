@@ -89,14 +89,14 @@ public class CellInfo
     {
         get
         {
-            return cell.X;
+            return (int)cell.X;
         }
     }
     public int Z
     {
         get
         {
-            return cell.Z;
+            return (int)cell.Z;
         }
     }
 
@@ -219,7 +219,6 @@ public class SimpleNavigation : MonoBehaviour
         UpdatePath_ComputeHeuristic(pathGen, nextCellInfo);
 
         float EdgeCost = 1.0f + penalty;
-
         float CostUntilNow = cellInfo.CostFromStartToThisCell + EdgeCost;
 
         if (pathGen.ContainsOpen(nextCellInfo) && CostUntilNow >= nextCellInfo.CostFromStartToThisCell)
