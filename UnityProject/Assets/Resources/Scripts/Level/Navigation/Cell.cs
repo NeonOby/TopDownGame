@@ -44,15 +44,33 @@ public class Cell : PathFind.IHasNeighbours<Cell>
             Cell bottom = LevelGenerator.level.GetCell(X, (float)Z - 1f);
             Cell right = LevelGenerator.level.GetCell((float)X + 1f, Z);
             Cell left = LevelGenerator.level.GetCell((float)X - 1f, Z);
+
+            Cell topRight = LevelGenerator.level.GetCell((float)X + 1f, (float)Z + 1f);
+            Cell bottomRight = LevelGenerator.level.GetCell((float)X + 1f, (float)Z - 1f);
+            Cell topLeft = LevelGenerator.level.GetCell((float)X - 1f, (float)Z + 1f);
+            Cell bottomLeft = LevelGenerator.level.GetCell((float)X - 1f, (float)Z - 1f);
             List<Cell> cells = new List<Cell>();
+
             if (top != null)
                 cells.Add(top);
+            if (topRight != null)
+                cells.Add(topRight);
+
             if (bottom != null)
                 cells.Add(bottom);
+            if (bottomRight != null)
+                cells.Add(bottomRight);
+
             if (right != null)
                 cells.Add(right);
+            if (topLeft != null)
+                cells.Add(topLeft);
+
             if (left != null)
                 cells.Add(left);
+            if (bottomLeft != null)
+                cells.Add(bottomLeft);
+
             return cells.ToArray();
         }
     }

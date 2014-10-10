@@ -61,6 +61,7 @@ public class SaveGameManager : MonoBehaviour
 
     void OnGUI()
     {
+        return;
         if (GUILayout.Button("Load Game"))
         {
             currentSaveGame = Load("this");

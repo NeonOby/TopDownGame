@@ -10,6 +10,7 @@ namespace PathFind
 
     public static class PathFind
     {
+
         public static Path<Node> FindPath<Node>(
             Node start,
             Node destination,
