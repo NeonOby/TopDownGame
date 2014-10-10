@@ -73,8 +73,8 @@ public class LevelGenerator : MonoBehaviour
         level.UpdateChunks();
     }
 
-    private static float safeDistance = 16f;
-    private static float chancePerDistance = 0.0001f;
+    private static float safeDistance = 2f;
+    private static float chancePerDistance = 0.001f;
     private static float strengthPerDistance = 0.5f;
 
     private static float maxChance = 0.1f;
