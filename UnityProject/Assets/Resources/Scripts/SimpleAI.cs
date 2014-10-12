@@ -17,8 +17,6 @@ public class SimpleAI : MonoBehaviour
 
     public bool Enabled = false;
 
-    private NavMeshAgent agent;
-
     public Transform currentTarget;
     public Vector3 targetPos;
 
@@ -37,15 +35,8 @@ public class SimpleAI : MonoBehaviour
 	// Use this for initialization
 	void Start () 
     {
-        agent = GetComponent<NavMeshAgent>();
-        if(agent == null)
-        {
-            enabled = false;
-            return;
-        }
-        agent.updateRotation = false;
-        agent.speed = 0f;
-
+        NextNavigationPosition = transform.position;
+        WantedLookDirection = Vector3.forward;
         GameObjectPool.DespawnAllPerPool += DespawnAllPerPool;
 	}
 
@@ -59,7 +50,7 @@ public class SimpleAI : MonoBehaviour
         if (!Enabled)
             return;
         targetPos = newTargetPos;
-        agent.SetDestination(targetPos);
+        NextNavigationPosition = newTargetPos;
         if (removeTarget) currentTarget = null;
     }
 
@@ -74,7 +65,16 @@ public class SimpleAI : MonoBehaviour
     public float RotationDamping = 5.0f;
     private Vector3 WantedLookDirection = Vector3.zero;
 
+    public float CurrentSpeed = 0f;
+
     public Transform target = null;
+
+    public Vector3 NextNavigationPosition = Vector3.zero;
+
+    public void NextWaypoint()
+    {
+        NextNavigationPosition = path.GetNext().Position();
+    }
 
 	// Update is called once per frame
 	void Update ()
@@ -82,26 +82,44 @@ public class SimpleAI : MonoBehaviour
         if (!Enabled)
             return;
 
+        if (Vector3.Distance(transform.position, NextNavigationPosition) < 0.2f)
+        {
+            if (path != null && !path.IsLast)
+            {
+                NextWaypoint();
+            }
+        }
+
         UpdateTarget();
         UpdateTargetPos();
 
+        WantedLookDirection = NextNavigationPosition - transform.position;
         if (target != null)
         {
             WantedLookDirection = target.position - transform.position;
         }
-        else
-        {
-            WantedLookDirection = agent.destination - transform.position;
-        }
         
-        if (WantedLookDirection.magnitude > 0.2f)
+        if (WantedLookDirection.magnitude > 0.3f)
         {
             Quaternion wantedRotation = Quaternion.LookRotation(WantedLookDirection);
-            transform.rotation = Quaternion.Lerp(transform.rotation, wantedRotation, Time.deltaTime * RotationDamping);
+            transform.rotation = Quaternion.Lerp(transform.rotation, wantedRotation, Time.deltaTime * RotationDamping);            
         }
 
-        agent.speed = Vector3.Dot(transform.forward, (agent.destination - transform.position).normalized);
-        agent.speed = Mathf.Max(agent.speed * MaxSpeed, MinSpeed);
+        float WantedSpeed = 0f;
+
+        float dot = Mathf.Max(Vector3.Dot(transform.forward, (NextNavigationPosition - transform.position).normalized)-0.5f, 0.0f)*2f;
+
+        WantedSpeed = dot * MaxSpeed;
+
+        if(target != null)
+            WantedSpeed = Mathf.Max(WantedSpeed, MinSpeed);
+
+        if(path != null && path.IsLast)
+            WantedSpeed *= Mathf.Min((NextNavigationPosition - transform.position).magnitude, 1.0f);
+
+        CurrentSpeed = Mathf.Lerp(WantedSpeed, WantedSpeed, Time.deltaTime * 1.0f);
+
+        transform.position += (NextNavigationPosition - transform.position).normalized * CurrentSpeed * Time.deltaTime;
 
         ShootTimer += Time.deltaTime;
         if (ShootTimer >= ShootCD)
@@ -176,6 +194,7 @@ public class SimpleAI : MonoBehaviour
         CurrentHits = 0;
         Enabled = true;
         collider.enabled = true;
+        NextNavigationPosition = transform.position;
     }
 
     public void Hit()
@@ -192,5 +211,17 @@ public class SimpleAI : MonoBehaviour
     {
         Enabled = false;
         collider.enabled = false;
+    }
+
+    public Path path = null;
+
+    public void PathFinished(Path newPath)
+    {
+        path = newPath;
+        if (path.IsEmpty)
+        {
+            return;
+        }
+        NextNavigationPosition = path.GetNext().Position();
     }
 }

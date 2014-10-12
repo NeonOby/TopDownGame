@@ -15,7 +15,8 @@ namespace PathFind
             Node start,
             Node destination,
             Func<Node, Node, double> costBetweenTwo,
-            Func<Node, Node, double> heuristic)
+            Func<Node, Node, double> heuristic,
+            Func<Node, bool> walkable)
             where Node : IHasNeighbours<Node>
         {
             var closed = new HashSet<Node>();
@@ -35,6 +36,9 @@ namespace PathFind
 
                 foreach (Node currentNode in path.LastStep.Neighbours)
                 {
+                    if (!walkable(currentNode))
+                        continue;
+
                     double d = costBetweenTwo(path.LastStep, currentNode);
                     var newPath = path.AddStep(currentNode, d);
                     queue.Enqueue(newPath.TotalCost + heuristic(currentNode, destination), newPath);

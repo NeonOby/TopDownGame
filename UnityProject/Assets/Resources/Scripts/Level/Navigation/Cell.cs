@@ -22,6 +22,9 @@ public class Cell : PathFind.IHasNeighbours<Cell>
 
     public CellType Type = CellType.EMPTY;
 
+    public bool ContainsEntity = false;
+    public string PoolName = "";
+
     //Not used yet
     public byte Layer = 0;
 
@@ -33,6 +36,11 @@ public class Cell : PathFind.IHasNeighbours<Cell>
     public override string ToString()
     {
         return String.Format("Cell:{0} {1}:{2}", Walkable, X, Z);
+    }
+
+    public static implicit operator bool(Cell cell)
+    {
+        return cell != null;
     }
 
     //TODO OPTIMIZING
@@ -51,24 +59,23 @@ public class Cell : PathFind.IHasNeighbours<Cell>
             Cell bottomLeft = LevelGenerator.level.GetCell((float)X - 1f, (float)Z - 1f);
             List<Cell> cells = new List<Cell>();
 
-            if (top != null)
+            if (top)
                 cells.Add(top);
-            if (topRight != null)
-                cells.Add(topRight);
-
-            if (bottom != null)
+            if (bottom)
                 cells.Add(bottom);
-            if (bottomRight != null)
-                cells.Add(bottomRight);
-
-            if (right != null)
+            if (right)
                 cells.Add(right);
-            if (topLeft != null)
+            if (left)
+                cells.Add(left);
+
+            if (((top && top.Walkable) || (right && right.Walkable)) && topRight && !((top && !top.Walkable) || (right && !right.Walkable)))
+                cells.Add(topRight);
+            if (((top && top.Walkable) || (left && left.Walkable)) && topLeft && !((top && !top.Walkable) || (left && !left.Walkable)))
                 cells.Add(topLeft);
 
-            if (left != null)
-                cells.Add(left);
-            if (bottomLeft != null)
+            if (((bottom && bottom.Walkable) || (right && right.Walkable)) && bottomRight && !((bottom && !bottom.Walkable) || (right && !right.Walkable)))
+                cells.Add(bottomRight);
+            if (((bottom && bottom.Walkable) || (left && left.Walkable)) && bottomLeft && !((bottom && !bottom.Walkable) || (left && !left.Walkable)))
                 cells.Add(bottomLeft);
 
             return cells.ToArray();

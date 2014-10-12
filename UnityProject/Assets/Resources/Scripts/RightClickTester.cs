@@ -11,18 +11,23 @@ public class SearchingPath<Node> where Node : PathFind.IHasNeighbours<Node>
 
 	Func<Node, Node, double> CostBetweenTwo;
 	Func<Node, Node, double> Heuristic;
+    Func<Node, bool> Walkable;
 
 	HashSet<Node> Closed;
 	PriorityQueue<double, PathFind.Path<Node>> Queue;
+
+    public RightClickTester.PathFinished CallBack = null;
 
 	public SearchingPath(
 			Node start,
 			Node destination,
 			Func<Node, Node, double> costBetweenTwo,
-			Func<Node, Node, double> heuristic)
+			Func<Node, Node, double> heuristic,
+            Func<Node, bool> walkable)
 	{
 		Start = start;
 		Destination = destination;
+        Walkable = walkable;
 
 		CostBetweenTwo = costBetweenTwo;
 		Heuristic = heuristic;
@@ -34,33 +39,7 @@ public class SearchingPath<Node> where Node : PathFind.IHasNeighbours<Node>
 	}
 
 	public PathFind.Path<Node> finishedPath = null;
-
-	public bool NextStep()
-	{
-		if (Queue.IsEmpty)
-			return true;
-
-		var path = Queue.Dequeue();
-
-		if (Closed.Contains(path.LastStep))
-			return false;
-		if (path.LastStep.Equals(Destination))
-		{
-			finishedPath = path;
-			return true;
-		}
-
-		Closed.Add(path.LastStep);
-
-		foreach (Node currentNode in path.LastStep.Neighbours)
-		{
-			double d = CostBetweenTwo(path.LastStep, currentNode);
-			var newPath = path.AddStep(currentNode, d);
-			Queue.Enqueue(newPath.TotalCost + Heuristic(currentNode, Destination), newPath);
-		}
-		return false;
-	}
-
+    
 	public PathFind.Path<Node> NextStepPath(out bool result)
 	{
 		result = false;
@@ -84,6 +63,12 @@ public class SearchingPath<Node> where Node : PathFind.IHasNeighbours<Node>
 
 		foreach (Node currentNode in path.LastStep.Neighbours)
 		{
+            if (!Walkable(currentNode))
+            {
+                Closed.Add(currentNode);
+                continue;
+            }
+
 			double d = CostBetweenTwo(path.LastStep, currentNode);
 			var newPath = path.AddStep(currentNode, d);
 			Queue.Enqueue(newPath.TotalCost + Heuristic(currentNode, Destination), newPath);
@@ -95,12 +80,11 @@ public class SearchingPath<Node> where Node : PathFind.IHasNeighbours<Node>
 
 public class RightClickTester : MonoBehaviour 
 {
+    public delegate void PathFinished(Path path);
 
+    SearchingPath<Cell> currentFindingPath = null;
+    bool finished = false;
 	PathFind.Path<Cell> path = null;
-
-
-	SearchingPath<Cell> currentFindingPath = null;
-	bool finished = false;
 
 	int updatesPerFrame = 50;
 
@@ -130,14 +114,7 @@ public class RightClickTester : MonoBehaviour
 					break;
 				}
 			}
-			/*
-			if (currentFindingPath.NextStep())
-			{
-				path = currentFindingPath.finishedPath;
-			}
-			*/
 		}
-
 		
 		if (path != null && path.PreviousSteps != null)
 		{
@@ -146,8 +123,8 @@ public class RightClickTester : MonoBehaviour
 			foreach (var item in path)
 			{
 				Vector3 currentPos = item.Position();
-				currentPos.y = 1;
-				Debug.DrawLine(lastPos, currentPos);
+				currentPos.y = 0.5f;
+				Debug.DrawLine(lastPos, currentPos, Color.green);
 				lastPos = currentPos;
 			}
 		}
@@ -158,31 +135,48 @@ public class RightClickTester : MonoBehaviour
 		GUILayout.Label(LastNeededTime.ToString());
 	}
 
-	public void DebugAllNeighbors(Cell cell)
-	{
-		foreach (var item in cell.Neighbours)
-		{
-			Debug.Log(item);
-		}
-	}
+    public Cell FindNeighborWalkableCell(Cell cell, Cell start)
+    {
+        float minDistance = -1f;
+        Cell foundCell = null;
+        foreach (var neighbor in cell.Neighbours)
+        {
+            if (neighbor.Walkable)
+            {
+                if (minDistance == -1 || Distance(neighbor, start) < minDistance)
+                {
+                    foundCell = neighbor;
+                    minDistance = Distance(neighbor, start);
+                }
+            }
+        }
+        return foundCell;
+    }
 
 	public void Do(Vector3 pos)
 	{
-		//Debug.Log(System.String.Format("Pos: {0}:{1} {2}", pos.x, pos.z, LevelGenerator.level.GetCell(pos.x, pos.z)));
-		//DebugAllNeighbors(LevelGenerator.level.GetCell(pos.x, pos.z));
-		//return;
-
-		path = null;
-		finished = false;
 		Cell start = LevelGenerator.level.GetCell(0, 0);
 		Cell end = LevelGenerator.level.GetCell(pos.x, pos.z);
-		if (end == null)
+        if (!end.Walkable)
+        {
+            end = FindNeighborWalkableCell(end, start);
+        }
+
+		if (end == null || !end.Walkable)
 			return;
 
-		currentFindingPath = new SearchingPath<Cell>(start, end, CostBetweenNeighbors, Heuristic);
+        path = null;
+        finished = false;
+
+		currentFindingPath = new SearchingPath<Cell>(start, end, CostBetweenNeighbors, Heuristic, Walkable);
 		startTime = Time.realtimeSinceStartup;
 		//path = PathFind.PathFind.FindPath<Cell>(start, end, CostBetweenNeighbors, Heuristic);
 	}
+
+    public float Distance(Cell cell1, Cell cell2)
+    {
+        return Vector3.Distance(cell1.Position(), cell2.Position());
+    }
 
 	public double CostBetweenNeighbors(Cell cell1, Cell cell2)
 	{
@@ -191,6 +185,11 @@ public class RightClickTester : MonoBehaviour
 
 	public double Heuristic(Cell currentCell, Cell end)
 	{
-		return Mathf.Pow(Vector3.Distance(currentCell.Position(), end.Position()), 2);
+		return Mathf.Pow(Vector3.Distance(currentCell.Position(), end.Position()), 2) * 10f;
 	}
+
+    public bool Walkable(Cell cell)
+    {
+        return cell.Walkable;
+    }
 }

@@ -16,11 +16,16 @@ public class Level
     public int lowestX = 0, highestX = 0;
     public int lowestZ = 0, highestZ = 0;
 
+    public float randomizedMapPositionX = 0, randomizedMapPositionZ = 0;
+
     public Level(int seed)
     {
         Seed = seed;
         random = new System.Random(Seed);
         chunks = new Dictionary<string, Chunk>();
+
+        randomizedMapPositionX = random.Next(-20000, 20000);
+        randomizedMapPositionZ = random.Next(-20000, 20000);
     }
 
     public void Clear()
@@ -28,26 +33,20 @@ public class Level
         chunks.Clear();
     }
 
-    public Cell GetCell(float x, float z)
+    public Cell GetCell(float x, float z, bool autoGen = true)
     {
         Point cellPoint = GetCellPoint(x, z);
         Point chunkPoint = GetChunkPoint(x, z);
 
         if (!ContainsChunk(chunkPoint.X, chunkPoint.Y))
         {
-            return null;
+            if (!autoGen)
+                return null;
+            AddChunk(chunkPoint.X, chunkPoint.Y, LevelGenerator.GenerateChunk(Seed, chunkPoint.X, chunkPoint.Y, randomizedMapPositionX, randomizedMapPositionZ));
         }
 
         //Debug.Log(String.Format("Pos: {0}:{1} found, looking for {2}:{3}", x, z, cellPoint.X, cellPoint.Y));
         return chunks[GetKey(chunkPoint.X, chunkPoint.Y)].GetCell(cellPoint.X, cellPoint.Y);
-    }
-
-    int NextPowerOfTwo(int x)
-    {
-        int power = 1;
-        while (power < x)
-            power *= 2;
-        return power;
     }
 
     public bool PositionOutOfLevel(float x, float z)
@@ -67,8 +66,8 @@ public class Level
         width *= LevelGenerator.ChunkSize;
         height *= LevelGenerator.ChunkSize;
 
-        width = NextPowerOfTwo(width);
-        height = NextPowerOfTwo(height);
+        width = Mathf.NextPowerOfTwo(width);
+        height = Mathf.NextPowerOfTwo(height);
 
         int lowestXCells = lowestX * LevelGenerator.ChunkSize;
         int lowestZCells = lowestZ * LevelGenerator.ChunkSize;
@@ -147,7 +146,7 @@ public class Level
                 Chunk currentChunk;
                 if (!ContainsChunk(x, z))
                 {
-                    currentChunk = LevelGenerator.GenerateChunk(Seed, x, z);
+                    currentChunk = LevelGenerator.GenerateChunk(Seed, x, z, randomizedMapPositionX, randomizedMapPositionZ);
                     AddChunk(x, z, currentChunk);
                 }
                 else
