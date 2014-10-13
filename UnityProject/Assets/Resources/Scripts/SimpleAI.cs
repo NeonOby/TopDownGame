@@ -17,9 +17,6 @@ public class SimpleAI : MonoBehaviour
 
     public bool Enabled = false;
 
-    public Transform currentTarget;
-    public Vector3 targetPos;
-
     public float MinSpeed = 0.5f; //Backwards
     public float MaxSpeed = 5.0f; //Straight
 
@@ -40,26 +37,9 @@ public class SimpleAI : MonoBehaviour
         GameObjectPool.DespawnAllPerPool += DespawnAllPerPool;
 	}
 
-    public void SetTarget(Transform newTarget)
+    public void SetVisionTarget(Transform newTarget)
     {
-        currentTarget = newTarget;
-    }
-
-    public void SetTargetPos(Vector3 newTargetPos, bool removeTarget = false)
-    {
-        if (!Enabled)
-            return;
-        targetPos = newTargetPos;
-        NextNavigationPosition = newTargetPos;
-        if (removeTarget) currentTarget = null;
-    }
-
-    private void UpdateTargetPos()
-    {
-        if (currentTarget)
-        {
-            SetTargetPos(currentTarget.transform.position);
-        }
+        VisionTarget = newTarget;
     }
 
     public float RotationDamping = 5.0f;
@@ -67,7 +47,7 @@ public class SimpleAI : MonoBehaviour
 
     public float CurrentSpeed = 0f;
 
-    public Transform target = null;
+    public Transform VisionTarget = null;
 
     public Vector3 NextNavigationPosition = Vector3.zero;
 
@@ -91,15 +71,14 @@ public class SimpleAI : MonoBehaviour
         }
 
         UpdateTarget();
-        UpdateTargetPos();
 
         WantedLookDirection = NextNavigationPosition - transform.position;
-        if (target != null)
+        if (VisionTarget != null)
         {
-            WantedLookDirection = target.position - transform.position;
+            WantedLookDirection = VisionTarget.position - transform.position;
         }
         
-        if (WantedLookDirection.magnitude > 0.3f)
+        if (WantedLookDirection.magnitude > 0.2f)
         {
             Quaternion wantedRotation = Quaternion.LookRotation(WantedLookDirection);
             transform.rotation = Quaternion.Lerp(transform.rotation, wantedRotation, Time.deltaTime * RotationDamping);            
@@ -111,7 +90,7 @@ public class SimpleAI : MonoBehaviour
 
         WantedSpeed = dot * MaxSpeed;
 
-        if(target != null)
+        if(VisionTarget != null)
             WantedSpeed = Mathf.Max(WantedSpeed, MinSpeed);
 
         if(path != null && path.IsLast)
@@ -137,7 +116,7 @@ public class SimpleAI : MonoBehaviour
 
     public void Shoot()
     {
-        if (target == null)
+        if (VisionTarget == null)
             return;
 
         GameObject go = GameObjectPool.Instance.Spawn("SimpleBullet", transform.position + transform.forward, Quaternion.LookRotation(WantedLookDirection));
@@ -147,15 +126,15 @@ public class SimpleAI : MonoBehaviour
 
     public void UpdateTarget()
     {
-        if (target != null)
+        if (VisionTarget != null)
         {
-            SimpleAI ai = target.GetComponent<SimpleAI>();
+            SimpleAI ai = VisionTarget.GetComponent<SimpleAI>();
             if (!ai.IsAlive)
-                target = null;
+                VisionTarget = null;
         }
-        if (target != null)
+        if (VisionTarget != null)
         {
-            if (Vector3.Distance(target.position, transform.position) < MaxDistance)
+            if (Vector3.Distance(VisionTarget.position, transform.position) < MaxDistance)
             {
                 //Target still in range
                 return; 
@@ -163,14 +142,14 @@ public class SimpleAI : MonoBehaviour
             else
             {
                 //Target out of range
-                target = null;
+                VisionTarget = null;
             }
         }
 
         //Find new Target
         Collider[] collider = Physics.OverlapSphere(transform.position, MaxDistance, mask);
-        if(collider.Length > 0)
-            target = collider[0].transform;
+        if (collider.Length > 0)
+            SetVisionTarget(collider[0].transform);
     }
 
     public int MaxHits = 10;
@@ -218,8 +197,9 @@ public class SimpleAI : MonoBehaviour
     public void PathFinished(Path newPath)
     {
         path = newPath;
-        if (path.IsEmpty)
+        if (path == null || path.IsEmpty)
         {
+            NextNavigationPosition = transform.position;
             return;
         }
         NextNavigationPosition = path.GetNext().Position();

@@ -69,7 +69,7 @@ public class BoxSelection : MonoBehaviour {
                 {
                     LastNeededTime = Time.realtimeSinceStartup - startTime;
                     if (currentFindingPath.CallBack != null)
-                        currentFindingPath.CallBack(GeneratePath(path));
+                        currentFindingPath.CallBack(GeneratePath(currentFindingPath, path));
                     break;
                 }
             }
@@ -89,13 +89,14 @@ public class BoxSelection : MonoBehaviour {
         }
 	}
 
-    public Path GeneratePath(PathFind.Path<Cell> path)
+    public Path GeneratePath(SearchingPath<Cell> pathSearcher, PathFind.Path<Cell> path)
     {
         Path newPath = new Path();
         foreach (var item in path)
         {
             newPath.AddWaypoint(item);
         }
+        newPath.Destination = pathSearcher.Destination;
         return newPath;
     }
 

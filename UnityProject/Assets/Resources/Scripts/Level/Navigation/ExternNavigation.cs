@@ -44,7 +44,8 @@ public class Path
 
         return path[currentIndex];
     }
-    
+
+    public Cell Destination { get; set; }
 }
 
 public class ExternNavigation : MonoBehaviour

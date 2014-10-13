@@ -6,8 +6,8 @@ using System.Collections.Generic;
 
 public class SearchingPath<Node> where Node : PathFind.IHasNeighbours<Node>
 {
-	Node Start;
-	Node Destination;
+    public Node Start;
+	public Node Destination;
 
 	Func<Node, Node, double> CostBetweenTwo;
 	Func<Node, Node, double> Heuristic;
