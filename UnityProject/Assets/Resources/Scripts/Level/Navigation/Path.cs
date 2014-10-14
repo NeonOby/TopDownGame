@@ -1,8 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using Algorithms;
-
+﻿using System.Collections.Generic;
 public class Path
 {
     public List<Cell> path = new List<Cell>();
@@ -30,12 +26,12 @@ public class Path
     }
     public Cell GetNext()
     {
-        if(path.Count == 0)
+        if (path.Count == 0)
             return null;
         if (currentIndex == 0)
             return null;
         if (currentIndex == -1)
-            currentIndex = path.Count-1;
+            currentIndex = path.Count - 1;
         else
             currentIndex--;
 
@@ -46,10 +42,4 @@ public class Path
     }
 
     public Cell Destination { get; set; }
-}
-
-public class ExternNavigation : MonoBehaviour
-{
-
-    
 }

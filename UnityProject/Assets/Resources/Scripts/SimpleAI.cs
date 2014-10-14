@@ -20,6 +20,17 @@ public class SimpleAI : MonoBehaviour
     public float MinSpeed = 0.5f; //Backwards
     public float MaxSpeed = 5.0f; //Straight
 
+    public Job CurrentJob = null;
+
+    public Transform Transform;
+    public Vector3 CurrentPosition
+    {
+        get
+        {
+            return Transform.position;
+        }
+    }
+
     public void DespawnAllPerPool(string pool)
     {
         if (pool != poolName)
@@ -29,12 +40,20 @@ public class SimpleAI : MonoBehaviour
         GameObjectPool.Instance.Despawn(poolName, gameObject);
     }
 
+    void Awake()
+    {
+        Transform = transform;
+    }
+
 	// Use this for initialization
 	void Start () 
     {
         NextNavigationPosition = transform.position;
         WantedLookDirection = Vector3.forward;
         GameObjectPool.DespawnAllPerPool += DespawnAllPerPool;
+
+        CurrentJob = new Job(this, "StandingAround", null);
+        CurrentJob.NextJob = null;
 	}
 
     public void SetVisionTarget(Transform newTarget)
@@ -53,7 +72,7 @@ public class SimpleAI : MonoBehaviour
 
     public void NextWaypoint()
     {
-        NextNavigationPosition = path.GetNext().Position();
+        NextNavigationPosition = path.GetNext().Position;
     }
 
 	// Update is called once per frame
@@ -106,7 +125,24 @@ public class SimpleAI : MonoBehaviour
             ShootTimer = 0f;
             Shoot();
         }
+
+        if (CurrentJob != null)
+        {
+            if (CurrentJob.Update())
+            {
+                CurrentJob = CurrentJob.NextJob;
+            }
+        }
 	}
+
+    void OnGUI()
+    {
+        if (CurrentJob != null)
+        {
+            Vector3 Position = Camera.main.WorldToScreenPoint(CurrentPosition);
+            GUI.Label(new Rect(Position.x, Screen.height - Position.y, 200, 25), CurrentJob.Info);
+        }
+    }
 
     public float MaxDistance = 10f;
     public LayerMask mask;
@@ -202,6 +238,8 @@ public class SimpleAI : MonoBehaviour
             NextNavigationPosition = transform.position;
             return;
         }
-        NextNavigationPosition = path.GetNext().Position();
+        NextNavigationPosition = path.GetNext().Position;
+
+        CurrentJob = new Job(this, "WalkTo", path.Destination);
     }
 }

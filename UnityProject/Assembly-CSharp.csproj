@@ -65,11 +65,13 @@
      <Compile Include="Assets\Resources\Scripts\Level\Level.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\LevelGenerator.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\Navigation\Cell.cs" />
-     <Compile Include="Assets\Resources\Scripts\Level\Navigation\ExternNavigation.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\Navigation\Jobs\Job.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\Navigation\Path.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\Navigation\PathFind\IHasNeighbours.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\Navigation\PathFind\Path.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\Navigation\PathFind\PathFind.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\Navigation\PathFind\PriorityQueue.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\Navigation\SearchingPath.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\Navigation\SimpleNavigation.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\QuaternionRotation.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\SaveGame.cs" />

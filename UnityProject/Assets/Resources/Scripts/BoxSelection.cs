@@ -2,7 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class BoxSelection : MonoBehaviour {
+public class BoxSelection : MonoBehaviour 
+{
 
     public static bool Selecting = false;
 
@@ -77,11 +78,11 @@ public class BoxSelection : MonoBehaviour {
 
         if (path != null && path.PreviousSteps != null)
         {
-            Vector3 lastPos = path.LastStep.Position();
+            Vector3 lastPos = path.LastStep.Position;
             lastPos.y = 0;
             foreach (var item in path)
             {
-                Vector3 currentPos = item.Position();
+                Vector3 currentPos = item.Position;
                 currentPos.y = 0.5f;
                 Debug.DrawLine(lastPos, currentPos, Color.green);
                 lastPos = currentPos;
@@ -181,17 +182,17 @@ public class BoxSelection : MonoBehaviour {
 
     public float Distance(Cell cell1, Cell cell2)
     {
-        return Vector3.Distance(cell1.Position(), cell2.Position());
+        return Vector3.Distance(cell1.Position, cell2.Position);
     }
 
     public double CostBetweenNeighbors(Cell cell1, Cell cell2)
     {
-        return Vector3.Distance(cell1.Position(), cell2.Position()) + cell2.WalkCost;
+        return Vector3.Distance(cell1.Position, cell2.Position) + cell2.WalkCost;
     }
 
     public double Heuristic(Cell currentCell, Cell end)
     {
-        return Mathf.Pow(Vector3.Distance(currentCell.Position(), end.Position()), 2) * 10f;
+        return Mathf.Pow(Vector3.Distance(currentCell.Position, end.Position), 2) * 10f;
     }
 
     public bool Walkable(Cell cell)

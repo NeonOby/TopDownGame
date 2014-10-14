@@ -28,9 +28,11 @@ public class Cell : PathFind.IHasNeighbours<Cell>
     //Not used yet
     public byte Layer = 0;
 
-    public UnityEngine.Vector3 Position()
+    public UnityEngine.Vector3 Position
     {
-        return new UnityEngine.Vector3(X, 0, Z);
+        get{
+            return new UnityEngine.Vector3(X, 0, Z);
+        }
     }
 
     public override string ToString()
