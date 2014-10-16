@@ -53,6 +53,7 @@
      <Compile Include="Assets\Algorithms\PathFinderFast.cs" />
      <Compile Include="Assets\Algorithms\Point.cs" />
      <Compile Include="Assets\Algorithms\PriorityQueueB.cs" />
+     <Compile Include="Assets\ResourceCube.cs" />
      <Compile Include="Assets\Resources\GameObjectPool\GameObjectPool.cs" />
      <Compile Include="Assets\Resources\GameObjectPool\GameObjectPoolCreate.cs" />
      <Compile Include="Assets\Resources\Scripts\Controls.cs" />
