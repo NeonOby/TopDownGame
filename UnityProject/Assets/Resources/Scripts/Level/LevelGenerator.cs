@@ -90,12 +90,7 @@ public class LevelGenerator : MonoBehaviour
 
         float distance = Vector3.Distance(zeroPos, currentPos);
 
-        float relChance = distance * chancePerDistance;
-        float absChance = 0f;
-
-        System.Random random = new System.Random(seed);
-
-        Entity entity;
+        LevelEntity entity;
         for (int x = 0; x < ChunkSize; x++)
         {
             for (int z = 0; z < ChunkSize; z++)
@@ -114,7 +109,6 @@ public class LevelGenerator : MonoBehaviour
                 if (distance - safeDistance < safeDistance)
                     continue;
 
-                absChance = distance * chancePerDistance;
 
                 float NoiseScale = 0.5f;
 
@@ -130,7 +124,7 @@ public class LevelGenerator : MonoBehaviour
                     newChunk.GetCell(x, z).ContainsEntity = true;
                     newChunk.GetCell(x, z).PoolName = "Block";
 
-                    entity = new Entity();
+                    entity = new LevelEntity();
                     entity.PoolName = "Block";
                     entity.Position.Value = currentPos;
                     newChunk.AddEntity(entity);

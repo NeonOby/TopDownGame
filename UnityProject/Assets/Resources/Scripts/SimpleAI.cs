@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class SimpleAI : MonoBehaviour 
+public class SimpleAI : Entity 
 {
 
     public delegate void SimpleAIEvent(SimpleAI sender);
@@ -33,11 +33,11 @@ public class SimpleAI : MonoBehaviour
 
     public void DespawnAllPerPool(string pool)
     {
-        if (pool != poolName)
+        if (pool != PoolName)
         {
             return;
         }
-        GameObjectPool.Instance.Despawn(poolName, gameObject);
+        GameObjectPool.Instance.Despawn(PoolName, gameObject);
     }
 
     void Awake()
@@ -119,6 +119,7 @@ public class SimpleAI : MonoBehaviour
 
         transform.position += (NextNavigationPosition - transform.position).normalized * CurrentSpeed * Time.deltaTime;
 
+        //Shooting
         ShootTimer += Time.deltaTime;
         if (ShootTimer >= ShootCD)
         {
@@ -126,6 +127,7 @@ public class SimpleAI : MonoBehaviour
             Shoot();
         }
 
+        //Job Update
         if (CurrentJob != null)
         {
             if (CurrentJob.Update())
@@ -190,7 +192,6 @@ public class SimpleAI : MonoBehaviour
 
     public int MaxHits = 10;
     public int CurrentHits = 0;
-    private string poolName = "";
 
     public bool IsAlive
     {
@@ -200,11 +201,7 @@ public class SimpleAI : MonoBehaviour
         }
     }
 
-    public void SetPoolName(string newPoolName)
-    {
-        poolName = newPoolName;
-    }
-    public void Reset()
+    public override void Reset()
     {
         CurrentHits = 0;
         Enabled = true;
@@ -218,7 +215,7 @@ public class SimpleAI : MonoBehaviour
         if (CurrentHits >= MaxHits)
         {
             TriggerSimpleAIDied(this);
-            GameObjectPool.Instance.Despawn(poolName, gameObject);
+            GameObjectPool.Instance.Despawn(PoolName, gameObject);
         }
     }
 

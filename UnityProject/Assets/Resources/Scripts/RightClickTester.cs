@@ -7,7 +7,7 @@ public class RightClickTester : MonoBehaviour
 {
     public delegate void PathFinished(Path path);
 
-    SearchingPath<Cell> currentFindingPath = null;
+    SearchingPath currentFindingPath = null;
     bool finished = false;
 	PathFind.Path<Cell> path = null;
 
@@ -93,7 +93,7 @@ public class RightClickTester : MonoBehaviour
         path = null;
         finished = false;
 
-		currentFindingPath = new SearchingPath<Cell>(start, end, CostBetweenNeighbors, Heuristic, Walkable);
+		currentFindingPath = new SearchingPath(start, end);
 		startTime = Time.realtimeSinceStartup;
 		//path = PathFind.PathFind.FindPath<Cell>(start, end, CostBetweenNeighbors, Heuristic);
 	}

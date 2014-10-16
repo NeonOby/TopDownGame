@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public enum CellType
 {
@@ -10,7 +11,7 @@ public enum CellType
 }
 
 [System.Serializable]
-public class Cell : PathFind.IHasNeighbours<Cell>
+public class Cell : PathFind.IHasNeighbours<Cell>, IHasPosition<Cell>
 {
     public float X = 0, Z = 0;
 
@@ -43,6 +44,15 @@ public class Cell : PathFind.IHasNeighbours<Cell>
     public static implicit operator bool(Cell cell)
     {
         return cell != null;
+    }
+
+    public static float Distance(Cell cell1, Cell cell2)
+    {
+        return Vector3.Distance(cell1.Position, cell2.Position);
+    }
+    public float Distance(Cell other)
+    {
+        return Vector3.Distance(Position, other.Position);
     }
 
     //TODO OPTIMIZING

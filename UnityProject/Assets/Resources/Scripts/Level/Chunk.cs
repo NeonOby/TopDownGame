@@ -26,7 +26,7 @@ public class Chunk
     public Cell[,] cells;
 
     [JsonProperty]
-    public List<Entity> entities = new List<Entity>();
+    public List<LevelEntity> entities = new List<LevelEntity>();
 
     private List<GameObjectInfo> spawnedObjects = new List<GameObjectInfo>();
 
@@ -38,7 +38,7 @@ public class Chunk
         cells = new Cell[LevelGenerator.ChunkSize, LevelGenerator.ChunkSize];
     }
 
-    public void AddEntity(Entity entity)
+    public void AddEntity(LevelEntity entity)
     {
         entities.Add(entity);
     }
@@ -119,7 +119,7 @@ public class Chunk
         if (Loaded)
             return;
 
-        Entity entity;
+        LevelEntity entity;
         GameObject gameObject;
         for (int i = 0; i < entities.Count; i++)
         {

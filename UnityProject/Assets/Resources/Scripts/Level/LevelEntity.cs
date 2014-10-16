@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [System.Serializable]
-public class Entity
+public class LevelEntity
 {
     public string PoolName = "";
 

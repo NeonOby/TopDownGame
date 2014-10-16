@@ -228,7 +228,7 @@ public class SimpleNavigation : MonoBehaviour
             return;
         }
 
-        float HeuristicCostForThisCell = CostUntilNow + nextCellInfo.HeuristicFromThisCellToEnd;
+        //float HeuristicCostForThisCell = CostUntilNow + nextCellInfo.HeuristicFromThisCellToEnd;
         nextCellInfo.Parent = cellInfo;
         nextCellInfo.CostFromStartToThisCell = CostUntilNow;
 

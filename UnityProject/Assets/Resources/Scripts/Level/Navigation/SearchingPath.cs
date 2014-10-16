@@ -1,43 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
-public class SearchingPath<Node> where Node : PathFind.IHasNeighbours<Node>
+public class SearchingPath
 {
-    public Node Start;
-    public Node Destination;
+    public Cell Start;
+    public Cell Destination;
 
-    Func<Node, Node, double> CostBetweenTwo;
-    Func<Node, Node, double> Heuristic;
-    Func<Node, bool> Walkable;
-
-    HashSet<Node> Closed;
-    PriorityQueue<double, PathFind.Path<Node>> Queue;
+    HashSet<Cell> Closed;
+    PriorityQueue<double, PathFind.Path<Cell>> Queue;
 
     public RightClickTester.PathFinished CallBack = null;
 
     public SearchingPath(
-            Node start,
-            Node destination,
-            Func<Node, Node, double> costBetweenTwo,
-            Func<Node, Node, double> heuristic,
-            Func<Node, bool> walkable)
+            Cell start,
+            Cell destination)
     {
         Start = start;
         Destination = destination;
-        Walkable = walkable;
 
-        CostBetweenTwo = costBetweenTwo;
-        Heuristic = heuristic;
+        Closed = new HashSet<Cell>();
+        Queue = new PriorityQueue<double, PathFind.Path<Cell>>();
 
-        Closed = new HashSet<Node>();
-        Queue = new PriorityQueue<double, PathFind.Path<Node>>();
-
-        Queue.Enqueue(0, new PathFind.Path<Node>(start));
+        Queue.Enqueue(0, new PathFind.Path<Cell>(start));
     }
 
-    public PathFind.Path<Node> finishedPath = null;
+    public PathFind.Path<Cell> finishedPath = null;
 
-    public PathFind.Path<Node> NextStepPath(out bool result)
+    public PathFind.Path<Cell> NextStepPath(out bool result)
     {
         result = false;
         if (Queue.IsEmpty)
@@ -58,7 +48,7 @@ public class SearchingPath<Node> where Node : PathFind.IHasNeighbours<Node>
 
         Closed.Add(path.LastStep);
 
-        foreach (Node currentNode in path.LastStep.Neighbours)
+        foreach (Cell currentNode in path.LastStep.Neighbours)
         {
             if (!Walkable(currentNode))
             {
@@ -71,5 +61,20 @@ public class SearchingPath<Node> where Node : PathFind.IHasNeighbours<Node>
             Queue.Enqueue(newPath.TotalCost + Heuristic(currentNode, Destination), newPath);
         }
         return path;
+    }
+
+    public double CostBetweenTwo(Cell cell1, Cell cell2)
+    {
+        return Vector3.Distance(cell1.Position, cell2.Position) + cell2.WalkCost;
+    }
+
+    public double Heuristic(Cell currentCell, Cell end)
+    {
+        return Mathf.Pow(Vector3.Distance(currentCell.Position, end.Position), 2) * 10f;
+    }
+
+    public bool Walkable(Cell cell)
+    {
+        return cell.Walkable;
     }
 }
