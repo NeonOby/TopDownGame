@@ -109,7 +109,6 @@ public class LevelGenerator : MonoBehaviour
                 if (distance - safeDistance < safeDistance)
                     continue;
 
-
                 float NoiseScale = 0.5f;
 
                 float NoiseX = (float)(randomizedMapPositionX + currentPos.x) * NoiseScale;
@@ -122,10 +121,10 @@ public class LevelGenerator : MonoBehaviour
                 {
                     newChunk.GetCell(x, z).Walkable = false;
                     newChunk.GetCell(x, z).ContainsEntity = true;
-                    newChunk.GetCell(x, z).PoolName = "Block";
+                    newChunk.GetCell(x, z).PoolName = "ResourceCube";
 
-                    entity = new LevelEntity();
-                    entity.PoolName = "Block";
+                    entity = new ResourceBlockEntity();
+                    entity.PoolName = "ResourceCube";
                     entity.Position.Value = currentPos;
                     newChunk.AddEntity(entity);
                 }
@@ -135,6 +134,7 @@ public class LevelGenerator : MonoBehaviour
         return newChunk;
     }
 
+    #region Noise
     private static float persistence = 1f;
     private static int NumberOfOctaves = 2;
 
@@ -199,43 +199,8 @@ public class LevelGenerator : MonoBehaviour
         }
         return total;
     }
-
-    public static int NumberOfNeighbors(int x, int z, string PoolName)
-    {
-        int count = 0;
-
-        Cell top = LevelGenerator.level.GetCell(x, (float)z + 1f, false);
-        Cell bottom = LevelGenerator.level.GetCell(x, (float)z - 1f, false);
-        Cell right = LevelGenerator.level.GetCell((float)x + 1f, z, false);
-        Cell left = LevelGenerator.level.GetCell((float)x - 1f, z, false);
-
-        Cell topRight = LevelGenerator.level.GetCell((float)x + 1f, (float)z + 1f, false);
-        Cell bottomRight = LevelGenerator.level.GetCell((float)x + 1f, (float)z - 1f, false);
-        Cell topLeft = LevelGenerator.level.GetCell((float)x - 1f, (float)z + 1f, false);
-        Cell bottomLeft = LevelGenerator.level.GetCell((float)x - 1f, (float)z - 1f, false);
-
-        if (top != null && top.PoolName.Equals(PoolName))
-            count++;
-        if (topRight != null && topRight.PoolName.Equals(PoolName))
-            count++;
-
-        if (bottom != null && bottom.PoolName.Equals(PoolName))
-            count++;
-        if (bottomRight != null && bottomRight.PoolName.Equals(PoolName))
-            count++;
-
-        if (right != null && right.PoolName.Equals(PoolName))
-            count++;
-        if (topLeft != null && topLeft.PoolName.Equals(PoolName))
-            count++;
-
-        if (left != null && left.PoolName.Equals(PoolName))
-            count++;
-        if (bottomLeft != null && bottomLeft.PoolName.Equals(PoolName))
-            count++;
-
-        return count;
-    }
+    #endregion
+    
 
     public void GenerateLevel(int seed)
     {

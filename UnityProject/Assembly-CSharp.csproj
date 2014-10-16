@@ -77,6 +77,7 @@
      <Compile Include="Assets\Resources\Scripts\Level\Navigation\SearchingPath.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\Navigation\SimpleNavigation.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\QuaternionRotation.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\ResourceBlockEntity.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\SaveGame.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\SaveGameManager.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\Vector3Position.cs" />

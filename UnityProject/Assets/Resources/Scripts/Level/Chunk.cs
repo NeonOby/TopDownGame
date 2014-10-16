@@ -120,16 +120,16 @@ public class Chunk
             return;
 
         LevelEntity entity;
-        GameObject gameObject;
+        //GameObject gameObject;
         for (int i = 0; i < entities.Count; i++)
         {
             entity = entities[i];
             if (entity == null)
                 continue;
+            entity.Spawn();
+            //gameObject = GameObjectPool.Instance.Spawn(entity.PoolName, entity.Position.Value, entity.Rotation.Value);
 
-            gameObject = GameObjectPool.Instance.Spawn(entity.PoolName, entity.Position.Value, entity.Rotation.Value);
-
-            spawnedObjects.Add(new GameObjectInfo(entity.PoolName, gameObject));
+            //spawnedObjects.Add(new GameObjectInfo(entity.PoolName, gameObject));
         }
 
         Loaded = true;
@@ -142,6 +142,16 @@ public class Chunk
         if (!Loaded)
             return;
 
+        LevelEntity entity;
+        //GameObject gameObject;
+        for (int i = 0; i < entities.Count; i++)
+        {
+            entity = entities[i];
+            if (entity == null)
+                continue;
+            entity.Despawn();
+        }
+        /*
         for (int i = 0; i < spawnedObjects.Count; i++)
         {
             if (spawnedObjects[i].poolName == "")
@@ -150,6 +160,7 @@ public class Chunk
             GameObjectPool.Instance.Despawn(spawnedObjects[i].poolName, spawnedObjects[i].gameObject);
         }
         spawnedObjects.Clear();
+        */
 
         Loaded = false;
     }
