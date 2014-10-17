@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class SimpleAI : Entity 
+public class SimpleAI : Worker 
 {
 
     public delegate void SimpleAIEvent(SimpleAI sender);
@@ -227,7 +227,7 @@ public class SimpleAI : Entity
 
     public Path path = null;
 
-    public void PathFinished(Path newPath)
+    public override void PathFinished(Path newPath)
     {
         path = newPath;
         if (path == null || path.IsEmpty)

@@ -18,6 +18,8 @@ public class Level
 
     public float randomizedMapPositionX = 0, randomizedMapPositionZ = 0;
 
+    public List<Chunk> loadedChunks = new List<Chunk>();
+
     public Level(int seed)
     {
         Seed = seed;
@@ -42,10 +44,10 @@ public class Level
         {
             if (!autoGen)
                 return null;
-            AddChunk(chunkPoint.X, chunkPoint.Y, LevelGenerator.GenerateChunk(Seed, chunkPoint.X, chunkPoint.Y, randomizedMapPositionX, randomizedMapPositionZ));
+            //AddChunk(chunkPoint.X, chunkPoint.Y, LevelGenerator.GenerateChunk(Seed, chunkPoint.X, chunkPoint.Y, randomizedMapPositionX, randomizedMapPositionZ));
+            return null;
         }
 
-        //Debug.Log(String.Format("Pos: {0}:{1} found, looking for {2}:{3}", x, z, cellPoint.X, cellPoint.Y));
         return chunks[GetKey(chunkPoint.X, chunkPoint.Y)].GetCell(cellPoint.X, cellPoint.Y);
     }
 
@@ -59,6 +61,10 @@ public class Level
         return false;
     }
 
+    //Astar "PathFinderFast.cs" was using this
+    //Copies complete grid to two dimensional Cell array
+    //to sloooooooooow
+    [Obsolete]
     public Cell[,] GetCurrentGrid()
     {
         int width = (highestX) - (lowestX);
@@ -71,8 +77,6 @@ public class Level
 
         int lowestXCells = lowestX * LevelGenerator.ChunkSize;
         int lowestZCells = lowestZ * LevelGenerator.ChunkSize;
-
-        //Debug.Log(String.Format("GridGenerated: MinX:{0} MaxX:{1} MinZ:{2} MaxZ:{3}", lowestXCells, lowestZCells, lowestXCells + width, lowestZCells + height));
 
         Cell[,] grid = new Cell[width, height];
         for (int x = 0; x < width; x++)
@@ -106,6 +110,7 @@ public class Level
         
         AddChunk(GetKey(x, z), chunk);
     }
+
     private void AddChunk(string key, Chunk chunk)
     {
         if(chunks.ContainsKey(key))
@@ -114,49 +119,8 @@ public class Level
             return;
         }
         chunks.Add(key, chunk);
-    }
 
-    List<Chunk> loadedChunks = new List<Chunk>();
-
-    public void UpdateChunks()
-    {
-        float CameraPosX = Camera.main.transform.position.x;
-        float CameraPosZ = Camera.main.transform.position.z;
-
-        float centerX = (CameraPosX / LevelGenerator.ChunkSize);
-        float centerZ = (CameraPosZ / LevelGenerator.ChunkSize);
-
-        Chunk[] tmpChunks = loadedChunks.ToArray();
-        for (int i = 0; i < tmpChunks.Length; i++)
-        {
-            if (Level.PosDistance(centerX, centerZ, tmpChunks[i].posX, tmpChunks[i].posZ) >= LevelGenerator.ChunkLoadDistance)
-            {
-                tmpChunks[i].Unload();
-                loadedChunks.Remove(tmpChunks[i]);
-            }
-        }
-
-        for (int x = (Mathf.RoundToInt(centerX) - LevelGenerator.ChunkLoadDistance) - 1; x <= Mathf.RoundToInt(centerX) + LevelGenerator.ChunkLoadDistance; x++)
-        {
-            for (int z = (Mathf.RoundToInt(centerZ) - LevelGenerator.ChunkLoadDistance) - 1; z <= Mathf.RoundToInt(centerZ) + LevelGenerator.ChunkLoadDistance; z++)
-            {
-                if (Level.PosDistance(centerX, centerZ, x, z) >= LevelGenerator.ChunkLoadDistance)
-                    continue;
-
-                Chunk currentChunk;
-                if (!ContainsChunk(x, z))
-                {
-                    currentChunk = LevelGenerator.GenerateChunk(Seed, x, z, randomizedMapPositionX, randomizedMapPositionZ);
-                    AddChunk(x, z, currentChunk);
-                }
-                else
-                {
-                    currentChunk = chunks[GetKey(x, z)];
-                }
-                currentChunk.Load();
-                loadedChunks.Add(currentChunk);
-            }
-        }
+        chunk.UpdateCellNeighbours();
     }
 
     public Point GetCellPoint(float x, float z)

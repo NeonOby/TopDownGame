@@ -1,12 +1,92 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.Threading;
+using System.Collections.Generic;
 
 public class LevelGenerator : MonoBehaviour
 {
-    public static int ChunkSize = 8;
-    public static int ChunkLoadDistance = 4;
+    #region ThreadedMapGeneration
+    private static volatile System.Object fastLock = new System.Object();
 
+    private static int chunkSize = 8;
+    private static int chunkLoadDistance = 2;
+
+    private static float safeDistance = 2f;
+    private static float chancePerDistance = 0.001f;
+    private static float strengthPerDistance = 0.5f;
+
+    private static float maxChance = 0.1f;
+
+    public static float SafeDistance
+    {
+        get
+        {
+            lock (fastLock)
+            {
+                return safeDistance;
+            }
+        }
+    }
+
+    public static int ChunkSize
+    {
+        get
+        {
+            lock (fastLock)
+            {
+                return chunkSize;
+            }
+        }
+        set
+        {
+            lock (fastLock)
+            {
+                chunkSize = value;
+            }
+        }
+    }
+    public static int ChunkLoadDistance
+    {
+        get
+        {
+            lock (fastLock)
+            {
+                return chunkLoadDistance;
+            }
+        }
+        set
+        {
+            lock (fastLock)
+            {
+                chunkLoadDistance = value;
+            }
+        }
+    }
+
+    public static float SeedXPosition
+    {
+        get
+        {
+            lock (fastLock)
+            {
+                return level.randomizedMapPositionX;
+            }
+        }
+    }
+
+    public static float SeedZPosition
+    {
+        get
+        {
+            lock (fastLock)
+            {
+                return level.randomizedMapPositionZ;
+            }
+        }
+    }
+    #endregion
+    
     public static Level level = null;
 
     public string[] DespawnPoolsOnLoad;
@@ -14,9 +94,21 @@ public class LevelGenerator : MonoBehaviour
     public float ChunkUpdateTime = 1f;
     private float ChunkUpdateTimer = 0f;
 
+    public List<ChunkGenerator> generators = new List<ChunkGenerator>();
+
     void Start()
     {
         GenerateLevel(0);
+    }
+
+    public bool ContainsGenerator(int x, int z)
+    {
+        foreach (var item in generators)
+        {
+            if (item.ChunkX == x && item.ChunkZ == z)
+                return true;
+        }
+        return false;
     }
 
     void Update()
@@ -28,9 +120,23 @@ public class LevelGenerator : MonoBehaviour
         if (ChunkUpdateTimer > ChunkUpdateTime)
         {
             ChunkUpdateTimer = 0f;
-            level.UpdateChunks();
+            CheckChunks();
+        }
+
+        foreach (var generator in generators.ToArray())
+        {
+            if (!generator.Generating)
+            {
+                Chunk chunk = generator.GeneratedChunk;
+                level.AddChunk(chunk.posX, chunk.posZ, chunk);
+                generators.Remove(generator);
+                chunk.finishedGenerating = true;
+                chunk.Load();
+            }
         }
     }
+
+    
 
     [Obsolete]
     private void CheckForEmptyChunks()
@@ -68,16 +174,70 @@ public class LevelGenerator : MonoBehaviour
         }
 
         level = newLevel;
-        level.UpdateChunks();
     }
 
-    private static float safeDistance = 2f;
-    private static float chancePerDistance = 0.001f;
-    private static float strengthPerDistance = 0.5f;
+    public float DistanceToCam(Chunk chunk)
+    {
+        return DistanceToCam(chunk.posX, chunk.posZ);
+    }
 
-    private static float maxChance = 0.1f;
+    public float DistanceToCam(int x, int z)
+    {
+        float CameraPosX = Camera.main.transform.position.x;
+        float CameraPosZ = Camera.main.transform.position.z;
 
-    public static Chunk GenerateChunk(int seed, int relX, int relZ, float randomizedMapPositionX, float randomizedMapPositionZ)
+        float centerX = (CameraPosX / ChunkSize);
+        float centerZ = (CameraPosZ / ChunkSize);
+
+        int chunkX = x < 0 ? x + 1 : x;
+        int chunkZ = z < 0 ? z + 1 : z;
+
+        return Level.PosDistance(centerX, centerZ, chunkX, chunkZ);
+    }
+
+    public void CheckChunks()
+    {
+        float CameraPosX = Camera.main.transform.position.x;
+        float CameraPosZ = Camera.main.transform.position.z;
+
+        float centerX = (CameraPosX / ChunkSize);
+        float centerZ = (CameraPosZ / ChunkSize);
+
+        Chunk[] tmpChunks = level.loadedChunks.ToArray();
+        for (int i = 0; i < tmpChunks.Length; i++)
+        {
+            if (DistanceToCam(tmpChunks[i]) >= LevelGenerator.ChunkLoadDistance)
+            {
+                tmpChunks[i].Unload();
+                level.loadedChunks.Remove(tmpChunks[i]);
+            }
+        }
+
+        for (int x = (Mathf.RoundToInt(centerX) - LevelGenerator.ChunkLoadDistance); x < Mathf.RoundToInt(centerX) + LevelGenerator.ChunkLoadDistance; x++)
+        {
+            for (int z = (Mathf.RoundToInt(centerZ) - LevelGenerator.ChunkLoadDistance); z < Mathf.RoundToInt(centerZ) + LevelGenerator.ChunkLoadDistance; z++)
+            {
+                //if (DistanceToCam(x, z) >= LevelGenerator.ChunkLoadDistance)
+
+
+
+                if (!level.ContainsChunk(x, z) && !ContainsGenerator(x, z))
+                {
+                    generators.Add(new ChunkGenerator(x, z, level.Seed));
+                }
+                else if (level.ContainsChunk(x, z))
+                {
+                    Chunk currentChunk = level.chunks[level.GetKey(x, z)];
+                    currentChunk.Load();
+                    level.loadedChunks.Add(currentChunk);
+                }
+            }
+        }
+    }
+
+    //new one in "ChunkGenerator" Thread Safe?
+    [Obsolete]
+    private static Chunk GenerateChunk(int seed, int relX, int relZ, float randomizedMapPositionX, float randomizedMapPositionZ)
     {
         Chunk newChunk = new Chunk();
         newChunk.posX = relX;
@@ -119,13 +279,14 @@ public class LevelGenerator : MonoBehaviour
                 //Versuche auf jedem meter dinge zu erstellen
                 if (Noise > 0.5f)
                 {
-                    newChunk.GetCell(x, z).Walkable = false;
-                    newChunk.GetCell(x, z).ContainsEntity = true;
-                    newChunk.GetCell(x, z).PoolName = "ResourceCube";
-
                     entity = new ResourceBlockEntity();
                     entity.PoolName = "ResourceCube";
                     entity.Position.Value = currentPos;
+
+                    newChunk.GetCell(x, z).Walkable = false;
+                    newChunk.GetCell(x, z).Entity = entity;
+                    newChunk.GetCell(x, z).ContainsEntity = true;
+                    
                     newChunk.AddEntity(entity);
                 }
             }
@@ -201,7 +362,6 @@ public class LevelGenerator : MonoBehaviour
     }
     #endregion
     
-
     public void GenerateLevel(int seed)
     {
         Level newLevel = new Level(seed);

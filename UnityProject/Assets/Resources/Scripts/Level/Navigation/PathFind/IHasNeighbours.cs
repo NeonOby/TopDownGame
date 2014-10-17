@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace PathFind
-{
-    public interface IHasNeighbours<N>
+
+    public interface IHasNeighbours<T>
     {
-        IEnumerable<N> Neighbours { get; }
+        IEnumerable<T> Neighbours { get; set; }
     }
-}
+

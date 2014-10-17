@@ -1,4 +1,6 @@
 ﻿
+using UnityEngine;
+
 public class Worker : Entity
 {
     private Job currentJob;
@@ -7,6 +9,14 @@ public class Worker : Entity
         get
         {
             return currentJob;
+        }
+    }
+
+    public Vector3 CurrentPosition
+    {
+        get
+        {
+            return transform.position;
         }
     }
 
@@ -26,6 +36,10 @@ public class Worker : Entity
         {
             currentJob = currentJob.NextJob;
         }
+    }
+    public virtual void PathFinished(Path newPath)
+    {
+
     }
 }
 

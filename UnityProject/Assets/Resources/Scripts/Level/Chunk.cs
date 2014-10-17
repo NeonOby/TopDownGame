@@ -2,17 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameObjectInfo
-{
-    public GameObjectInfo(string pool, GameObject go)
-    {
-        poolName = pool;
-        gameObject = go;
-    }
 
-    public string poolName = "";
-    public GameObject gameObject = null;
-}
 
 [JsonObject(MemberSerialization.OptIn)]
 public class Chunk
@@ -27,8 +17,6 @@ public class Chunk
 
     [JsonProperty]
     public List<LevelEntity> entities = new List<LevelEntity>();
-
-    private List<GameObjectInfo> spawnedObjects = new List<GameObjectInfo>();
 
     [JsonProperty]
     public int posX = 0, posZ = 0;
@@ -62,6 +50,8 @@ public class Chunk
     private GameObjectInfo chunkInfoInfo = new GameObjectInfo("", null);
 
     private int currentState = -1;
+
+    public bool finishedGenerating = false;
 
     private string loadedPool = "LoadedChunk";
     private string unloadedPool = "UnLoadedChunk";
@@ -114,22 +104,24 @@ public class Chunk
 
     public void Load()
     {
+        if (!finishedGenerating)
+        {
+            ShowUnLoadedGrid();
+            return;
+        }
+
         ShowLoadedGrid();
 
         if (Loaded)
             return;
 
         LevelEntity entity;
-        //GameObject gameObject;
         for (int i = 0; i < entities.Count; i++)
         {
             entity = entities[i];
             if (entity == null)
                 continue;
             entity.Spawn();
-            //gameObject = GameObjectPool.Instance.Spawn(entity.PoolName, entity.Position.Value, entity.Rotation.Value);
-
-            //spawnedObjects.Add(new GameObjectInfo(entity.PoolName, gameObject));
         }
 
         Loaded = true;
@@ -143,7 +135,6 @@ public class Chunk
             return;
 
         LevelEntity entity;
-        //GameObject gameObject;
         for (int i = 0; i < entities.Count; i++)
         {
             entity = entities[i];
@@ -151,18 +142,16 @@ public class Chunk
                 continue;
             entity.Despawn();
         }
-        /*
-        for (int i = 0; i < spawnedObjects.Count; i++)
-        {
-            if (spawnedObjects[i].poolName == "")
-                continue;
-
-            GameObjectPool.Instance.Despawn(spawnedObjects[i].poolName, spawnedObjects[i].gameObject);
-        }
-        spawnedObjects.Clear();
-        */
 
         Loaded = false;
+    }
+
+    public void UpdateCellNeighbours()
+    {
+        foreach (var cell in cells)
+        {
+            cell.ChunkChanged();
+        }
     }
 }
 

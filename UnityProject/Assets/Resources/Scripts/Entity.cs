@@ -11,5 +11,9 @@ public class Entity : MonoBehaviour
     {
 
     }
+    public virtual void Die()
+    {
+        GameObjectPool.Instance.Despawn(PoolName, gameObject);
+    }
 }
 

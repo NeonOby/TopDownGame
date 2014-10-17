@@ -64,11 +64,12 @@
     <Compile Include="Assets\Resources\Scripts\Fighter.cs" />
     <Compile Include="Assets\Resources\Scripts\GameManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Level\Chunk.cs" />
+    <Compile Include="Assets\Resources\Scripts\Level\ChunkGenerator.cs" />
+    <Compile Include="Assets\Resources\Scripts\Level\GameObjectInfo.cs" />
     <Compile Include="Assets\Resources\Scripts\Level\Level.cs" />
     <Compile Include="Assets\Resources\Scripts\Level\LevelEntity.cs" />
     <Compile Include="Assets\Resources\Scripts\Level\LevelGenerator.cs" />
     <Compile Include="Assets\Resources\Scripts\Level\Navigation\Cell.cs" />
-    <Compile Include="Assets\Resources\Scripts\Level\Navigation\IHasPosition.cs" />
     <Compile Include="Assets\Resources\Scripts\Level\Navigation\Jobs\Job.cs" />
     <Compile Include="Assets\Resources\Scripts\Level\Navigation\Path.cs" />
     <Compile Include="Assets\Resources\Scripts\Level\Navigation\PathFind\IHasNeighbours.cs" />

@@ -3,7 +3,7 @@
 [System.Serializable]
 public class Job
 {
-    public Job(SimpleAI owner, string name, Cell target)
+    public Job(Worker owner, string name, Cell target)
     {
         Owner = owner;
         Name = name;
@@ -11,7 +11,7 @@ public class Job
         StartDistance = Vector3.Distance(Owner.CurrentPosition, WantedPosition);
     }
 
-    public SimpleAI Owner { get; set; }
+    public Worker Owner { get; set; }
     public string Name { get; set; }
     public float Progression = 0f;
     public string Info

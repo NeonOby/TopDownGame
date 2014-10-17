@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
@@ -8,49 +9,103 @@ public class ResourceCube : MonoBehaviour
 {
     public int ResourceAmount = 64;
 
-    private int CurrentResources = 0;
-
-    private int lastAmount = 0;
-
-    int width = 4, length = 4;
-
-    int Height
-    {
-        get
-        {
-            return (int)(CurrentResources / (width * length)) + 1;
-        }
-    }
-
     public void SetResourceAmount(int newAmount)
     {
         ResourceAmount = newAmount;
         Reset();
-        GenerateMesh();
+        UpdateMesh();
     }
 
     public void Reset()
     {
-        CurrentResources = ResourceAmount;
+        lock (lockThis)
+        {
+            CurrentResources = ResourceAmount;
+        }
     }
 
     public int MineResource(int amount)
     {
         amount = Mathf.Min(CurrentResources, amount);
-        CurrentResources -= amount;
-        GenerateMesh();
+        lock (lockThis)
+        {
+            CurrentResources -= amount;
+        }
+        UpdateMesh();
         return amount;
     }
 
 	// Use this for initialization
 	void Start () 
     {
-        Reset();
-        GenerateMesh();
+        lock (lockArrays)
+        {
+            InitMesh();
+        }
+
+        //Reset();
+        //UpdateMesh();
 	}
 
+    private void InitMesh()
+    {
+        mesh = new Mesh();
+        mesh.name = "HEllo";
+        meshFilter = gameObject.GetComponent<MeshFilter>();
+        meshFilter.mesh = mesh;
+    }
+
+    void Update()
+    {
+        lock (lockThis)
+        {
+            if (lastGenerating && !generating)
+            {
+                lock (lockArrays)
+                {
+                    mesh.Clear();
+                    mesh.vertices = vertices.ToArray();
+                    mesh.triangles = triangles.ToArray();
+                    mesh.uv = uvs.ToArray();
+
+                    mesh.RecalculateNormals();
+                    mesh.RecalculateBounds();
+
+                    TangentSolver(mesh);
+
+                    mesh.Optimize();
+                }
+            }
+            lastGenerating = generating;
+        }
+    }
+
+    MeshFilter meshFilter;
+
+    private void UpdateMesh()
+    {
+        if (generatingThread != null && generatingThread.IsAlive)
+        {
+            generatingThread.Abort();
+        }
+        lock (lockThis)
+        {
+            generating = true;
+            lastGenerating = true;
+        }
+        lock (lockArrays)
+        {
+            if(mesh == null)
+            {
+                InitMesh();
+            }
+        }
+        generatingThread = new Thread(GenerateMesh);
+        generatingThread.Start();
+    }
+
     #region MeshGeneration
-    public bool GetIsAir(int x, int y, int z)
+    private bool GetIsAir(int x, int y, int z)
     {
         if (x < 0 || x >= width)
             return true;
@@ -62,7 +117,7 @@ public class ResourceCube : MonoBehaviour
         if (y < 0)
             return false;
 
-        if ((x + z * width + y * (width * length)) >= ResourceAmount)
+        if ((x + z * width + y * (width * length)) >= CurrentResources)
         {
             return true;
         }
@@ -92,121 +147,146 @@ public class ResourceCube : MonoBehaviour
         uvs.Add(new Vector2(uvX, uvY + 0.25f));
     }
 
-    [ContextMenu("RecreateMesh")]
-    void GenerateMesh()
+    public volatile bool generating = false;
+    public bool lastGenerating = false;
+
+    public Thread generatingThread;
+
+    //Generating Thread used variables
+    private System.Object lockThis = new System.Object();
+    private System.Object lockArrays = new System.Object();
+
+    int Height
     {
-        if (lastAmount == ResourceAmount)
-            return;
-
-        lastAmount = ResourceAmount;
-
-        if (ResourceAmount > 64)
-            ResourceAmount = 64;
-        if (ResourceAmount < 0)
-            ResourceAmount = 0;
-
-        MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
-        Mesh mesh = new Mesh();
-        meshFilter.mesh = mesh;
-
-        int layerCount = Height;
-
-        List<Vector3> vertices = new List<Vector3>();
-        List<int> triangles = new List<int>();
-        List<Vector2> uvs = new List<Vector2>();
-
-        float diffX = -0.4f;
-        float diffZ = -0.4f;
-
-        float xDiff = 0.2f;
-        float zDiff = 0.2f;
-        float layerHeight = 0.2f;
-
-        int vertexIndex = vertices.Count;
-
-        for (int layer = 0; layer < layerCount; layer++)
+        get
         {
-            for (int x = 0; x < width; x++)
+            return (int)(CurrentResources / (width * length)) + 1;
+        }
+    }
+
+    private volatile Mesh mesh;
+
+    private volatile int CurrentResources = 0;
+    private volatile int width = 4, length = 4;
+    private volatile int lastAmount = 0;
+
+    private volatile List<Vector3> vertices = new List<Vector3>();
+    private volatile List<int> triangles = new List<int>();
+    private volatile List<Vector2> uvs = new List<Vector2>();
+
+    private void GenerateMesh()
+    {
+        int layerCount = 0;
+        lock (lockThis)
+        {
+            if (lastAmount == CurrentResources)
+                return;
+
+            lastAmount = CurrentResources;
+
+            if (CurrentResources > 64)
+                CurrentResources = 64;
+            if (CurrentResources < 0)
+                CurrentResources = 0;
+
+            generating = true;
+
+            layerCount = Height;
+        }
+
+        lock (lockArrays)
+        {
+            vertices.Clear();
+            triangles.Clear();
+            uvs.Clear();
+
+            float diffX = -0.4f;
+            float diffZ = -0.4f;
+
+            float xDiff = 0.2f;
+            float zDiff = 0.2f;
+            float layerHeight = 0.2f;
+
+            int vertexIndex = vertices.Count;
+
+            for (int layer = 0; layer < layerCount; layer++)
             {
-                for (int z = 0; z < length; z++)
+                for (int x = 0; x < width; x++)
                 {
-                    if (!GetIsAir(x, layer, z) && GetIsAir(x, layer + 1, z)) //TOP
+                    for (int z = 0; z < length; z++)
                     {
-                        vertexIndex = vertices.Count;
-                        vertices.Add(new Vector3(diffX + x * xDiff, layer * layerHeight + layerHeight, diffZ + z * zDiff));
-                        vertices.Add(new Vector3(diffX + x * xDiff, layer * layerHeight + layerHeight, diffZ + z * zDiff + zDiff));
-                        vertices.Add(new Vector3(diffX + x * xDiff + xDiff, layer * layerHeight + layerHeight, diffZ + z * zDiff + zDiff));
-                        vertices.Add(new Vector3(diffX + x * xDiff + xDiff, layer * layerHeight + layerHeight, diffZ + z * zDiff));
+                        if (!GetIsAir(x, layer, z) && GetIsAir(x, layer + 1, z)) //TOP
+                        {
+                            vertexIndex = vertices.Count;
+                            vertices.Add(new Vector3(diffX + x * xDiff, layer * layerHeight + layerHeight, diffZ + z * zDiff));
+                            vertices.Add(new Vector3(diffX + x * xDiff, layer * layerHeight + layerHeight, diffZ + z * zDiff + zDiff));
+                            vertices.Add(new Vector3(diffX + x * xDiff + xDiff, layer * layerHeight + layerHeight, diffZ + z * zDiff + zDiff));
+                            vertices.Add(new Vector3(diffX + x * xDiff + xDiff, layer * layerHeight + layerHeight, diffZ + z * zDiff));
 
-                        GenerateTriangles(triangles, vertexIndex);
-                        GenerateUVs(uvs, x, layer, z);
-                    }
+                            GenerateTriangles(triangles, vertexIndex);
+                            GenerateUVs(uvs, x, layer, z);
+                        }
 
-                    //Right
-                    if (!GetIsAir(x, layer, z) && GetIsAir(x + 1, layer, z))
-                    {
-                        vertexIndex = vertices.Count;
-                        vertices.Add(new Vector3(diffX + x * xDiff + xDiff, layer * layerHeight + layerHeight, diffZ + z * zDiff));
-                        vertices.Add(new Vector3(diffX + x * xDiff + xDiff, layer * layerHeight + layerHeight, diffZ + z * zDiff + zDiff));
-                        vertices.Add(new Vector3(diffX + x * xDiff + xDiff, layer * layerHeight, diffZ + z * zDiff + zDiff));
-                        vertices.Add(new Vector3(diffX + x * xDiff + xDiff, layer * layerHeight, diffZ + z * zDiff));
+                        //Right
+                        if (!GetIsAir(x, layer, z) && GetIsAir(x + 1, layer, z))
+                        {
+                            vertexIndex = vertices.Count;
+                            vertices.Add(new Vector3(diffX + x * xDiff + xDiff, layer * layerHeight + layerHeight, diffZ + z * zDiff));
+                            vertices.Add(new Vector3(diffX + x * xDiff + xDiff, layer * layerHeight + layerHeight, diffZ + z * zDiff + zDiff));
+                            vertices.Add(new Vector3(diffX + x * xDiff + xDiff, layer * layerHeight, diffZ + z * zDiff + zDiff));
+                            vertices.Add(new Vector3(diffX + x * xDiff + xDiff, layer * layerHeight, diffZ + z * zDiff));
 
-                        GenerateTriangles(triangles, vertexIndex);
-                        GenerateUVs(uvs, x, layer, z);
-                    }
+                            GenerateTriangles(triangles, vertexIndex);
+                            GenerateUVs(uvs, x, layer, z);
+                        }
 
-                    //Left
-                    if (!GetIsAir(x, layer, z) && GetIsAir(x - 1, layer, z))
-                    {
-                        vertexIndex = vertices.Count;
-                        vertices.Add(new Vector3(diffX + x * xDiff, layer * layerHeight, diffZ + z * zDiff));
-                        vertices.Add(new Vector3(diffX + x * xDiff, layer * layerHeight, diffZ + z * zDiff + zDiff));
-                        vertices.Add(new Vector3(diffX + x * xDiff, layer * layerHeight + layerHeight, diffZ + z * zDiff + zDiff));
-                        vertices.Add(new Vector3(diffX + x * xDiff, layer * layerHeight + layerHeight, diffZ + z * zDiff));
+                        //Left
+                        if (!GetIsAir(x, layer, z) && GetIsAir(x - 1, layer, z))
+                        {
+                            vertexIndex = vertices.Count;
+                            vertices.Add(new Vector3(diffX + x * xDiff, layer * layerHeight, diffZ + z * zDiff));
+                            vertices.Add(new Vector3(diffX + x * xDiff, layer * layerHeight, diffZ + z * zDiff + zDiff));
+                            vertices.Add(new Vector3(diffX + x * xDiff, layer * layerHeight + layerHeight, diffZ + z * zDiff + zDiff));
+                            vertices.Add(new Vector3(diffX + x * xDiff, layer * layerHeight + layerHeight, diffZ + z * zDiff));
 
-                        GenerateTriangles(triangles, vertexIndex);
-                        GenerateUVs(uvs, x, layer, z);
-                    }
+                            GenerateTriangles(triangles, vertexIndex);
+                            GenerateUVs(uvs, x, layer, z);
+                        }
 
-                    //Front
-                    if (!GetIsAir(x, layer, z) && GetIsAir(x, layer, z - 1))
-                    {
-                        vertexIndex = vertices.Count;
-                        vertices.Add(new Vector3(diffX + x * xDiff, layer * layerHeight + layerHeight, diffZ + z * zDiff));
-                        vertices.Add(new Vector3(diffX + x * xDiff + xDiff, layer * layerHeight + layerHeight, diffZ + z * zDiff));
-                        vertices.Add(new Vector3(diffX + x * xDiff + xDiff, layer * layerHeight, diffZ + z * zDiff));
-                        vertices.Add(new Vector3(diffX + x * xDiff, layer * layerHeight, diffZ + z * zDiff));
+                        //Front
+                        if (!GetIsAir(x, layer, z) && GetIsAir(x, layer, z - 1))
+                        {
+                            vertexIndex = vertices.Count;
+                            vertices.Add(new Vector3(diffX + x * xDiff, layer * layerHeight + layerHeight, diffZ + z * zDiff));
+                            vertices.Add(new Vector3(diffX + x * xDiff + xDiff, layer * layerHeight + layerHeight, diffZ + z * zDiff));
+                            vertices.Add(new Vector3(diffX + x * xDiff + xDiff, layer * layerHeight, diffZ + z * zDiff));
+                            vertices.Add(new Vector3(diffX + x * xDiff, layer * layerHeight, diffZ + z * zDiff));
 
-                        GenerateTriangles(triangles, vertexIndex);
-                        GenerateUVs(uvs, x, layer, z);
-                    }
+                            GenerateTriangles(triangles, vertexIndex);
+                            GenerateUVs(uvs, x, layer, z);
+                        }
 
-                    //Front
-                    if (!GetIsAir(x, layer, z) && GetIsAir(x, layer, z + 1))
-                    {
-                        vertexIndex = vertices.Count;
-                        vertices.Add(new Vector3(diffX + x * xDiff, layer * layerHeight, diffZ + z * zDiff + zDiff));
-                        vertices.Add(new Vector3(diffX + x * xDiff + xDiff, layer * layerHeight, diffZ + z * zDiff + zDiff));
-                        vertices.Add(new Vector3(diffX + x * xDiff + xDiff, layer * layerHeight + layerHeight, diffZ + z * zDiff + zDiff));
-                        vertices.Add(new Vector3(diffX + x * xDiff, layer * layerHeight + layerHeight, diffZ + z * zDiff + zDiff));
+                        //Front
+                        if (!GetIsAir(x, layer, z) && GetIsAir(x, layer, z + 1))
+                        {
+                            vertexIndex = vertices.Count;
+                            vertices.Add(new Vector3(diffX + x * xDiff, layer * layerHeight, diffZ + z * zDiff + zDiff));
+                            vertices.Add(new Vector3(diffX + x * xDiff + xDiff, layer * layerHeight, diffZ + z * zDiff + zDiff));
+                            vertices.Add(new Vector3(diffX + x * xDiff + xDiff, layer * layerHeight + layerHeight, diffZ + z * zDiff + zDiff));
+                            vertices.Add(new Vector3(diffX + x * xDiff, layer * layerHeight + layerHeight, diffZ + z * zDiff + zDiff));
 
-                        GenerateTriangles(triangles, vertexIndex);
-                        GenerateUVs(uvs, x, layer, z);
+                            GenerateTriangles(triangles, vertexIndex);
+                            GenerateUVs(uvs, x, layer, z);
+                        }
                     }
                 }
             }
+
         }
-
-        mesh.vertices = vertices.ToArray();
-        mesh.triangles = triangles.ToArray();
-        mesh.uv = uvs.ToArray();
-
-        mesh.RecalculateNormals();
-        mesh.RecalculateBounds();
-
-        TangentSolver(mesh);
-
-        mesh.Optimize();
+        lock (lockThis)
+        {
+            generating = false;
+        }
     }
 
     public void TangentSolver(Mesh mesh)

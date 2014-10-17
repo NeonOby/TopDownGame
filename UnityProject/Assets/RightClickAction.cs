@@ -44,7 +44,10 @@ public class RightClickAction : MonoBehaviour
                 {
                     LastNeededTime = Time.realtimeSinceStartup - startTime;
                     if (currentFindingPath.CallBack != null)
+                    {
                         currentFindingPath.CallBack(GeneratePath(currentFindingPath, path));
+                    }
+                        
                     break;
                 }
             }
@@ -64,6 +67,11 @@ public class RightClickAction : MonoBehaviour
         }
 	}
 
+    void OnGUI()
+    {
+        GUILayout.Label(LastNeededTime.ToString());
+    }
+
     public Path GeneratePath(SearchingPath pathSearcher, PathFind.Path<Cell> path)
     {
         Path newPath = new Path();
@@ -81,20 +89,32 @@ public class RightClickAction : MonoBehaviour
             return;
 
         Cell start = LevelGenerator.level.GetCell(MouseSelection.GetSelected()[0].transform.position.x, MouseSelection.GetSelected()[0].transform.position.z);
+
+        if (!start)
+            return;
+        
         Cell end = LevelGenerator.level.GetCell(lastClickedPosition.x, lastClickedPosition.z);
-        if (!end.Walkable)
+        if (!end || !end.Walkable)
         {
             end = FindNeighborWalkableCell(end, start);
         }
 
-        if (end == null || !end.Walkable)
+        if (!end || !end.Walkable)
             return;
 
         path = null;
         finished = false;
 
         currentFindingPath = new SearchingPath(start, end);
-        //currentFindingPath.CallBack = selectedEntities[0].PathFinished;
+        if (MouseSelection.State == MouseSelection.States.SINGLE_SELECTED && MouseSelection.GetSelected()[0] is Worker)
+        {
+            currentFindingPath.CallBack = ((Worker)MouseSelection.GetSelected()[0]).PathFinished;
+        }
+        else
+        {
+            //Multiple Selection
+            //TODO Group Flocking
+        }
         startTime = Time.realtimeSinceStartup;
 
         //Effekt
