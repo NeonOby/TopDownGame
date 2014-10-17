@@ -86,7 +86,23 @@ public class LevelGenerator : MonoBehaviour
         }
     }
     #endregion
-    
+
+    private static LevelGenerator instance;
+    public static LevelGenerator Instance
+    {
+        get
+        {
+            if (instance == null)
+                instance = FindObjectOfType<LevelGenerator>();
+            return instance;
+        }
+    }
+
+    void Awake()
+    {
+        instance = this;
+    }
+
     public static Level level = null;
 
     public string[] DespawnPoolsOnLoad;
@@ -111,6 +127,14 @@ public class LevelGenerator : MonoBehaviour
         return false;
     }
 
+    public void AddChunkGenerator(int x, int z)
+    {
+        if (!level.ContainsChunk(x, z) && !ContainsGenerator(x, z))
+        {
+            generators.Add(new ChunkGenerator(x, z, level.Seed));
+        }
+    }
+
     void Update()
     {
         if (level == null)
@@ -131,7 +155,6 @@ public class LevelGenerator : MonoBehaviour
                 level.AddChunk(chunk.posX, chunk.posZ, chunk);
                 generators.Remove(generator);
                 chunk.finishedGenerating = true;
-                chunk.Load();
             }
         }
     }
@@ -217,15 +240,11 @@ public class LevelGenerator : MonoBehaviour
         {
             for (int z = (Mathf.RoundToInt(centerZ) - LevelGenerator.ChunkLoadDistance); z < Mathf.RoundToInt(centerZ) + LevelGenerator.ChunkLoadDistance; z++)
             {
-                //if (DistanceToCam(x, z) >= LevelGenerator.ChunkLoadDistance)
+                if (DistanceToCam(x, z) >= LevelGenerator.ChunkLoadDistance)
+                    continue;
 
-
-
-                if (!level.ContainsChunk(x, z) && !ContainsGenerator(x, z))
-                {
-                    generators.Add(new ChunkGenerator(x, z, level.Seed));
-                }
-                else if (level.ContainsChunk(x, z))
+                AddChunkGenerator(x, z);
+                if (level.ContainsChunk(x, z))
                 {
                     Chunk currentChunk = level.chunks[level.GetKey(x, z)];
                     currentChunk.Load();

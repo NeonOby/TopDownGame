@@ -2,6 +2,62 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using System.Linq;
+
+public class ResizeAbleArray<T>
+{
+    private T[] array = null;
+    private List<T> list = new List<T>();
+
+    private void IncreaseSize()
+    {
+        T[] tmpArray = new T[array.Length + 1];
+        for (int i = 0; i < array.Length; i++)
+        {
+            tmpArray[i] = array[i];
+        }
+        array = tmpArray;
+    }
+
+    private void AddElement(T element)
+    {
+        list.Add(element);
+    }
+
+    #region PublicThings
+    public void Add(T element)
+    {
+        AddElement(element);
+    }
+
+    public void Clear()
+    {
+        list.Clear();
+    }
+
+    public int Count
+    {
+        get
+        {
+            return list.Count;
+        }
+    }
+
+    public void GenerateArray()
+    {
+        array = list.ToArray();
+    }
+
+    public T[] Array
+    {
+        get
+        {
+            return array;
+        }
+    }
+    #endregion
+    
+}
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
@@ -18,19 +74,13 @@ public class ResourceCube : MonoBehaviour
 
     public void Reset()
     {
-        lock (lockThis)
-        {
-            CurrentResources = ResourceAmount;
-        }
+        CurrentResources = ResourceAmount;
     }
 
     public int MineResource(int amount)
     {
         amount = Mathf.Min(CurrentResources, amount);
-        lock (lockThis)
-        {
-            CurrentResources -= amount;
-        }
+        CurrentResources -= amount;
         UpdateMesh();
         return amount;
     }
@@ -38,13 +88,7 @@ public class ResourceCube : MonoBehaviour
 	// Use this for initialization
 	void Start () 
     {
-        lock (lockArrays)
-        {
-            InitMesh();
-        }
-
-        //Reset();
-        //UpdateMesh();
+        InitMesh();
 	}
 
     private void InitMesh()
@@ -57,26 +101,31 @@ public class ResourceCube : MonoBehaviour
 
     void Update()
     {
-        lock (lockThis)
+        if (lastGenerating && !generating)
         {
-            if (lastGenerating && !generating)
-            {
-                lock (lockArrays)
-                {
-                    mesh.Clear();
-                    mesh.vertices = vertices.ToArray();
-                    mesh.triangles = triangles.ToArray();
-                    mesh.uv = uvs.ToArray();
+            ChangeMesh();
+        }
+        lastGenerating = generating;
+    }
 
-                    mesh.RecalculateNormals();
-                    mesh.RecalculateBounds();
+    public void ChangeMesh()
+    {
+        lock (lockArrays)
+        {
+            
+            mesh.Clear();
 
-                    TangentSolver(mesh);
+            mesh.vertices = vertices.Array;
+            mesh.triangles = triangles.Array;
+            mesh.uv = uvs.Array;
 
-                    mesh.Optimize();
-                }
-            }
-            lastGenerating = generating;
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+
+            TangentSolver(mesh);
+
+            mesh.Optimize();
+            
         }
     }
 
@@ -88,17 +137,13 @@ public class ResourceCube : MonoBehaviour
         {
             generatingThread.Abort();
         }
-        lock (lockThis)
+
+        generating = true;
+        lastGenerating = true;
+
+        if(mesh == null)
         {
-            generating = true;
-            lastGenerating = true;
-        }
-        lock (lockArrays)
-        {
-            if(mesh == null)
-            {
-                InitMesh();
-            }
+            InitMesh();
         }
         generatingThread = new Thread(GenerateMesh);
         generatingThread.Start();
@@ -125,7 +170,7 @@ public class ResourceCube : MonoBehaviour
         return false;
     }
 
-    private void GenerateTriangles(List<int> triangles, int vertexIndex)
+    private void GenerateTriangles(ResizeAbleArray<int> triangles, int vertexIndex)
     {
         triangles.Add(vertexIndex);
         triangles.Add(vertexIndex + 1);
@@ -136,7 +181,7 @@ public class ResourceCube : MonoBehaviour
         triangles.Add(vertexIndex);
     }
 
-    private void GenerateUVs(List<Vector2> uvs, int x, int y, int z)
+    private void GenerateUVs(ResizeAbleArray<Vector2> uvs, int x, int y, int z)
     {
         float uvX = (x % 4) * 0.25f + (y % 4) * 0.25f;
         float uvY = (z % 4) * 0.25f + (y % 4) * 0.25f;
@@ -170,29 +215,27 @@ public class ResourceCube : MonoBehaviour
     private volatile int width = 4, length = 4;
     private volatile int lastAmount = 0;
 
-    private volatile List<Vector3> vertices = new List<Vector3>();
-    private volatile List<int> triangles = new List<int>();
-    private volatile List<Vector2> uvs = new List<Vector2>();
+    private volatile ResizeAbleArray<Vector3> vertices = new ResizeAbleArray<Vector3>();
+    private volatile ResizeAbleArray<int> triangles = new ResizeAbleArray<int>();
+    private volatile ResizeAbleArray<Vector2> uvs = new ResizeAbleArray<Vector2>();
 
     private void GenerateMesh()
     {
         int layerCount = 0;
-        lock (lockThis)
-        {
-            if (lastAmount == CurrentResources)
-                return;
 
-            lastAmount = CurrentResources;
+        if (lastAmount == CurrentResources)
+            return;
 
-            if (CurrentResources > 64)
-                CurrentResources = 64;
-            if (CurrentResources < 0)
-                CurrentResources = 0;
+        lastAmount = CurrentResources;
 
-            generating = true;
+        if (CurrentResources > 64)
+            CurrentResources = 64;
+        if (CurrentResources < 0)
+            CurrentResources = 0;
 
-            layerCount = Height;
-        }
+        generating = true;
+
+        layerCount = Height;
 
         lock (lockArrays)
         {
@@ -283,10 +326,12 @@ public class ResourceCube : MonoBehaviour
             }
 
         }
-        lock (lockThis)
-        {
-            generating = false;
-        }
+
+        vertices.GenerateArray();
+        triangles.GenerateArray();
+        uvs.GenerateArray();
+
+        generating = false;
     }
 
     public void TangentSolver(Mesh mesh)

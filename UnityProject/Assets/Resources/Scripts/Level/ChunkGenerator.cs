@@ -134,7 +134,7 @@ public class ChunkGenerator
                     float NoiseY = (float)(LevelGenerator.SeedZPosition + currentPos.z) * NoiseScale;
                     float Noise = LevelGenerator.PerlinNoise2D(NoiseX, NoiseY);
 
-                    currentPos.y = Noise;
+                    currentPos.y = Noise * 2f;
 
                     generatedChunk.SetCell(x, z, new Cell());
                     generatedChunk.GetCell(x, z).X = currentPos.x;

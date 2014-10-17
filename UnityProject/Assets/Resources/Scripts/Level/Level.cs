@@ -44,7 +44,8 @@ public class Level
         {
             if (!autoGen)
                 return null;
-            //AddChunk(chunkPoint.X, chunkPoint.Y, LevelGenerator.GenerateChunk(Seed, chunkPoint.X, chunkPoint.Y, randomizedMapPositionX, randomizedMapPositionZ));
+
+            //LevelGenerator.Instance.AddChunkGenerator(chunkPoint.X, chunkPoint.Y);
             return null;
         }
 
