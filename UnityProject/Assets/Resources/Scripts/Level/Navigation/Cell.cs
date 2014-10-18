@@ -67,16 +67,18 @@ public class Cell : IHasNeighbours<Cell>
         AddNeighbour(right);
         AddNeighbour(left);
 
+        /*
         AddNeighbour(topRight);
         AddNeighbour(bottomRight);
         AddNeighbour(topLeft);
         AddNeighbour(bottomLeft);
+        */
 
         /*
          * Check to avoid block edges
          * Shouldn't be part of this, should be somewhere else ?
          * (Could be hard to calculate somewhere else)
-         * 
+         */
         if (((top && top.Walkable) || (right && right.Walkable)) && topRight && !((top && !top.Walkable) || (right && !right.Walkable)))
             AddNeighbour(topRight);
         if (((top && top.Walkable) || (left && left.Walkable)) && topLeft && !((top && !top.Walkable) || (left && !left.Walkable)))
@@ -86,7 +88,7 @@ public class Cell : IHasNeighbours<Cell>
             AddNeighbour(bottomRight);
         if (((bottom && bottom.Walkable) || (left && left.Walkable)) && bottomLeft && !((bottom && !bottom.Walkable) || (left && !left.Walkable)))
             AddNeighbour(bottomLeft);
-        */
+        
 
         foreach (var item in neighbours)
         {

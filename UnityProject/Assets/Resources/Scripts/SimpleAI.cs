@@ -20,6 +20,9 @@ public class SimpleAI : Worker
     public float MinSpeed = 0.5f; //Backwards
     public float MaxSpeed = 5.0f; //Straight
 
+    public float ClimbSpeed = 4.0f;
+    public float FlyHeight = 2.0f;
+
     public Job CurrentJob = null;
 
     public Transform Transform;
@@ -52,7 +55,7 @@ public class SimpleAI : Worker
         WantedLookDirection = Vector3.forward;
         GameObjectPool.DespawnAllPerPool += DespawnAllPerPool;
 
-        CurrentJob = new Job(this, "StandingAround", null);
+        CurrentJob = new Job(this, "StandingAround", transform.position);
         CurrentJob.NextJob = null;
 	}
 
@@ -81,7 +84,7 @@ public class SimpleAI : Worker
         if (!Enabled)
             return;
 
-        if (Vector3.Distance(transform.position, NextNavigationPosition) < 0.2f)
+        if (Vector3.Distance(transform.position, NextNavigationPosition + Vector3.up * FlyHeight) < 0.2f)
         {
             if (path != null && !path.IsLast)
             {
@@ -96,6 +99,7 @@ public class SimpleAI : Worker
         {
             WantedLookDirection = VisionTarget.position - transform.position;
         }
+        WantedLookDirection.y = 0;
         
         if (WantedLookDirection.magnitude > 0.2f)
         {
@@ -103,9 +107,11 @@ public class SimpleAI : Worker
             transform.rotation = Quaternion.Lerp(transform.rotation, wantedRotation, Time.deltaTime * RotationDamping);            
         }
 
+        Vector3 wantedPosition = NextNavigationPosition + Vector3.up * FlyHeight;
+
         float WantedSpeed = 0f;
 
-        float dot = Mathf.Max(Vector3.Dot(transform.forward, (NextNavigationPosition - transform.position).normalized)-0.5f, 0.0f)*2f;
+        float dot = Mathf.Max(Vector3.Dot(transform.forward, (wantedPosition - transform.position).normalized) - 0.5f, 0.0f) * 2f;
 
         WantedSpeed = dot * MaxSpeed;
 
@@ -113,11 +119,14 @@ public class SimpleAI : Worker
             WantedSpeed = Mathf.Max(WantedSpeed, MinSpeed);
 
         if(path != null && path.IsLast)
-            WantedSpeed *= Mathf.Min((NextNavigationPosition - transform.position).magnitude, 1.0f);
+            WantedSpeed *= Mathf.Min((wantedPosition - transform.position).magnitude, 1.0f);
 
         CurrentSpeed = Mathf.Lerp(WantedSpeed, WantedSpeed, Time.deltaTime * 1.0f);
 
-        transform.position += (NextNavigationPosition - transform.position).normalized * CurrentSpeed * Time.deltaTime;
+
+        transform.position += (wantedPosition - transform.position).normalized * CurrentSpeed * Time.deltaTime;
+
+        transform.position += Vector3.up * (wantedPosition - transform.position).y * Time.deltaTime * ClimbSpeed;
 
         //Shooting
         ShootTimer += Time.deltaTime;
@@ -235,8 +244,10 @@ public class SimpleAI : Worker
             NextNavigationPosition = transform.position;
             return;
         }
-        NextNavigationPosition = path.GetNext().Position;
+        NextWaypoint();
+        if (!path.IsLast)
+            NextWaypoint();
 
-        CurrentJob = new Job(this, "WalkTo", path.Destination);
+        CurrentJob = new Job(this, "WalkTo", path.Destination.Position + Vector3.up * FlyHeight);
     }
 }

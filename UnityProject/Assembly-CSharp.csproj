@@ -53,7 +53,6 @@
      <Compile Include="Assets\Algorithms\PathFinderFast.cs" />
      <Compile Include="Assets\Algorithms\Point.cs" />
      <Compile Include="Assets\Algorithms\PriorityQueueB.cs" />
-     <Compile Include="Assets\ResourceCube.cs" />
      <Compile Include="Assets\Resources\GameObjectPool\GameObjectPool.cs" />
      <Compile Include="Assets\Resources\GameObjectPool\GameObjectPoolCreate.cs" />
      <Compile Include="Assets\Resources\Scripts\Controls.cs" />
@@ -83,6 +82,8 @@
      <Compile Include="Assets\Resources\Scripts\Level\SaveGameManager.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\Vector3Position.cs" />
      <Compile Include="Assets\Resources\Scripts\MouseSelection.cs" />
+     <Compile Include="Assets\Resources\Scripts\ResourceCube.cs" />
+     <Compile Include="Assets\Resources\Scripts\RightClickAction.cs" />
      <Compile Include="Assets\Resources\Scripts\RightClickTester.cs" />
      <Compile Include="Assets\Resources\Scripts\SimpleAI.cs" />
      <Compile Include="Assets\Resources\Scripts\SimpleBullet.cs" />
@@ -93,7 +94,6 @@
      <Compile Include="Assets\Resources\Scripts\TopDownZoom.cs" />
      <Compile Include="Assets\Resources\Scripts\Utility\GridSystem.cs" />
      <Compile Include="Assets\Resources\Scripts\Worker.cs" />
-     <Compile Include="Assets\RightClickAction.cs" />
      <Compile Include="Assets\_ProgrammerInfo.cs" />
      <None Include="Assets\Resources\Shaders\VertexColorIllum.shader" />
      <None Include="Assets\Resources\Shaders\VertexColorTransparent.shader" />

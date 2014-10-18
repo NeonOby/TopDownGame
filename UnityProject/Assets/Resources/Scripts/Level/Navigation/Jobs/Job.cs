@@ -3,10 +3,11 @@
 [System.Serializable]
 public class Job
 {
-    public Job(Worker owner, string name, Cell target)
+    public Job(Worker owner, string name, Vector3 target)
     {
         Owner = owner;
         Name = name;
+        WantedPosition = target;
 
         StartDistance = Vector3.Distance(Owner.CurrentPosition, WantedPosition);
     }
@@ -22,16 +23,7 @@ public class Job
         }
     }
 
-    public Cell Target { get; set; }
-    public Vector3 WantedPosition
-    {
-        get
-        {
-            if (!Target)
-                return Owner.CurrentPosition;
-            return Target.Position; 
-        }
-    }
+    public Vector3 WantedPosition;
 
     private float StartDistance = 0f;
 
