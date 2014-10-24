@@ -37,7 +37,7 @@ public class Worker : Entity
             currentJob = currentJob.NextJob;
         }
     }
-    public virtual void PathFinished(Path newPath)
+    public virtual void PathFinished(EntityController controller, Path newPath)
     {
 
     }

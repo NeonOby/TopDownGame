@@ -5,11 +5,10 @@ using System.Collections.Generic;
 
 public class RightClickTester : MonoBehaviour 
 {
-    public delegate void PathFinished(Path path);
 
     SearchingPath currentFindingPath = null;
     bool finished = false;
-	PathFind.Path<Cell> path = null;
+	PathNode path = null;
 
 	int updatesPerFrame = 50;
 

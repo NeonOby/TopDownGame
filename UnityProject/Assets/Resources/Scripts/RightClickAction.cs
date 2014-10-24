@@ -16,7 +16,7 @@ public class RightClickAction : MonoBehaviour
 
     SearchingPath currentFindingPath = null;
     bool finished = false;
-    PathFind.Path<Cell> path = null;
+    PathNode path = null;
 
     int updatesPerFrame = 50;
 
@@ -45,9 +45,9 @@ public class RightClickAction : MonoBehaviour
                     LastNeededTime = Time.realtimeSinceStartup - startTime;
                     if (currentFindingPath.CallBack != null)
                     {
-                        currentFindingPath.CallBack(GeneratePath(currentFindingPath, path));
+                        currentFindingPath.CallBack(currentFindingPath.Owner, GeneratePath(currentFindingPath, path));
                     }
-                        
+
                     break;
                 }
             }
@@ -72,7 +72,7 @@ public class RightClickAction : MonoBehaviour
         GUILayout.Label(LastNeededTime.ToString());
     }
 
-    public Path GeneratePath(SearchingPath pathSearcher, PathFind.Path<Cell> path)
+    public Path GeneratePath(SearchingPath pathSearcher, PathNode path)
     {
         Path newPath = new Path();
         foreach (var item in path)

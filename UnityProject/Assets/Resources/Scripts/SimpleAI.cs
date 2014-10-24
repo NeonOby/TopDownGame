@@ -3,6 +3,7 @@ using System.Collections;
 
 public class SimpleAI : Worker 
 {
+    public Player Owner;
 
     public delegate void SimpleAIEvent(SimpleAI sender);
     public static event SimpleAIEvent SimpleAIDied;
@@ -55,7 +56,7 @@ public class SimpleAI : Worker
         WantedLookDirection = Vector3.forward;
         GameObjectPool.DespawnAllPerPool += DespawnAllPerPool;
 
-        CurrentJob = new Job(this, "StandingAround", transform.position);
+        CurrentJob = new Job(Owner, this, "StandingAround", transform.position);
         CurrentJob.NextJob = null;
 	}
 
@@ -236,7 +237,14 @@ public class SimpleAI : Worker
 
     public Path path = null;
 
-    public override void PathFinished(Path newPath)
+    public override void SetJob(Job value)
+    {
+        base.SetJob(value);
+
+
+    }
+
+    public override void PathFinished(EntityController controller, Path newPath)
     {
         path = newPath;
         if (path == null || path.IsEmpty)
@@ -248,6 +256,6 @@ public class SimpleAI : Worker
         if (!path.IsLast)
             NextWaypoint();
 
-        CurrentJob = new Job(this, "WalkTo", path.Destination.Position + Vector3.up * FlyHeight);
+        CurrentJob = new Job(controller, this, "WalkTo", path.Destination.Position + Vector3.up * FlyHeight);
     }
 }

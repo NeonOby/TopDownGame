@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System;
+
 [System.Serializable]
 public class Level 
 {
@@ -37,10 +38,10 @@ public class Level
 
     public Cell GetCell(float x, float z, bool autoGen = true)
     {
-        Point cellPoint = GetCellPoint(x, z);
-        Point chunkPoint = GetChunkPoint(x, z);
+        Vector3 cellPoint = GetCellPoint(x, z);
+        Vector3 chunkPoint = GetChunkPoint(x, z);
 
-        if (!ContainsChunk(chunkPoint.X, chunkPoint.Y))
+        if (!ContainsChunk(chunkPoint.x, chunkPoint.z))
         {
             if (!autoGen)
                 return null;
@@ -49,7 +50,7 @@ public class Level
             return null;
         }
 
-        return chunks[GetKey(chunkPoint.X, chunkPoint.Y)].GetCell(cellPoint.X, cellPoint.Y);
+        return chunks[GetKey(chunkPoint.x, chunkPoint.z)].GetCell(cellPoint.x, cellPoint.z);
     }
 
     public bool PositionOutOfLevel(float x, float z)
@@ -93,6 +94,11 @@ public class Level
         return grid;
     }
 
+    public string GetKey(float x, float z)
+    {
+        return GetKey((int)x, (int)z);
+    }
+
     public string GetKey(int x, int z)
     {
         return System.String.Format("{0}{1}{2}", x, split, z);
@@ -124,29 +130,29 @@ public class Level
         chunk.UpdateCellNeighbours();
     }
 
-    public Point GetCellPoint(float x, float z)
+    public Vector3 GetCellPoint(float x, float z)
     {
-        Point point = new Point((int)x, (int)z);
-        point.X = point.X % LevelGenerator.ChunkSize;
-        point.Y = point.Y % LevelGenerator.ChunkSize;
-        point.X = x < 0 ? (LevelGenerator.ChunkSize - 1) - Mathf.Abs(point.X) : point.X;
-        point.Y = z < 0 ? (LevelGenerator.ChunkSize - 1) - Mathf.Abs(point.Y) : point.Y;
+        Vector3 point = new Vector3((int)x, 0, (int)z);
+        point.x = point.x % LevelGenerator.ChunkSize;
+        point.z = point.z % LevelGenerator.ChunkSize;
+        point.x = x < 0 ? (LevelGenerator.ChunkSize - 1) - Mathf.Abs(point.x) : point.x;
+        point.z = z < 0 ? (LevelGenerator.ChunkSize - 1) - Mathf.Abs(point.z) : point.z;
         return point;
     }
-    public Point GetChunkPoint(float x, float z)
+    public Vector3 GetChunkPoint(float x, float z)
     {
-        Point point = new Point((int)x, (int)z);
-        point.X = (int)(x / LevelGenerator.ChunkSize);
-        point.Y = (int)(z / LevelGenerator.ChunkSize);
-        point.X = x < 0 ? point.X - 1 : point.X;
-        point.Y = z < 0 ? point.Y - 1 : point.Y;
+        Vector3 point = new Vector3((int)x, 0, (int)z);
+        point.x = (int)(x / LevelGenerator.ChunkSize);
+        point.z = (int)(z / LevelGenerator.ChunkSize);
+        point.x = x < 0 ? point.x - 1 : point.x;
+        point.z = z < 0 ? point.z - 1 : point.z;
         return point;
     }
 
     public bool ContainsChunk(float x, float z)
     {
-        Point p = GetChunkPoint(x, z);
-        return ContainsChunk(p.X, p.Y);
+        Vector3 p = GetChunkPoint(x, z);
+        return ContainsChunk(p.x, p.z);
     }
     public bool ContainsChunk(int x, int z)
     {
