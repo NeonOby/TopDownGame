@@ -31,6 +31,11 @@ public class Chunk
         entities.Add(entity);
     }
 
+    public Cell GetCell(float x, float z)
+    {
+        return GetCell((int)x, (int)z);
+    }
+
     public Cell GetCell(int x, int z)
     {
         if (x < 0 || x > cells.GetUpperBound(0) || z < 0 || z > cells.GetUpperBound(1))
