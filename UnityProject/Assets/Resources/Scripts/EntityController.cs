@@ -61,5 +61,20 @@ public class EntityController : MonoBehaviour
     {
         AddResources(StartResources);
     }
+
+    public virtual void RightClick()
+    {
+
+    }
+    public virtual void ShiftRightClick()
+    {
+
+    }
+
+    public virtual void GenerateJobForSelectedEntities()
+    {
+
+    }
+
 }
 

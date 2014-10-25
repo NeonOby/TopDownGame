@@ -42,10 +42,12 @@ public class RightClickAction : MonoBehaviour
                 path = currentFindingPath.NextStepPath(out finished);
                 if (finished)
                 {
+                    //TODO Create and set job to selected workers
+
                     LastNeededTime = Time.realtimeSinceStartup - startTime;
                     if (currentFindingPath.CallBack != null)
                     {
-                        currentFindingPath.CallBack(currentFindingPath.Owner, GeneratePath(currentFindingPath, path));
+                        currentFindingPath.CallBack(currentFindingPath.Owner, currentFindingPath.GeneratePath());
                     }
 
                     break;
@@ -72,17 +74,6 @@ public class RightClickAction : MonoBehaviour
         GUILayout.Label(LastNeededTime.ToString());
     }
 
-    public Path GeneratePath(SearchingPath pathSearcher, PathNode path)
-    {
-        Path newPath = new Path();
-        foreach (var item in path)
-        {
-            newPath.AddWaypoint(item);
-        }
-        newPath.Destination = pathSearcher.Destination;
-        return newPath;
-    }
-
     public void DoRightClick()
     {
         if (MouseSelection.State == MouseSelection.States.NOTHING_SELECTED)
@@ -96,7 +87,7 @@ public class RightClickAction : MonoBehaviour
         Cell end = LevelGenerator.level.GetCell(lastClickedPosition.x, lastClickedPosition.z);
         if (!end || !end.Walkable)
         {
-            end = FindNeighborWalkableCell(end, start);
+            end = LevelGenerator.level.FindNeighborWalkableCell(end, start);
         }
 
         if (!end || !end.Walkable)
@@ -119,24 +110,6 @@ public class RightClickAction : MonoBehaviour
 
         //Effekt
         GameObjectPool.Instance.Spawn(RightClickEffectPool, lastClickedPosition, Quaternion.identity);
-    }
-
-    public Cell FindNeighborWalkableCell(Cell cell, Cell start)
-    {
-        float minDistance = -1f;
-        Cell foundCell = null;
-        foreach (var neighbor in cell.Neighbours)
-        {
-            if (neighbor.Walkable)
-            {
-                if (minDistance == -1 || start.Distance(neighbor) < minDistance)
-                {
-                    foundCell = neighbor;
-                    minDistance = Cell.Distance(neighbor, start);
-                }
-            }
-        }
-        return foundCell;
     }
 
 }

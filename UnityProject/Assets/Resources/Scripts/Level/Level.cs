@@ -130,6 +130,24 @@ public class Level
         chunk.UpdateCellNeighbours();
     }
 
+    public Cell FindNeighborWalkableCell(Cell cell, Cell start)
+    {
+        float minDistance = -1f;
+        Cell foundCell = null;
+        foreach (var neighbor in cell.Neighbours)
+        {
+            if (neighbor.Walkable)
+            {
+                if (minDistance == -1 || Cell.Distance(neighbor, start) < minDistance)
+                {
+                    foundCell = neighbor;
+                    minDistance = Cell.Distance(neighbor, start);
+                }
+            }
+        }
+        return foundCell;
+    }
+
     public Vector3 GetCellPoint(float x, float z)
     {
         Vector3 point = new Vector3((int)x, 0, (int)z);

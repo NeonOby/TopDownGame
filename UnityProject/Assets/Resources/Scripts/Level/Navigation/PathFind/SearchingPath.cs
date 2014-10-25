@@ -29,6 +29,17 @@ public class SearchingPath
         Queue.Enqueue(0, new PathNode(start));
     }
 
+    public Path GeneratePath()
+    {
+        Path newPath = new Path();
+        foreach (var item in finishedPath)
+        {
+            newPath.AddWaypoint(item);
+        }
+        newPath.Destination = Destination;
+        return newPath;
+    }
+
     public PathNode finishedPath = null;
 
     public PathNode NextStepPath(out bool result)

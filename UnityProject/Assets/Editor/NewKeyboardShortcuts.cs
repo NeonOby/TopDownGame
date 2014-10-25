@@ -2,7 +2,7 @@
 using UnityEditor;
 using System.Collections;
 
-public class NewKeyboardShortkuts : MonoBehaviour {
+public class NewKeyboardShortcuts : MonoBehaviour {
 
 	[MenuItem ("GameObject/ToggleGameObject Active State #&a")]
 	static void ToggleGameObjectActiveState () {

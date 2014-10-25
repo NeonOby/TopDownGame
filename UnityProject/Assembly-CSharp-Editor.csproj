@@ -46,7 +46,7 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Editor\NewKeyboardShortkuts.cs" />
+     <Compile Include="Assets\Editor\NewKeyboardShortcuts.cs" />
      <Compile Include="Assets\Editor\TransformInspector.cs" />
      <None Include="Assets\Resources\Shaders\VertexColorIllum.shader" />
      <None Include="Assets\Resources\Shaders\VertexColorTransparent.shader" />

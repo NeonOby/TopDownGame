@@ -1,101 +1,100 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>10.0.20506</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{5B580621-09B4-68CB-B5F4-5B9DD210A60F}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>
-    </RootNamespace>
-    <AssemblyName>Assembly-CSharp</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <BaseDirectory>Assets</BaseDirectory>
+	<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+	<ProductVersion>10.0.20506</ProductVersion>
+	<SchemaVersion>2.0</SchemaVersion>
+	<ProjectGuid>{5B580621-09B4-68CB-B5F4-5B9DD210A60F}</ProjectGuid>
+	<OutputType>Library</OutputType>
+	<AppDesignerFolder>Properties</AppDesignerFolder>
+	<RootNamespace></RootNamespace>
+	<AssemblyName>Assembly-CSharp</AssemblyName>
+	<TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+	<FileAlignment>512</FileAlignment>
+	<BaseDirectory>Assets</BaseDirectory>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>Temp\bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;UNITY_4_5_5;UNITY_4_5;UNITY_STANDALONE_WIN;ENABLE_MICROPHONE;ENABLE_TEXTUREID_MAP;ENABLE_UNITYEVENTS;ENABLE_NEW_HIERARCHY ;ENABLE_AUDIO_FMOD;UNITY_STANDALONE;ENABLE_MONO;ENABLE_TERRAIN;ENABLE_SUBSTANCE;ENABLE_GENERICS;INCLUDE_WP8SUPPORT;ENABLE_MOVIES;ENABLE_WWW;ENABLE_IMAGEEFFECTS;INCLUDE_WP_BLUE_SUPPORT;ENABLE_WEBCAM;INCLUDE_METROSUPPORT;RENDER_SOFTWARE_CURSOR;ENABLE_NETWORK;ENABLE_PHYSICS;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_2D_PHYSICS;ENABLE_SHADOWS;ENABLE_AUDIO;ENABLE_NAVMESH_CARVING;ENABLE_DUCK_TYPING;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;ENABLE_PROFILER;UNITY_EDITOR;UNITY_EDITOR_WIN;UNITY_TEAM_LICENSE;UNITY_PRO_LICENSE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <NoWarn>0169</NoWarn>
+	<DebugSymbols>true</DebugSymbols>
+	<DebugType>full</DebugType>
+	<Optimize>false</Optimize>
+	<OutputPath>Temp\bin\Debug\</OutputPath>
+	<DefineConstants>DEBUG;TRACE;UNITY_4_5_5;UNITY_4_5;UNITY_STANDALONE_WIN;ENABLE_MICROPHONE;ENABLE_TEXTUREID_MAP;ENABLE_UNITYEVENTS;ENABLE_NEW_HIERARCHY ;ENABLE_AUDIO_FMOD;UNITY_STANDALONE;ENABLE_MONO;ENABLE_TERRAIN;ENABLE_SUBSTANCE;ENABLE_GENERICS;INCLUDE_WP8SUPPORT;ENABLE_MOVIES;ENABLE_WWW;ENABLE_IMAGEEFFECTS;INCLUDE_WP_BLUE_SUPPORT;ENABLE_WEBCAM;INCLUDE_METROSUPPORT;RENDER_SOFTWARE_CURSOR;ENABLE_NETWORK;ENABLE_PHYSICS;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_2D_PHYSICS;ENABLE_SHADOWS;ENABLE_AUDIO;ENABLE_NAVMESH_CARVING;ENABLE_DUCK_TYPING;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;ENABLE_PROFILER;UNITY_EDITOR;UNITY_EDITOR_WIN;UNITY_TEAM_LICENSE;UNITY_PRO_LICENSE</DefineConstants>
+	<ErrorReport>prompt</ErrorReport>
+	<WarningLevel>4</WarningLevel>
+	<NoWarn>0169</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>Temp\bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <NoWarn>0169</NoWarn>
+	<DebugType>pdbonly</DebugType>
+	<Optimize>true</Optimize>
+	<OutputPath>Temp\bin\Release\</OutputPath>
+	<DefineConstants>TRACE</DefineConstants>
+	<ErrorReport>prompt</ErrorReport>
+	<WarningLevel>4</WarningLevel>
+	<NoWarn>0169</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
+	<Reference Include="System" />
     <Reference Include="System.XML" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="UnityEngine">
-      <HintPath>G:/Programmieren/Unity/Editor-4.5.5/Data/Managed/UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEditor">
-      <HintPath>G:/Programmieren/Unity/Editor-4.5.5/Data/Managed/UnityEditor.dll</HintPath>
-    </Reference>
+	<Reference Include="System.Core" />
+	<Reference Include="System.Xml.Linq" />
+	<Reference Include="UnityEngine">
+	  <HintPath>G:/Programmieren/Unity/Editor-4.5.5/Data/Managed/UnityEngine.dll</HintPath>
+	</Reference>
+	<Reference Include="UnityEditor">
+	  <HintPath>G:/Programmieren/Unity/Editor-4.5.5/Data/Managed/UnityEditor.dll</HintPath>
+	</Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Resources\GameObjectPool\GameObjectPool.cs" />
-    <Compile Include="Assets\Resources\GameObjectPool\GameObjectPoolCreate.cs" />
-    <Compile Include="Assets\Resources\Scripts\Controls.cs" />
-    <Compile Include="Assets\Resources\Scripts\DebugSpawner.cs" />
-    <Compile Include="Assets\Resources\Scripts\Despawner.cs" />
-    <Compile Include="Assets\Resources\Scripts\Entity.cs" />
-    <Compile Include="Assets\Resources\Scripts\EntityController.cs" />
-    <Compile Include="Assets\Resources\Scripts\Fighter.cs" />
-    <Compile Include="Assets\Resources\Scripts\GameManager.cs" />
-    <Compile Include="Assets\Resources\Scripts\Level\Chunk.cs" />
-    <Compile Include="Assets\Resources\Scripts\Level\Generation\ChunkGenerator.cs" />
-    <Compile Include="Assets\Resources\Scripts\Level\GameObjectInfo.cs" />
-    <Compile Include="Assets\Resources\Scripts\Level\Level.cs" />
-    <Compile Include="Assets\Resources\Scripts\Level\LevelEntity.cs" />
-    <Compile Include="Assets\Resources\Scripts\Level\Generation\LevelGenerator.cs" />
-    <Compile Include="Assets\Resources\Scripts\Level\Cell.cs" />
-    <Compile Include="Assets\Resources\Scripts\Jobs\Job.cs" />
-    <Compile Include="Assets\Resources\Scripts\Level\Navigation\Path.cs" />
-    <Compile Include="Assets\Resources\Scripts\Level\Navigation\PathFind\PathNode.cs" />
-    <Compile Include="Assets\Resources\Scripts\Level\Navigation\PathFind\PriorityQueue.cs" />
-    <Compile Include="Assets\Resources\Scripts\Level\Navigation\PathFind\SearchingPath.cs" />
-    <Compile Include="Assets\Resources\Scripts\Level\Navigation\SimpleNavigation.cs" />
-    <Compile Include="Assets\Resources\Scripts\Level\SaveGame\QuaternionRotation.cs" />
-    <Compile Include="Assets\Resources\Scripts\Level\ResourceBlockEntity.cs" />
-    <Compile Include="Assets\Resources\Scripts\Level\ResourceCube.cs" />
-    <Compile Include="Assets\Resources\Scripts\Level\SaveGame\SaveGame.cs" />
-    <Compile Include="Assets\Resources\Scripts\Level\SaveGame\SaveGameManager.cs" />
-    <Compile Include="Assets\Resources\Scripts\Level\SaveGame\Vector3Position.cs" />
-    <Compile Include="Assets\Resources\Scripts\MouseSelection.cs" />
-    <Compile Include="Assets\Resources\Scripts\Player.cs" />
-    <Compile Include="Assets\Resources\Scripts\RightClickAction.cs" />
-    <Compile Include="Assets\Resources\Scripts\RightClickTester.cs" />
-    <Compile Include="Assets\Resources\Scripts\SimpleAI.cs" />
-    <Compile Include="Assets\Resources\Scripts\SimpleBullet.cs" />
-    <Compile Include="Assets\Resources\Scripts\TimedEffect.cs" />
-    <Compile Include="Assets\Resources\Scripts\TopDownCamera.cs" />
-    <Compile Include="Assets\Resources\Scripts\TopDownController.cs" />
-    <Compile Include="Assets\Resources\Scripts\TopDownMovement.cs" />
-    <Compile Include="Assets\Resources\Scripts\TopDownZoom.cs" />
-    <Compile Include="Assets\Resources\Scripts\Utility\GridSystem.cs" />
-    <Compile Include="Assets\Resources\Scripts\Worker.cs" />
-    <Compile Include="Assets\_ProgrammerInfo.cs" />
-    <None Include="Assets\Resources\Shaders\VertexColorIllum.shader" />
-    <None Include="Assets\Resources\Shaders\VertexColorTransparent.shader" />
-    <None Include="Assets\Resources\Shaders\VertexColorDetail.shader" />
-    <None Include="Assets\Resources\Shaders\VertexColor.shader" />
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>C:/Users/ADoby/Documents/GitHub/TopDownGame/UnityProject/Assets/Plugins/Newtonsoft.Json.dll</HintPath>
-    </Reference>
+     <Compile Include="Assets\Resources\GameObjectPool\GameObjectPool.cs" />
+     <Compile Include="Assets\Resources\GameObjectPool\GameObjectPoolCreate.cs" />
+     <Compile Include="Assets\Resources\Scripts\Controls.cs" />
+     <Compile Include="Assets\Resources\Scripts\DebugSpawner.cs" />
+     <Compile Include="Assets\Resources\Scripts\Despawner.cs" />
+     <Compile Include="Assets\Resources\Scripts\Entity.cs" />
+     <Compile Include="Assets\Resources\Scripts\EntityController.cs" />
+     <Compile Include="Assets\Resources\Scripts\Fighter.cs" />
+     <Compile Include="Assets\Resources\Scripts\GameManager.cs" />
+     <Compile Include="Assets\Resources\Scripts\Jobs\Job.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\Cell.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\Chunk.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\GameObjectInfo.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\Generation\ChunkGenerator.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\Generation\LevelGenerator.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\Level.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\LevelEntity.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\Navigation\Path.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\Navigation\PathFind\PathNode.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\Navigation\PathFind\PriorityQueue.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\Navigation\PathFind\SearchingPath.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\Navigation\SimpleNavigation.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\ResourceBlockEntity.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\ResourceCube.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\SaveGame\QuaternionRotation.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\SaveGame\SaveGame.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\SaveGame\SaveGameManager.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\SaveGame\Vector3Position.cs" />
+     <Compile Include="Assets\Resources\Scripts\MouseSelection.cs" />
+     <Compile Include="Assets\Resources\Scripts\Player.cs" />
+     <Compile Include="Assets\Resources\Scripts\RightClickAction.cs" />
+     <Compile Include="Assets\Resources\Scripts\RightClickTester.cs" />
+     <Compile Include="Assets\Resources\Scripts\SimpleAI.cs" />
+     <Compile Include="Assets\Resources\Scripts\SimpleBullet.cs" />
+     <Compile Include="Assets\Resources\Scripts\TimedEffect.cs" />
+     <Compile Include="Assets\Resources\Scripts\TopDownCamera.cs" />
+     <Compile Include="Assets\Resources\Scripts\TopDownController.cs" />
+     <Compile Include="Assets\Resources\Scripts\TopDownMovement.cs" />
+     <Compile Include="Assets\Resources\Scripts\TopDownZoom.cs" />
+     <Compile Include="Assets\Resources\Scripts\Utility\GridSystem.cs" />
+     <Compile Include="Assets\Resources\Scripts\Worker.cs" />
+     <Compile Include="Assets\_ProgrammerInfo.cs" />
+     <None Include="Assets\Resources\Shaders\VertexColorIllum.shader" />
+     <None Include="Assets\Resources\Shaders\VertexColorTransparent.shader" />
+     <None Include="Assets\Resources\Shaders\VertexColorDetail.shader" />
+     <None Include="Assets\Resources\Shaders\VertexColor.shader" />
+ <Reference Include="Newtonsoft.Json">
+ <HintPath>C:/Users/ADoby/Documents/GitHub/TopDownGame/UnityProject/Assets/Plugins/Newtonsoft.Json.dll</HintPath>
+ </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -105,4 +104,5 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  
 </Project>
