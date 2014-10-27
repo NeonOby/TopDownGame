@@ -7,7 +7,7 @@ using UnityEngine;
 [JsonObject(MemberSerialization.OptIn)]
 public class Chunk
 {
-    private bool Loaded = false;
+    public bool Loaded = false;
 
     //TODO change save system to two dimensional array with different type of grid-information
     //This should make it possible to implement an easy A* into the levelgeneration system.
@@ -65,7 +65,7 @@ public class Chunk
     {
         if (info.poolName == "")
             return;
-        GameObjectPool.Instance.Despawn(info.poolName, info.gameObject);
+        PriorityWorker_Entity_Despawn.Create(info.poolName, info.gameObject, null);
     }
     public void SpawnChunkInfo(string poolName)
     {
@@ -121,6 +121,7 @@ public class Chunk
             return;
 
         LevelEntity entity;
+        PriorityWorker_Entity_Spawn worker;
         for (int i = 0; i < entities.Count; i++)
         {
             entity = entities[i];

@@ -10,20 +10,28 @@ public class LevelEntity
 
     protected GameObject gameObject = null;
 
-    protected virtual void AfterSpawnSetup()
+    protected virtual void AfterSpawn(GameObject go)
     {
+        gameObject = go;
+    }
 
+    protected virtual void AfterDespawn()
+    {
+        gameObject = null;
     }
 
     public void Spawn()
     {
-        gameObject = GameObjectPool.Instance.Spawn(PoolName, Position.Value, Rotation.Value);
-        AfterSpawnSetup();
+        PriorityWorker_Entity_Spawn.Create(PoolName, Position.Value, Rotation.Value, AfterSpawn);
     }
     public void Despawn()
     {
-        GameObjectPool.Instance.Despawn(PoolName, gameObject);
-        gameObject = null;
+        PriorityWorker_Entity_Despawn.Create(PoolName, gameObject, AfterDespawn);
+    }
+
+    public virtual void Init(float value)
+    {
+
     }
 }
 

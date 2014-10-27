@@ -10,7 +10,7 @@ public class LevelGenerator : MonoBehaviour
     private static volatile System.Object fastLock = new System.Object();
 
     private static int chunkSize = 16;
-    private static int chunkLoadDistance = 3;
+    private static int chunkLoadDistance = 4;
 
     private static float safeDistance = 2f;
     private static float chancePerDistance = 0.001f;
@@ -224,13 +224,14 @@ public class LevelGenerator : MonoBehaviour
         float centerX = (CameraPosX / ChunkSize);
         float centerZ = (CameraPosZ / ChunkSize);
 
-        Chunk[] tmpChunks = level.loadedChunks.ToArray();
-        for (int i = 0; i < tmpChunks.Length; i++)
+        for (int i = 0; i < level.loadedChunks.Count; i++)
         {
-            if (DistanceToCam(tmpChunks[i]) >= LevelGenerator.ChunkLoadDistance)
+            if (Level.PosDistance(centerX, centerZ, level.loadedChunks[i].posX, level.loadedChunks[i].posZ) >= LevelGenerator.ChunkLoadDistance)
             {
-                tmpChunks[i].Unload();
-                level.loadedChunks.Remove(tmpChunks[i]);
+                if (level.loadedChunks[i].Loaded)
+                {
+                    PriorityWorker_Chunk_Unload.Create(level.loadedChunks[i], ChunkUnloaded); 
+                }
             }
         }
 
@@ -238,18 +239,29 @@ public class LevelGenerator : MonoBehaviour
         {
             for (int z = (Mathf.RoundToInt(centerZ) - LevelGenerator.ChunkLoadDistance); z < Mathf.RoundToInt(centerZ) + LevelGenerator.ChunkLoadDistance; z++)
             {
-                if (DistanceToCam(x, z) >= LevelGenerator.ChunkLoadDistance)
+                if (Level.PosDistance(centerX, centerZ, x, z) >= LevelGenerator.ChunkLoadDistance)
                     continue;
 
                 AddChunkGenerator(x, z);
                 if (level.ContainsChunk(x, z))
                 {
                     Chunk currentChunk = level.chunks[level.GetKey(x, z)];
-                    currentChunk.Load();
-                    level.loadedChunks.Add(currentChunk);
+                    if (!currentChunk.Loaded)
+                    {
+                        PriorityWorker_Chunk_Load.Create(currentChunk, ChunkLoaded);   
+                    }                 
                 }
             }
         }
+    }
+
+    public void ChunkLoaded(Chunk chunk)
+    {
+        level.loadedChunks.Add(chunk);
+    }
+    public void ChunkUnloaded(Chunk chunk)
+    {
+        level.loadedChunks.Remove(chunk);
     }
 
     //new one in "ChunkGenerator" Thread Safe?

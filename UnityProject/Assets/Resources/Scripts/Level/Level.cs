@@ -185,8 +185,11 @@ public class Level
         int max = 0;
         max = Mathf.Max(Mathf.Abs(x1 - x2), max);
         max = Mathf.Max(Mathf.Abs(y1 - y2), max);
+        
         return max;
     }
+
+    
 
     public static float PosDistance(float x1, float y1, float x2, float y2)
     {

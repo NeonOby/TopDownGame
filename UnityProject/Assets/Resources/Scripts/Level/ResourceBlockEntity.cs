@@ -1,18 +1,26 @@
-﻿
+﻿using UnityEngine;
+
 [System.Serializable]
 public class ResourceBlockEntity : LevelEntity
 {
     public int minResource = 2;
     public int maxResource = 64;
 
-    protected override void AfterSpawnSetup()
+    public int Resources = 0;
+
+    protected override void AfterSpawn(GameObject go)
     {
-        base.AfterSpawnSetup();
-        ResourceCube cube = gameObject.GetComponent<ResourceCube>();
+        base.AfterSpawn(go);
+        ResourceCube cube = go.GetComponent<ResourceCube>();
         if(cube)
         {
-            cube.SetResourceAmount(UnityEngine.Random.Range(minResource, maxResource));
+            cube.SetResourceAmount(Resources);
         }
+    }
+
+    public override void Init(float value)
+    {
+        Resources = minResource + (int)(value * (maxResource - minResource));
     }
 
 }

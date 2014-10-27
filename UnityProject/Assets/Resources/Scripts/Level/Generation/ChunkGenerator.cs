@@ -147,9 +147,12 @@ public class ChunkGenerator
 
                     if (Noise > 0.5f)
                     {
+                        float value = Mathf.Clamp01((Noise - 0.5f) * 2f);
+
                         entity = new ResourceBlockEntity();
                         entity.PoolName = "ResourceCube";
                         entity.Position.Value = currentPos;
+                        entity.Init(value);
 
                         generatedChunk.GetCell(x, z).Walkable = false;
                         generatedChunk.GetCell(x, z).ContainsEntity = true;

@@ -39,13 +39,20 @@
 	<Reference Include="System.Core" />
 	<Reference Include="System.Xml.Linq" />
 	<Reference Include="UnityEngine">
-	  <HintPath>G:/Programmieren/Unity/Editor-4.5.5/Data/Managed/UnityEngine.dll</HintPath>
+	  <HintPath>C:/Program Files (x86)/Unity/Editor4.5.5/Data/Managed/UnityEngine.dll</HintPath>
 	</Reference>
 	<Reference Include="UnityEditor">
-	  <HintPath>G:/Programmieren/Unity/Editor-4.5.5/Data/Managed/UnityEditor.dll</HintPath>
+	  <HintPath>C:/Program Files (x86)/Unity/Editor4.5.5/Data/Managed/UnityEditor.dll</HintPath>
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\PriorityWorkerQueue.cs" />
+     <Compile Include="Assets\PriorityWorker_Chunk_Load.cs" />
+     <Compile Include="Assets\PriorityWorker_Chunk_Unload.cs" />
+     <Compile Include="Assets\PriorityWorker_Entity_Despawn.cs" />
+     <Compile Include="Assets\PriorityWorker_Entity_Spawn.cs" />
+     <Compile Include="Assets\PriorityWorker_Gameobject_SetActive.cs" />
+     <Compile Include="Assets\PriorityWorker_ResourceCube_UpdateMesh.cs" />
      <Compile Include="Assets\ResourceCubeUpdater.cs" />
      <Compile Include="Assets\Resources\GameObjectPool\GameObjectPool.cs" />
      <Compile Include="Assets\Resources\GameObjectPool\GameObjectPoolCreate.cs" />

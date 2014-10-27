@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-public class PriorityQueue<P, V>
+public class PriorityQueue<P, V> 
 {
     private SortedDictionary<P, Queue<V>> list = new SortedDictionary<P, Queue<V>>();
     public void Enqueue(P priority, V value)
