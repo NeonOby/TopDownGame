@@ -46,6 +46,7 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\ResourceCubeUpdater.cs" />
      <Compile Include="Assets\Resources\GameObjectPool\GameObjectPool.cs" />
      <Compile Include="Assets\Resources\GameObjectPool\GameObjectPoolCreate.cs" />
      <Compile Include="Assets\Resources\Scripts\Controls.cs" />

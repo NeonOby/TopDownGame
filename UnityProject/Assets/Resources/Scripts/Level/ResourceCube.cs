@@ -75,6 +75,7 @@ public class ResourceCube : MonoBehaviour
     public void Reset()
     {
         CurrentResources = ResourceAmount;
+        renderer.enabled = false;
     }
 
     public int MineResource(int amount)
@@ -101,35 +102,28 @@ public class ResourceCube : MonoBehaviour
 
     void Update()
     {
-        if (lastGenerating && !generating)
+        if (MeshNeedsUpdate && !generating)
         {
             ChangeMesh();
         }
-        lastGenerating = generating;
+    }
+
+    public void MeshUpdate()
+    {
+        renderer.enabled = true;
     }
 
     public void ChangeMesh()
     {
         lock (lockArrays)
         {
-            
-            mesh.Clear();
+            ResourceCubeUpdater.Instance.AddUpdater(this, vertices, triangles, uvs, normals, tangents);
 
-            mesh.vertices = vertices.Array;
-            mesh.triangles = triangles.Array;
-            mesh.uv = uvs.Array;
-
-            mesh.RecalculateNormals();
-            mesh.RecalculateBounds();
-
-            TangentSolver(mesh);
-
-            mesh.Optimize();
-            
+            MeshNeedsUpdate = false;
         }
     }
 
-    MeshFilter meshFilter;
+    public MeshFilter meshFilter;
 
     private void UpdateMesh()
     {
@@ -139,7 +133,7 @@ public class ResourceCube : MonoBehaviour
         }
 
         generating = true;
-        lastGenerating = true;
+        MeshNeedsUpdate = true;
 
         if(mesh == null)
         {
@@ -192,8 +186,16 @@ public class ResourceCube : MonoBehaviour
         uvs.Add(new Vector2(uvX, uvY + 0.25f));
     }
 
+    private void GenerateNormals(ResizeAbleArray<Vector3> normals, Vector3 direction)
+    {
+        normals.Add(direction);
+        normals.Add(direction);
+        normals.Add(direction);
+        normals.Add(direction);
+    }
+
     public volatile bool generating = false;
-    public bool lastGenerating = false;
+    public bool MeshNeedsUpdate = false;
 
     public Thread generatingThread;
 
@@ -218,6 +220,8 @@ public class ResourceCube : MonoBehaviour
     private volatile ResizeAbleArray<Vector3> vertices = new ResizeAbleArray<Vector3>();
     private volatile ResizeAbleArray<int> triangles = new ResizeAbleArray<int>();
     private volatile ResizeAbleArray<Vector2> uvs = new ResizeAbleArray<Vector2>();
+    private volatile ResizeAbleArray<Vector3> normals = new ResizeAbleArray<Vector3>();
+    private volatile Vector4[] tangents = null;
 
     private void GenerateMesh()
     {
@@ -242,6 +246,7 @@ public class ResourceCube : MonoBehaviour
             vertices.Clear();
             triangles.Clear();
             uvs.Clear();
+            normals.Clear();
 
             float diffX = -0.4f;
             float diffZ = -0.4f;
@@ -268,6 +273,7 @@ public class ResourceCube : MonoBehaviour
 
                             GenerateTriangles(triangles, vertexIndex);
                             GenerateUVs(uvs, x, layer, z);
+                            GenerateNormals(normals, Vector3.up);
                         }
 
                         //Right
@@ -281,6 +287,7 @@ public class ResourceCube : MonoBehaviour
 
                             GenerateTriangles(triangles, vertexIndex);
                             GenerateUVs(uvs, x, layer, z);
+                            GenerateNormals(normals, Vector3.right);
                         }
 
                         //Left
@@ -294,6 +301,7 @@ public class ResourceCube : MonoBehaviour
 
                             GenerateTriangles(triangles, vertexIndex);
                             GenerateUVs(uvs, x, layer, z);
+                            GenerateNormals(normals, Vector3.left);
                         }
 
                         //Front
@@ -307,9 +315,10 @@ public class ResourceCube : MonoBehaviour
 
                             GenerateTriangles(triangles, vertexIndex);
                             GenerateUVs(uvs, x, layer, z);
+                            GenerateNormals(normals, Vector3.forward);
                         }
 
-                        //Front
+                        //Back
                         if (!GetIsAir(x, layer, z) && GetIsAir(x, layer, z + 1))
                         {
                             vertexIndex = vertices.Count;
@@ -320,6 +329,7 @@ public class ResourceCube : MonoBehaviour
 
                             GenerateTriangles(triangles, vertexIndex);
                             GenerateUVs(uvs, x, layer, z);
+                            GenerateNormals(normals, Vector3.back);
                         }
                     }
                 }
@@ -330,11 +340,75 @@ public class ResourceCube : MonoBehaviour
         vertices.GenerateArray();
         triangles.GenerateArray();
         uvs.GenerateArray();
+        normals.GenerateArray();
+
+        tangents = GenerateTangents(vertices.Array, triangles.Array, uvs.Array, normals.Array);
 
         generating = false;
     }
 
-    public void TangentSolver(Mesh mesh)
+    public Vector4[] GenerateTangents(Vector3[] vertices, int[] triangles, Vector2[] uvs, Vector3[] normals)
+    {
+        Vector3[] tan2 = new Vector3[vertices.Length];
+        Vector3[] tan1 = new Vector3[vertices.Length];
+        Vector4[] tangents = new Vector4[vertices.Length];
+        //Vector3[] binormal = new Vector3[mesh.vertices.Length]; 
+        for (int a = 0; a < (triangles.Length); a += 3)
+        {
+            long i1 = triangles[a + 0];
+            long i2 = triangles[a + 1];
+            long i3 = triangles[a + 2];
+
+            Vector3 v1 = vertices[i1];
+            Vector3 v2 = vertices[i2];
+            Vector3 v3 = vertices[i3];
+
+            Vector2 w1 = uvs[i1];
+            Vector2 w2 = uvs[i2];
+            Vector2 w3 = uvs[i3];
+
+            float x1 = v2.x - v1.x;
+            float x2 = v3.x - v1.x;
+            float y1 = v2.y - v1.y;
+            float y2 = v3.y - v1.y;
+            float z1 = v2.z - v1.z;
+            float z2 = v3.z - v1.z;
+
+            float s1 = w2.x - w1.x;
+            float s2 = w3.x - w1.x;
+            float t1 = w2.y - w1.y;
+            float t2 = w3.y - w1.y;
+
+            float r = 1.0F / (s1 * t2 - s2 * t1);
+            Vector3 sdir = new Vector3((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r, (t2 * z1 - t1 * z2) * r);
+            Vector3 tdir = new Vector3((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r, (s1 * z2 - s2 * z1) * r);
+
+            tan1[i1] += sdir;
+            tan1[i2] += sdir;
+            tan1[i3] += sdir;
+
+            tan2[i1] += tdir;
+            tan2[i2] += tdir;
+            tan2[i3] += tdir;
+        }
+
+        for (int a = 0; a < vertices.Length; a++)
+        {
+            Vector3 n = normals[a];
+            Vector3 t = tan1[a];
+
+            Vector3.OrthoNormalize(ref n, ref t);
+            tangents[a].x = t.x;
+            tangents[a].y = t.y;
+            tangents[a].z = t.z;
+
+            // Calculate handedness
+            tangents[a].w = (Vector3.Dot(Vector3.Cross(n, t), tan2[a]) < 0.0f) ? -1.0f : 1.0f;
+        }
+        return tangents;
+    }
+
+    public static void TangentSolver(Mesh mesh)
     {
         Vector3[] tan2 = new Vector3[mesh.vertices.Length];
         Vector3[] tan1 = new Vector3[mesh.vertices.Length];

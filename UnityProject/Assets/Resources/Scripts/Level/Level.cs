@@ -38,19 +38,15 @@ public class Level
 
     public Cell GetCell(float x, float z, bool autoGen = true)
     {
-        Vector3 cellPoint = GetCellPoint(x, z);
-        Vector3 chunkPoint = GetChunkPoint(x, z);
-
-        if (!ContainsChunk(chunkPoint.x, chunkPoint.z))
+        if (!ContainsChunkf(x, z))
         {
             if (!autoGen)
                 return null;
-
-            //LevelGenerator.Instance.AddChunkGenerator(chunkPoint.X, chunkPoint.Y);
             return null;
         }
 
-        return chunks[GetKey(chunkPoint.x, chunkPoint.z)].GetCell(cellPoint.x, cellPoint.z);
+        Vector3 cellPoint = GetCellPoint(x, z);
+        return chunks[GetKey(x, z)].GetCell(cellPoint.x, cellPoint.z);
     }
 
     public bool PositionOutOfLevel(float x, float z)
@@ -96,7 +92,8 @@ public class Level
 
     public string GetKey(float x, float z)
     {
-        return GetKey((int)x, (int)z);
+        Vector3 chunkPoint = GetChunkPoint(x, z);
+        return GetKey((int)chunkPoint.x, (int)chunkPoint.z);
     }
 
     public string GetKey(int x, int z)
@@ -167,10 +164,10 @@ public class Level
         return point;
     }
 
-    public bool ContainsChunk(float x, float z)
+    public bool ContainsChunkf(float x, float z)
     {
         Vector3 p = GetChunkPoint(x, z);
-        return ContainsChunk(p.x, p.z);
+        return ContainsChunk((int)p.x, (int)p.z);
     }
     public bool ContainsChunk(int x, int z)
     {

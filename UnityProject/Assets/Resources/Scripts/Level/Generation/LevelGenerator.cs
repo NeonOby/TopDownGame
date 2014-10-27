@@ -9,8 +9,8 @@ public class LevelGenerator : MonoBehaviour
     #region ThreadedMapGeneration
     private static volatile System.Object fastLock = new System.Object();
 
-    private static int chunkSize = 8;
-    private static int chunkLoadDistance = 2;
+    private static int chunkSize = 16;
+    private static int chunkLoadDistance = 3;
 
     private static float safeDistance = 2f;
     private static float chancePerDistance = 0.001f;
