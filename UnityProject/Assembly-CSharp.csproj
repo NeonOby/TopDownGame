@@ -39,10 +39,10 @@
 	<Reference Include="System.Core" />
 	<Reference Include="System.Xml.Linq" />
 	<Reference Include="UnityEngine">
-	  <HintPath>G:/Programmieren/Unity/Editor-4.5.5/Data/Managed/UnityEngine.dll</HintPath>
+	  <HintPath>C:/Program Files (x86)/Unity/Editor4.5.5/Data/Managed/UnityEngine.dll</HintPath>
 	</Reference>
 	<Reference Include="UnityEditor">
-	  <HintPath>G:/Programmieren/Unity/Editor-4.5.5/Data/Managed/UnityEditor.dll</HintPath>
+	  <HintPath>C:/Program Files (x86)/Unity/Editor4.5.5/Data/Managed/UnityEditor.dll</HintPath>
 	</Reference>
   </ItemGroup>
   <ItemGroup>
@@ -58,6 +58,8 @@
      <Compile Include="Assets\Resources\Scripts\EntityController.cs" />
      <Compile Include="Assets\Resources\Scripts\GameManager.cs" />
      <Compile Include="Assets\Resources\Scripts\Jobs\Job.cs" />
+     <Compile Include="Assets\Resources\Scripts\Jobs\Job_Mining.cs" />
+     <Compile Include="Assets\Resources\Scripts\Jobs\Job_Walk.cs" />
      <Compile Include="Assets\Resources\Scripts\Jobs\MiningJob.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\Cell.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\Chunk.cs" />

@@ -17,7 +17,6 @@ public class ChunkGenerator
     //Only used from one thread at once
     private volatile int chunkX = 0;
     private volatile int chunkZ = 0;
-    private volatile int Seed = 0;
 
     public int ChunkX
     {
@@ -93,7 +92,6 @@ public class ChunkGenerator
     {
         ChunkX = x;
         ChunkZ = z;
-        Seed = seed;
 
         Generating = true;
 

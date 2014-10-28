@@ -1,4 +1,4 @@
-﻿
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class Worker : Entity
@@ -48,42 +48,63 @@ public class Worker : Entity
     }
     #endregion
 
-    public virtual void SetTargetCell(Cell value)
+    public virtual void SetTargetCell(Cell value, bool shift)
     {
 
     }
-    public virtual void SetTargetPositionCell(Cell value)
+    protected virtual Cell SetTargetPositionCell(float x, float z)
+    {
+        return null;
+    }
+
+    protected Queue<Job> jobQueue = new Queue<Job>();
+    public void ClearJobs()
+    {
+        jobQueue.Clear();
+        CurrentJob = null;
+    }
+    public void AddJob(Job job)
+    {
+        jobQueue.Enqueue(job);
+        if (CurrentJob == null)
+            NextJob();
+    }
+    public virtual void OnJobChanged()
     {
 
     }
+    public void NextJob()
+    {
+        if (jobQueue.Count == 0)
+        {
+            CurrentJob = null;
+            return;
+        }
+        CurrentJob = jobQueue.Dequeue();
+        OnJobChanged();
+        CurrentJob.Start();
+    }
 
-    private Job currentJob;
     public Job CurrentJob
     {
-        get
-        {
-            return currentJob;
-        }
+        get;
+        protected set;
     }
 
     public override void Reset()
     {
         base.Reset();
-        currentJob = null;
+        CurrentJob = null;
     }
 
-    public virtual void SetJob(Job value)
-    {
-        currentJob = value;
-    }
     public virtual void Update()
     {
-        if (currentJob != null && currentJob.Update())
+        if (CurrentJob != null && CurrentJob.Update())
         {
-            currentJob = currentJob.NextJob;
+            NextJob();
         }
     }
-    public virtual void PathFinished(EntityController controller, Path newPath)
+    public virtual void PathFinished(Path newPath)
     {
 
     }

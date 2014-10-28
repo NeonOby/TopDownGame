@@ -1,31 +1,28 @@
 ﻿using UnityEngine;
 
+
 [System.Serializable]
 public class Job
 {
-    public Job(EntityController owner, Worker worker, string name, Vector3 target)
+
+    public Job(EntityController owner, Worker worker, string name)
     {
         Owner = owner;
         Worker = worker;
         Name = name;
-        WantedPosition = target;
-
-        Working = false;
-
-        Start();
     }
 
     public EntityController Owner { get; set; }
     public Worker Worker { get; set; }
     public string Name { get; set; }
     public float Progression = 0f;
-    public Vector3 WantedPosition;
-    private float StartDistance = 0f;
 
-    public bool Working
+    public virtual bool IsFinished
     {
-        get;
-        protected set;
+        get
+        {
+            return Progression >= 1;
+        }
     }
 
     public virtual string Info
@@ -46,18 +43,19 @@ public class Job
 
     public virtual void Start()
     {
-        StartDistance = Vector3.Distance(Worker.Position, WantedPosition);
-
-        Working = true;
+        Progression = 1f;
     }
 
-    public virtual bool Update()
+    public virtual void UpdateProgression()
     {
-        Progression = (1f - (Vector3.Distance(Worker.Position, WantedPosition) / StartDistance));
-        return Progression >= 1;
+        
     }
 
-    public Job NextJob { get; set; }
+    public bool Update()
+    {
+        UpdateProgression();
+        return IsFinished;
+    }
 
 }
 

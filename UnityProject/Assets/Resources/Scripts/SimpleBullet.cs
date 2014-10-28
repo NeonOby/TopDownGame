@@ -9,9 +9,7 @@ public class SimpleBullet : MonoBehaviour
         return ((mask.value & (1 << obj.layer)) > 0);
     }
 
-    public Collider Collider;
-
-    public float Speed = 5f;
+    public float Impulse = 10f;
 
     public float LifeTime = 4f;
     private float LifeTimer = 0f;
@@ -23,6 +21,8 @@ public class SimpleBullet : MonoBehaviour
     public void Reset()
     {
         LifeTimer = 0f;
+        rigidbody.velocity = Vector3.zero;
+        rigidbody.AddForce(transform.forward * Impulse, ForceMode.Impulse);
     }
 
     public void SetPoolName(string newPoolName)
@@ -36,15 +36,12 @@ public class SimpleBullet : MonoBehaviour
         if (LifeTimer >= LifeTime)
         {
             Explode();
+            return;
         }
-        transform.Translate(Vector3.forward * Speed * Time.deltaTime);
     }
 
     void OnTriggerEnter(Collider coll)
     {
-        if(coll.gameObject.tag == "Resource")
-            return;
-
         if (IsInLayerMask(coll.gameObject, mask))
         {
             Entity entity = coll.gameObject.GetComponent<Entity>();

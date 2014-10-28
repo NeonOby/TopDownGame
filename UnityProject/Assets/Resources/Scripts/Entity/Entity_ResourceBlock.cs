@@ -64,36 +64,36 @@ public class ResizeAbleArray<T>
 public class Entity_ResourceBlock : Entity
 {
 
-    public override float Health
-    {
-        get
-        {
-            return CurrentResources;
-        }
-    }
-    public override bool IsAlive
-    {
-        get
-        {
-            return CurrentResources > 0;
-        }
-    }
+	public override float Health
+	{
+		get
+		{
+			return CurrentResources;
+		}
+	}
+	public override bool IsAlive
+	{
+		get
+		{
+			return CurrentResources > 0;
+		}
+	}
 
-    public override void GotHit(float value, Entity other)
-    {
-        value = Mathf.Min(CurrentResources, value);
-        CurrentResources -= (int)value;
-        UpdateMesh();
+	public override void GotHit(float value, Entity other)
+	{
+		value = Mathf.Min(CurrentResources, value);
+		CurrentResources -= (int)value;
+		UpdateMesh();
 
-        Worker worker = null;
-        if (other is Worker)
-            worker = (Worker)other;
+		Worker worker = null;
+		if (other is Worker)
+			worker = (Worker)other;
 
-        for (int i = 0; i < (int)value; i++)
-        {
-            PriorityWorker_ResourceCube_Spawn.Create("ResourceCube", transform.position + Vector3.up, Quaternion.identity, null, worker);
-        }
-    }
+		for (int i = 0; i < (int)value; i++)
+		{
+			PriorityWorker_ResourceCube_Spawn.Create("ResourceCube", transform.position + Vector3.up, Quaternion.identity, null, worker);
+		}
+	}
 
 	public void SetResourceAmount(int newAmount)
 	{
@@ -102,8 +102,9 @@ public class Entity_ResourceBlock : Entity
 		UpdateMesh();
 	}
 
-	public void Reset()
+	public override void Reset()
 	{
+		base.Reset();
 		renderer.enabled = false;
 	}
 
@@ -210,7 +211,6 @@ public class Entity_ResourceBlock : Entity
 	public Thread generatingThread;
 
 	//Generating Thread used variables
-	private System.Object lockThis = new System.Object();
 	private System.Object lockArrays = new System.Object();
 
 	int Height
@@ -223,7 +223,25 @@ public class Entity_ResourceBlock : Entity
 
 	private volatile Mesh mesh;
 
-	private volatile int CurrentResources = 0;
+	private System.Object resLock = new System.Object();
+	private volatile int resources = 0;
+	public int CurrentResources
+	{
+		get
+		{
+			lock (resLock)
+			{
+				return resources;
+			}
+		}
+		set
+		{
+			lock (resLock)
+			{
+				resources = value;
+			}
+		}
+	}
 	private volatile int width = 4, length = 4;
 	private volatile int lastAmount = 0;
 

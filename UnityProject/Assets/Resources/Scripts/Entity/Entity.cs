@@ -15,6 +15,8 @@ public class Entity : MonoBehaviour
     }
     #endregion
 
+    public Collider colliderForRaycasts = null;
+
     public Player Owner = null;
 
     public delegate void EntityEvent(Entity entity);
@@ -35,6 +37,8 @@ public class Entity : MonoBehaviour
     void Awake()
     {
         Transform = transform;
+        if (colliderForRaycasts == null)
+            colliderForRaycasts = collider;
     }
 
     public virtual float Health

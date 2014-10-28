@@ -6,10 +6,10 @@ using System.Collections.Generic;
 	public class GameObjectPool
 	{
 
-        private static bool Deactivate = true;
+		private static bool Deactivate = true;
 
-        public static Vector3 disabledPosition = new Vector3(0, -10000, 0);
-        
+		public static Vector3 disabledPosition = new Vector3(0, -10000, 0);
+		
 
 		private static GameObjectPool instance;
 
@@ -33,13 +33,13 @@ using System.Collections.Generic;
 			}
 
 			Pool pool = pools[poolName];
-            if(Deactivate)
-			    go.SetActive(false);
+			if(Deactivate)
+				go.SetActive(false);
 
-            go.SendMessage("Disable", SendMessageOptions.DontRequireReceiver);
+			go.SendMessage("Disable", SendMessageOptions.DontRequireReceiver);
 
-            go.transform.position = disabledPosition;
-            pool.Enqueue(go);
+			go.transform.position = disabledPosition;
+			pool.Enqueue(go);
 		}
 
 		//Gives you an instance of a prefab
@@ -95,35 +95,37 @@ using System.Collections.Generic;
 		}
 
 		public GameObject Spawn(string poolName, Vector3 position, Quaternion rotation){
-			GameObject go = Spawn(poolName, null, position, rotation.eulerAngles, pools[poolName].prefab.transform.localScale);
+			GameObject go = Spawn(poolName, null, position, rotation, pools[poolName].prefab.transform.localScale);
 			
 			return go;
 		}
 
-		public GameObject Spawn(string poolName, Transform parent, Vector3 position, Vector3 rotation, Vector3 scale){
+		public GameObject Spawn(string poolName, Transform parent, Vector3 position, Quaternion rotation, Vector3 scale)
+		{
 			GameObject go = ReleaseGameObject(poolName);
 			if(!go)
 				return null;
 
-            if (parent != null)
-                go.transform.parent = parent;
-            else
-                go.transform.parent = pools[poolName].parent.transform;
+			if (parent != null)
+				go.transform.parent = parent;
+			else
+				go.transform.parent = pools[poolName].parent.transform;
 
 			go.transform.localPosition = position;
-			go.transform.localRotation = Quaternion.Euler(rotation);
+			go.transform.localRotation = rotation;
 			go.transform.localScale = scale;
 			
-            if(Deactivate)
-			    go.SetActive(true);
+			if(Deactivate)
+				go.SetActive(true);
 
-            go.SendMessage("SetPoolName", poolName, SendMessageOptions.DontRequireReceiver);
-            go.SendMessage("Reset", SendMessageOptions.DontRequireReceiver);
+			go.SendMessage("SetPoolName", poolName, SendMessageOptions.DontRequireReceiver);
+			go.SendMessage("Reset", SendMessageOptions.DontRequireReceiver);
 
 			return go;
 		}
-		
-		public GameObject Spawn(string poolName, Transform parent, string name, Vector3 position, Vector3 rotation, Vector3 scale){
+
+		public GameObject Spawn(string poolName, Transform parent, string name, Vector3 position, Quaternion rotation, Vector3 scale)
+		{
 			
 			GameObject go = Spawn(poolName, parent, position, rotation, scale);
 			if(!go)

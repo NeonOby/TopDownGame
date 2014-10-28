@@ -121,7 +121,6 @@ public class Chunk
             return;
 
         LevelEntity entity;
-        PriorityWorker_Entity_Spawn worker;
         for (int i = 0; i < entities.Count; i++)
         {
             entity = entities[i];
