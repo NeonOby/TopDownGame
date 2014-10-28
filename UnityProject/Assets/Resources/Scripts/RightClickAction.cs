@@ -35,6 +35,7 @@ public class RightClickAction : MonoBehaviour
             DoRightClick();
         }
 
+        /*
         if (currentFindingPath != null && !finished)
         {
             for (int i = 0; i < updatesPerFrame; i++)
@@ -67,6 +68,7 @@ public class RightClickAction : MonoBehaviour
                 lastPos = currentPos;
             }
         }
+        */ 
 	}
 
     void OnGUI()
@@ -79,34 +81,15 @@ public class RightClickAction : MonoBehaviour
         if (MouseSelection.State == MouseSelection.States.NOTHING_SELECTED)
             return;
 
-        Cell start = LevelGenerator.level.GetCell(MouseSelection.GetSelected()[0].transform.position.x, MouseSelection.GetSelected()[0].transform.position.z);
+        Cell targetCell = LevelGenerator.Level.GetCell(lastClickedPosition.x, lastClickedPosition.z);
 
-        if (!start)
-            return;
-        
-        Cell end = LevelGenerator.level.GetCell(lastClickedPosition.x, lastClickedPosition.z);
-        if (!end || !end.Walkable)
+        foreach (var item in MouseSelection.GetSelected())
         {
-            end = LevelGenerator.level.FindNeighborWalkableCell(end, start);
+            if (item is Worker)
+            {
+                ((Worker)item).SetTargetCell(targetCell);
+            }
         }
-
-        if (!end || !end.Walkable)
-            return;
-
-        path = null;
-        finished = false;
-
-        currentFindingPath = new SearchingPath(start, end);
-        if (MouseSelection.State == MouseSelection.States.SINGLE_SELECTED && MouseSelection.GetSelected()[0] is Worker)
-        {
-            currentFindingPath.CallBack = ((Worker)MouseSelection.GetSelected()[0]).PathFinished;
-        }
-        else
-        {
-            //Multiple Selection
-            //TODO Group Flocking
-        }
-        startTime = Time.realtimeSinceStartup;
 
         //Effekt
         GameObjectPool.Instance.Spawn(RightClickEffectPool, lastClickedPosition, Quaternion.identity);

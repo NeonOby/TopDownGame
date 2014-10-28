@@ -61,8 +61,39 @@ public class ResizeAbleArray<T>
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
-public class ResourceCube : MonoBehaviour
+public class Entity_ResourceBlock : Entity
 {
+
+    public override float Health
+    {
+        get
+        {
+            return CurrentResources;
+        }
+    }
+    public override bool IsAlive
+    {
+        get
+        {
+            return CurrentResources > 0;
+        }
+    }
+
+    public override void GotHit(float value, Entity other)
+    {
+        value = Mathf.Min(CurrentResources, value);
+        CurrentResources -= (int)value;
+        UpdateMesh();
+
+        Worker worker = null;
+        if (other is Worker)
+            worker = (Worker)other;
+
+        for (int i = 0; i < (int)value; i++)
+        {
+            PriorityWorker_ResourceCube_Spawn.Create("ResourceCube", transform.position + Vector3.up, Quaternion.identity, null, worker);
+        }
+    }
 
 	public void SetResourceAmount(int newAmount)
 	{
@@ -74,14 +105,6 @@ public class ResourceCube : MonoBehaviour
 	public void Reset()
 	{
 		renderer.enabled = false;
-	}
-
-	public int MineResource(int amount)
-	{
-		amount = Mathf.Min(CurrentResources, amount);
-		CurrentResources -= amount;
-		UpdateMesh();
-		return amount;
 	}
 
 	void Update()

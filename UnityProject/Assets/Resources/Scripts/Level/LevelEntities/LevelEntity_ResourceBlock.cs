@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [System.Serializable]
-public class ResourceBlockEntity : LevelEntity
+public class LevelEntity_ResourceBlock : LevelEntity
 {
     public int minResource = 2;
     public int maxResource = 64;
@@ -11,7 +11,7 @@ public class ResourceBlockEntity : LevelEntity
     protected override void AfterSpawn(GameObject go)
     {
         base.AfterSpawn(go);
-        ResourceCube cube = go.GetComponent<ResourceCube>();
+        Entity_ResourceBlock cube = go.GetComponent<Entity_ResourceBlock>();
         if(cube)
         {
             cube.SetResourceAmount(Resources);

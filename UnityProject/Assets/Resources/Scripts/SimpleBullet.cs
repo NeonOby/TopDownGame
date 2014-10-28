@@ -3,6 +3,7 @@ using System.Collections;
 
 public class SimpleBullet : MonoBehaviour 
 {
+    public Worker Owner;
 
     public static bool IsInLayerMask(GameObject obj, LayerMask mask){
         return ((mask.value & (1 << obj.layer)) > 0);
@@ -19,13 +20,9 @@ public class SimpleBullet : MonoBehaviour
 
     private string poolName = "";
 
-    public bool Enabled = false;
-
     public void Reset()
     {
         LifeTimer = 0f;
-        Enabled = true;
-        Collider.enabled = true;
     }
 
     public void SetPoolName(string newPoolName)
@@ -33,17 +30,8 @@ public class SimpleBullet : MonoBehaviour
         poolName = newPoolName;
     }
 
-    public void Disable()
-    {
-        Enabled = false;
-        Collider.enabled = false;
-    }
-
     void Update()
     {
-        if (!Enabled)
-            return;
-
         LifeTimer += Time.deltaTime;
         if (LifeTimer >= LifeTime)
         {
@@ -54,16 +42,16 @@ public class SimpleBullet : MonoBehaviour
 
     void OnTriggerEnter(Collider coll)
     {
-        if (!Enabled)
+        if(coll.gameObject.tag == "Resource")
             return;
 
         if (IsInLayerMask(coll.gameObject, mask))
         {
-            SimpleAI ai = coll.gameObject.GetComponent<SimpleAI>();
-            if (ai == null)
+            Entity entity = coll.gameObject.GetComponent<Entity>();
+            if (entity == null)
                 return;
 
-            ai.Hit();
+            entity.Hit(1f, Owner);
         }
         Explode();
     }

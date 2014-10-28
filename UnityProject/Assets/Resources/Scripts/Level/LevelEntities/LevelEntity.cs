@@ -10,14 +10,22 @@ public class LevelEntity
 
     protected GameObject gameObject = null;
 
+    public Entity SpawnedEntity = null;
+
+    PriorityWorker currentWorker = null;
+
     protected virtual void AfterSpawn(GameObject go)
     {
         gameObject = go;
+        SpawnedEntity = gameObject.GetComponent<Entity>();
+        currentWorker = null;
     }
 
     protected virtual void AfterDespawn()
     {
         gameObject = null;
+        SpawnedEntity = null;
+        currentWorker = null;
     }
 
     public void Spawn()

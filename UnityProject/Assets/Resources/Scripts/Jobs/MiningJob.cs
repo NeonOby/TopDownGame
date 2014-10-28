@@ -1,18 +1,17 @@
 ﻿using UnityEngine;
 
 [System.Serializable]
-public class Job
+public class MiningJob
 {
-    public Job(EntityController owner, Worker worker, string name, Vector3 target)
+    public MiningJob(EntityController owner, Worker worker, string name, Vector3 target)
     {
+        
         Owner = owner;
         Worker = worker;
         Name = name;
         WantedPosition = target;
 
         Working = false;
-
-        Start();
     }
 
     public EntityController Owner { get; set; }

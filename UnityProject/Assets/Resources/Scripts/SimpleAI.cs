@@ -3,20 +3,13 @@ using System.Collections;
 
 public class SimpleAI : Worker 
 {
-    public Player Owner;
 
-    public delegate void SimpleAIEvent(SimpleAI sender);
-    public static event SimpleAIEvent SimpleAIDied;
-
-    public void TriggerSimpleAIDied(SimpleAI sender)
+    public override void SetPoolName(string value)
     {
-        if(SimpleAIDied != null)
-        {
-            SimpleAIDied(sender);
-        }
+        base.SetPoolName(value);
     }
 
-    public bool Enabled = false;
+    public Entity TargetEntity = null;
 
     public float MinSpeed = 0.5f; //Backwards
     public float MaxSpeed = 5.0f; //Straight
@@ -26,43 +19,19 @@ public class SimpleAI : Worker
 
     public Job CurrentJob = null;
 
-    public Transform Transform;
-    public Vector3 CurrentPosition
-    {
-        get
-        {
-            return Transform.position;
-        }
-    }
-
-    public void DespawnAllPerPool(string pool)
-    {
-        if (pool != PoolName)
-        {
-            return;
-        }
-        GameObjectPool.Instance.Despawn(PoolName, gameObject);
-    }
-
-    void Awake()
-    {
-        Transform = transform;
-    }
-
 	// Use this for initialization
 	void Start () 
     {
         NextNavigationPosition = transform.position;
         WantedLookDirection = Vector3.forward;
-        GameObjectPool.DespawnAllPerPool += DespawnAllPerPool;
 
         CurrentJob = new Job(Owner, this, "StandingAround", transform.position);
         CurrentJob.NextJob = null;
 	}
 
-    public void SetVisionTarget(Transform newTarget)
+    public void SetTarget(Entity newTarget)
     {
-        VisionTarget = newTarget;
+        TargetEntity = newTarget;
     }
 
     public float RotationDamping = 5.0f;
@@ -70,7 +39,73 @@ public class SimpleAI : Worker
 
     public float CurrentSpeed = 0f;
 
-    public Transform VisionTarget = null;
+    public override void Reset()
+    {
+        base.Reset();
+        NextNavigationPosition = transform.position;
+    }
+
+    #region PathFinding
+    SearchingPath currentFindingPath = null;
+    bool finished = false;
+
+    public Path path = null;
+
+    public void UpdatePathFinding()
+    {
+        if (currentFindingPath != null && !finished)
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                currentFindingPath.NextStepPath(out finished);
+                if (finished)
+                {
+                    PathFinished(currentFindingPath.GeneratePath());
+                    break;
+                }
+            }
+        }
+    }
+
+    public override void SetTargetPositionCell(Cell end)
+    {
+        Cell start = LevelGenerator.Level.GetCell(Position.x, Position.z);
+
+        if (!start)
+            return;
+
+        if (!end || !end.Walkable)
+        {
+            end = LevelGenerator.Level.FindNeighborWalkableCell(end);
+        }
+
+        if (!end || !end.Walkable)
+            return;
+
+        path = null;
+        finished = false;
+
+        currentFindingPath = new SearchingPath(start, end);
+    }
+
+    public override void SetTargetCell(Cell destination)
+    {
+        if (destination.Entity != null)
+        {
+            TargetEntity = destination.Entity.SpawnedEntity;
+        }
+        else
+        {
+            TargetEntity = null;
+            SetTargetPositionCell(destination);
+        }
+    }
+
+    public override void SetJob(Job value)
+    {
+        base.SetJob(value);
+
+    }
 
     public Vector3 NextNavigationPosition = Vector3.zero;
 
@@ -79,11 +114,26 @@ public class SimpleAI : Worker
         NextNavigationPosition = path.GetNext().Position;
     }
 
-	// Update is called once per frame
+    public void PathFinished(Path newPath)
+    {
+        path = newPath;
+        if (path == null || path.IsEmpty)
+        {
+            NextNavigationPosition = transform.position;
+            return;
+        }
+        NextWaypoint();
+        if (!path.IsLast)
+            NextWaypoint();
+
+        CurrentJob = new Job(Owner, this, "WalkTo", path.Destination.Position + Vector3.up * FlyHeight);
+    }
+    #endregion
+
+    // Update is called once per frame
 	void Update ()
     {
-        if (!Enabled)
-            return;
+        UpdatePathFinding();
 
         if (Vector3.Distance(transform.position, NextNavigationPosition + Vector3.up * FlyHeight) < 0.2f)
         {
@@ -96,9 +146,9 @@ public class SimpleAI : Worker
         UpdateTarget();
 
         WantedLookDirection = NextNavigationPosition - transform.position;
-        if (VisionTarget != null)
+        if (TargetEntity != null)
         {
-            WantedLookDirection = VisionTarget.position - transform.position;
+            WantedLookDirection = TargetEntity.Position - transform.position;
         }
         WantedLookDirection.y = 0;
         
@@ -116,7 +166,7 @@ public class SimpleAI : Worker
 
         WantedSpeed = dot * MaxSpeed;
 
-        if(VisionTarget != null)
+        if (TargetEntity != null)
             WantedSpeed = Mathf.Max(WantedSpeed, MinSpeed);
 
         if(path != null && path.IsLast)
@@ -137,6 +187,7 @@ public class SimpleAI : Worker
             Shoot();
         }
 
+        
         //Job Update
         if (CurrentJob != null)
         {
@@ -145,44 +196,52 @@ public class SimpleAI : Worker
                 CurrentJob = CurrentJob.NextJob;
             }
         }
+        
 	}
 
     void OnGUI()
     {
         if (CurrentJob != null)
         {
-            Vector3 Position = Camera.main.WorldToScreenPoint(CurrentPosition);
-            GUI.Label(new Rect(Position.x, Screen.height - Position.y, 200, 25), CurrentJob.Info);
+            Vector3 pos = Camera.main.WorldToScreenPoint(Position);
+            GUI.Label(new Rect(pos.x, Screen.height - pos.y, 200, 25), CurrentJob.Info);
         }
     }
 
     public float MaxDistance = 10f;
-    public LayerMask mask;
+    public LayerMask FindMask;
+    public LayerMask AttackMask;
 
     public float ShootCD = 1.0f;
     private float ShootTimer = 0f;
 
     public void Shoot()
     {
-        if (VisionTarget == null)
+        if (TargetEntity == null)
             return;
 
-        GameObject go = GameObjectPool.Instance.Spawn("SimpleBullet", transform.position + transform.forward, Quaternion.LookRotation(WantedLookDirection));
+        Vector3 direction = (TargetEntity.Position - transform.position).normalized;
+
+        float dot = Vector3.Dot(transform.forward, TargetEntity.Position - transform.position);
+        if (dot < 0.5f)
+            return;
+
+        GameObject go = GameObjectPool.Instance.Spawn("SimpleBullet", transform.position + transform.forward, Quaternion.LookRotation(direction));
         SimpleBullet bullet = go.GetComponent<SimpleBullet>();
-        bullet.mask = mask;
+        bullet.mask = AttackMask;
+        bullet.Owner = this;
     }
 
     public void UpdateTarget()
     {
-        if (VisionTarget != null)
+        if (TargetEntity != null)
         {
-            SimpleAI ai = VisionTarget.GetComponent<SimpleAI>();
-            if (!ai.IsAlive)
-                VisionTarget = null;
+            if (!TargetEntity.IsAlive)
+                TargetEntity = null;
         }
-        if (VisionTarget != null)
+        if (TargetEntity != null)
         {
-            if (Vector3.Distance(VisionTarget.position, transform.position) < MaxDistance)
+            if (Vector3.Distance(TargetEntity.Position, transform.position) < MaxDistance)
             {
                 //Target still in range
                 return; 
@@ -190,72 +249,13 @@ public class SimpleAI : Worker
             else
             {
                 //Target out of range
-                VisionTarget = null;
+                TargetEntity = null;
             }
         }
 
         //Find new Target
-        Collider[] collider = Physics.OverlapSphere(transform.position, MaxDistance, mask);
+        Collider[] collider = Physics.OverlapSphere(transform.position, MaxDistance, FindMask);
         if (collider.Length > 0)
-            SetVisionTarget(collider[0].transform);
-    }
-
-    public int MaxHits = 10;
-    public int CurrentHits = 0;
-
-    public bool IsAlive
-    {
-        get
-        {
-            return CurrentHits < MaxHits;
-        }
-    }
-
-    public override void Reset()
-    {
-        CurrentHits = 0;
-        Enabled = true;
-        collider.enabled = true;
-        NextNavigationPosition = transform.position;
-    }
-
-    public void Hit()
-    {
-        CurrentHits++;
-        if (CurrentHits >= MaxHits)
-        {
-            TriggerSimpleAIDied(this);
-            GameObjectPool.Instance.Despawn(PoolName, gameObject);
-        }
-    }
-
-    public void Disable()
-    {
-        Enabled = false;
-        collider.enabled = false;
-    }
-
-    public Path path = null;
-
-    public override void SetJob(Job value)
-    {
-        base.SetJob(value);
-
-
-    }
-
-    public override void PathFinished(EntityController controller, Path newPath)
-    {
-        path = newPath;
-        if (path == null || path.IsEmpty)
-        {
-            NextNavigationPosition = transform.position;
-            return;
-        }
-        NextWaypoint();
-        if (!path.IsLast)
-            NextWaypoint();
-
-        CurrentJob = new Job(controller, this, "WalkTo", path.Destination.Position + Vector3.up * FlyHeight);
+            SetTarget(collider[0].GetComponent<Entity>());
     }
 }

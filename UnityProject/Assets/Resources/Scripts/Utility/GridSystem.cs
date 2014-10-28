@@ -18,9 +18,5 @@ public class GridSystem
         gridPosition = ray.origin + ray.direction * distance;
         return true;
     }
-    public static float Distance(Cell cell1, Cell cell2)
-    {
-        return Vector3.Distance(cell1.Position, cell2.Position);
-    }
 }
 

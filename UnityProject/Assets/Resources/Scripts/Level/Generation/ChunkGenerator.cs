@@ -134,7 +134,7 @@ public class ChunkGenerator
                     float NoiseY = (float)(LevelGenerator.SeedZPosition + currentPos.z) * NoiseScale;
                     float Noise = LevelGenerator.PerlinNoise2D(NoiseX, NoiseY);
 
-                    currentPos.y = Noise * 2f;
+                    //currentPos.y = Noise * 2f;
 
                     generatedChunk.SetCell(x, z, new Cell());
                     generatedChunk.GetCell(x, z).X = currentPos.x;
@@ -149,8 +149,8 @@ public class ChunkGenerator
                     {
                         float value = Mathf.Clamp01((Noise - 0.5f) * 2f);
 
-                        entity = new ResourceBlockEntity();
-                        entity.PoolName = "ResourceCube";
+                        entity = new LevelEntity_ResourceBlock();
+                        entity.PoolName = "ResourceBlock";
                         entity.Position.Value = currentPos;
                         entity.Init(value);
 
@@ -165,5 +165,6 @@ public class ChunkGenerator
         }
 
         Generating = false;
+        LevelGenerator.GeneratorFinished(this);
     }
 }

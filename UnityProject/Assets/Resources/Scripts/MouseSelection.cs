@@ -82,12 +82,14 @@ public class MouseSelection : MonoBehaviour
         CalculateStartAndEndPosition();
         selectionRect = new Rect(StartPos.x, Screen.height - StartPos.y, EndPos.x - StartPos.x, StartPos.y - EndPos.y);
         selectedEntities.Clear();
-        Entity[] allAIs = GameObject.FindObjectsOfType<Entity>();
-        for (int i = 0; i < allAIs.Length; i++)
+        Entity[] Entities = GameObject.FindObjectsOfType<Entity>();
+        for (int i = 0; i < Entities.Length; i++)
         {
-            if (TransformInSelectionBox(allAIs[i].transform, selectionRect))
+            if (TransformInSelectionBox(Entities[i].transform, selectionRect))
             {
-                selectedEntities.Add(allAIs[i]);
+                if (!Entities[i].gameObject.activeSelf)
+                    continue;
+                selectedEntities.Add(Entities[i]);
             }
         }
         UpdateState();
@@ -101,7 +103,6 @@ public class MouseSelection : MonoBehaviour
         return rect.Contains(targetScreenPos);
     }
     #endregion
-
 
     #region StaticMethods
     public static States State
@@ -117,18 +118,16 @@ public class MouseSelection : MonoBehaviour
     }
     #endregion
 
-    
-
     void Start()
     {
-        SimpleAI.SimpleAIDied += OnSimpleAIDied;
+        Entity.EntityDied += OnEntityDied;
     }
 
-    void OnSimpleAIDied(SimpleAI sender)
+    void OnEntityDied(Entity entity)
     {
-        if (selectedEntities.Contains(sender))
+        if (selectedEntities.Contains(entity))
         {
-            selectedEntities.Remove(sender);
+            selectedEntities.Remove(entity);
         }
     }
 

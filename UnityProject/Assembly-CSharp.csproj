@@ -39,51 +39,52 @@
 	<Reference Include="System.Core" />
 	<Reference Include="System.Xml.Linq" />
 	<Reference Include="UnityEngine">
-	  <HintPath>C:/Program Files (x86)/Unity/Editor4.5.5/Data/Managed/UnityEngine.dll</HintPath>
+	  <HintPath>G:/Programmieren/Unity/Editor-4.5.5/Data/Managed/UnityEngine.dll</HintPath>
 	</Reference>
 	<Reference Include="UnityEditor">
-	  <HintPath>C:/Program Files (x86)/Unity/Editor4.5.5/Data/Managed/UnityEditor.dll</HintPath>
+	  <HintPath>G:/Programmieren/Unity/Editor-4.5.5/Data/Managed/UnityEditor.dll</HintPath>
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\PriorityWorkerQueue.cs" />
-     <Compile Include="Assets\PriorityWorker_Chunk_Load.cs" />
-     <Compile Include="Assets\PriorityWorker_Chunk_Unload.cs" />
-     <Compile Include="Assets\PriorityWorker_Entity_Despawn.cs" />
-     <Compile Include="Assets\PriorityWorker_Entity_Spawn.cs" />
-     <Compile Include="Assets\PriorityWorker_Gameobject_SetActive.cs" />
-     <Compile Include="Assets\PriorityWorker_ResourceCube_UpdateMesh.cs" />
-     <Compile Include="Assets\ResourceCubeUpdater.cs" />
+     <Compile Include="Assets\Entity_ResourceCube.cs" />
      <Compile Include="Assets\Resources\GameObjectPool\GameObjectPool.cs" />
      <Compile Include="Assets\Resources\GameObjectPool\GameObjectPoolCreate.cs" />
      <Compile Include="Assets\Resources\Scripts\Controls.cs" />
      <Compile Include="Assets\Resources\Scripts\DebugSpawner.cs" />
-     <Compile Include="Assets\Resources\Scripts\Despawner.cs" />
-     <Compile Include="Assets\Resources\Scripts\Entity.cs" />
+     <Compile Include="Assets\Resources\Scripts\Entity\Entity.cs" />
+     <Compile Include="Assets\Resources\Scripts\Entity\Entity_ResourceBlock.cs" />
+     <Compile Include="Assets\Resources\Scripts\Entity\Fighter.cs" />
+     <Compile Include="Assets\Resources\Scripts\Entity\Worker.cs" />
      <Compile Include="Assets\Resources\Scripts\EntityController.cs" />
-     <Compile Include="Assets\Resources\Scripts\Fighter.cs" />
      <Compile Include="Assets\Resources\Scripts\GameManager.cs" />
      <Compile Include="Assets\Resources\Scripts\Jobs\Job.cs" />
+     <Compile Include="Assets\Resources\Scripts\Jobs\MiningJob.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\Cell.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\Chunk.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\GameObjectInfo.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\Generation\ChunkGenerator.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\Generation\LevelGenerator.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\Level.cs" />
-     <Compile Include="Assets\Resources\Scripts\Level\LevelEntity.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\LevelEntities\LevelEntity.cs" />
+     <Compile Include="Assets\Resources\Scripts\Level\LevelEntities\LevelEntity_ResourceBlock.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\Navigation\Path.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\Navigation\PathFind\PathNode.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\Navigation\PathFind\PriorityQueue.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\Navigation\PathFind\SearchingPath.cs" />
-     <Compile Include="Assets\Resources\Scripts\Level\Navigation\SimpleNavigation.cs" />
-     <Compile Include="Assets\Resources\Scripts\Level\ResourceBlockEntity.cs" />
-     <Compile Include="Assets\Resources\Scripts\Level\ResourceCube.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\SaveGame\QuaternionRotation.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\SaveGame\SaveGame.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\SaveGame\SaveGameManager.cs" />
      <Compile Include="Assets\Resources\Scripts\Level\SaveGame\Vector3Position.cs" />
      <Compile Include="Assets\Resources\Scripts\MouseSelection.cs" />
      <Compile Include="Assets\Resources\Scripts\Player.cs" />
+     <Compile Include="Assets\Resources\Scripts\PriorityWorkerQueue\PriorityWorkerQueue.cs" />
+     <Compile Include="Assets\Resources\Scripts\PriorityWorkerQueue\Worker\PriorityWorker_Chunk_Load.cs" />
+     <Compile Include="Assets\Resources\Scripts\PriorityWorkerQueue\Worker\PriorityWorker_Chunk_Unload.cs" />
+     <Compile Include="Assets\Resources\Scripts\PriorityWorkerQueue\Worker\PriorityWorker_Entity_Despawn.cs" />
+     <Compile Include="Assets\Resources\Scripts\PriorityWorkerQueue\Worker\PriorityWorker_Entity_Spawn.cs" />
+     <Compile Include="Assets\Resources\Scripts\PriorityWorkerQueue\Worker\PriorityWorker_Gameobject_SetActive.cs" />
+     <Compile Include="Assets\Resources\Scripts\PriorityWorkerQueue\Worker\PriorityWorker_ResourceCube_Spawn.cs" />
+     <Compile Include="Assets\Resources\Scripts\PriorityWorkerQueue\Worker\PriorityWorker_ResourceCube_UpdateMesh.cs" />
      <Compile Include="Assets\Resources\Scripts\RightClickAction.cs" />
      <Compile Include="Assets\Resources\Scripts\RightClickTester.cs" />
      <Compile Include="Assets\Resources\Scripts\SimpleAI.cs" />
@@ -94,7 +95,8 @@
      <Compile Include="Assets\Resources\Scripts\TopDownMovement.cs" />
      <Compile Include="Assets\Resources\Scripts\TopDownZoom.cs" />
      <Compile Include="Assets\Resources\Scripts\Utility\GridSystem.cs" />
-     <Compile Include="Assets\Resources\Scripts\Worker.cs" />
+     <Compile Include="Assets\Resources\Scripts\Utility\PriorityQueue.cs" />
+     <Compile Include="Assets\Resources\Scripts\Utility\TryLock.cs" />
      <Compile Include="Assets\_ProgrammerInfo.cs" />
      <None Include="Assets\Resources\Shaders\VertexColorIllum.shader" />
      <None Include="Assets\Resources\Shaders\VertexColorTransparent.shader" />

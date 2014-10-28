@@ -6,21 +6,10 @@ using System.Collections.Generic;
 	public class GameObjectPool
 	{
 
-        public delegate void GameObjectPoolEvents();
-        public static event GameObjectPoolEvents DespawnAll;
-
-        public delegate void GameObjectPoolEventsPerPool(string poolName);
-        public static event GameObjectPoolEventsPerPool DespawnAllPerPool;
-
         private static bool Deactivate = true;
 
         public static Vector3 disabledPosition = new Vector3(0, -10000, 0);
-
-        public static void TriggerDespawn(string poolName)
-        {
-            if (DespawnAllPerPool != null)
-                DespawnAllPerPool(poolName);
-        }
+        
 
 		private static GameObjectPool instance;
 

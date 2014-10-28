@@ -127,6 +127,17 @@ public class Level
         chunk.UpdateCellNeighbours();
     }
 
+    public Cell FindNeighborWalkableCell(Cell cell)
+    {
+        foreach (var neighbor in cell.Neighbours)
+        {
+            if (neighbor.Walkable)
+            {
+                return neighbor;
+            }
+        }
+        return null;
+    }
     public Cell FindNeighborWalkableCell(Cell cell, Cell start)
     {
         float minDistance = -1f;

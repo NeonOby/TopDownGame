@@ -52,15 +52,15 @@ public class Cell
     //Beim Generieren und Ändern eines Chunks
     public void ChunkChanged()
     {
-        Cell top = LevelGenerator.level.GetCell(X, (float)Z + 1f, false);
-        Cell bottom = LevelGenerator.level.GetCell(X, (float)Z - 1f, false);
-        Cell right = LevelGenerator.level.GetCell((float)X + 1f, Z, false);
-        Cell left = LevelGenerator.level.GetCell((float)X - 1f, Z, false);
+        Cell top = LevelGenerator.Level.GetCell(X, (float)Z + 1f, false);
+        Cell bottom = LevelGenerator.Level.GetCell(X, (float)Z - 1f, false);
+        Cell right = LevelGenerator.Level.GetCell((float)X + 1f, Z, false);
+        Cell left = LevelGenerator.Level.GetCell((float)X - 1f, Z, false);
 
-        Cell topRight = LevelGenerator.level.GetCell((float)X + 1f, (float)Z + 1f, false);
-        Cell bottomRight = LevelGenerator.level.GetCell((float)X + 1f, (float)Z - 1f, false);
-        Cell topLeft = LevelGenerator.level.GetCell((float)X - 1f, (float)Z + 1f, false);
-        Cell bottomLeft = LevelGenerator.level.GetCell((float)X - 1f, (float)Z - 1f, false);
+        Cell topRight = LevelGenerator.Level.GetCell((float)X + 1f, (float)Z + 1f, false);
+        Cell bottomRight = LevelGenerator.Level.GetCell((float)X + 1f, (float)Z - 1f, false);
+        Cell topLeft = LevelGenerator.Level.GetCell((float)X - 1f, (float)Z + 1f, false);
+        Cell bottomLeft = LevelGenerator.Level.GetCell((float)X - 1f, (float)Z - 1f, false);
 
         AddNeighbour(top);
         AddNeighbour(bottom);

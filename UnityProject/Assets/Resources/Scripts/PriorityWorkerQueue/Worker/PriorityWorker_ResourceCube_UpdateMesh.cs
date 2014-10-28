@@ -4,7 +4,7 @@ public class PriorityWorker_ResourceCube_UpdateMesh  : PriorityWorker
 {
     public static int PRIORITY = 3;
 
-    public ResourceCube cube;
+    public Entity_ResourceBlock cube;
 
     public Vector3[] vertices;
     public int[] triangles;
@@ -12,7 +12,7 @@ public class PriorityWorker_ResourceCube_UpdateMesh  : PriorityWorker
     public Vector3[] normals;
     public Vector4[] tangents;
 
-    public static void Create(ResourceCube cube,
+    public static void Create(Entity_ResourceBlock cube,
         Vector3[] vertices,
         int[] triangles,
         Vector2[] uvs,
