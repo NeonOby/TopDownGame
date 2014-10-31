@@ -29,7 +29,7 @@ public class PriorityWorker_ResourceCube_Spawn : PriorityWorker
         if (Canceled) return;
         GameObject go = GameObjectPool.Instance.Spawn(PoolName, Position, Rotation);
         Entity_ResourceCube cube = go.GetComponent<Entity_ResourceCube>();
-        if (cube) cube.target = Target;
+        if (cube) cube.SetTarget(Target);
         if (CallBack != null) CallBack(go);
     }
 }

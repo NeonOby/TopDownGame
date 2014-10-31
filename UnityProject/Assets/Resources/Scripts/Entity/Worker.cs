@@ -3,48 +3,187 @@ using UnityEngine;
 
 public class Worker : Entity
 {
+    public Healthbar healthBar = null;
+
+    public virtual void UpdateHealthBar()
+    {
+        if (healthBar == null)
+            return;
+        healthBar.UpdateHealth(ProcentageHealth);
+    }
+
     #region Health
-    public float health = 0f;
-    public override float Health
+    public int health = 10;
+    public int StartHealth = 10;
+    public int MaxHealthValue = 10;
+    public override int Health
     {
         get
         {
-            return health;
+            return health + resources;
         }
     }
-    public override bool IsAlive
+    public virtual int MaxHealth
     {
         get
         {
-            return Health > 0;
+            return MaxHealthValue + MaxResources;
         }
     }
-    public override void GotHit(float value, Entity other)
+    public virtual float ProcentageHealth
     {
-        health = Mathf.Max(health - value, 0);
+        get
+        {
+            return health / MaxHealthValue;
+        }
     }
-    public override void OnDeath()
+
+    public override void GotHit(int value, Entity other)
     {
-        
+        value = Mathf.Min(Health, value);
+
+        Worker worker = null;
+        if (other.GetType() == typeof(Worker))
+            worker = (Worker)other;
+
+        for (int i = 0; i < value; i++)
+        {
+            PriorityWorker_ResourceCube_Spawn.Create("ResourceCube", transform.position + Vector3.up, Quaternion.identity, null, worker);
+        }
+
+        int lostResources = Mathf.Min(resources, value);
+        int lostHealth = Mathf.Min(health, value - lostResources);
+
+        resources -= lostResources;
+        health -= lostHealth;
     }
     #endregion
 
     #region Inventory
-    private int resources = 0;
+    public int resources = 0;
     public int MaxResources = 20;
-
-    public void AddResources(int amount)
+    public virtual int CurResources
     {
-        resources = Mathf.Min(resources + amount, MaxResources);
+        get
+        {
+            return resources + IncomingResource;
+        }
     }
 
-    public void DropResources(Worker target)
+    public int IncomingResource = 0;
+
+    //Returns if it can take more resources
+    public bool AddIncomingResource()
     {
-        for (int i = 0; i < resources; i++)
+        if (AvailableSpace <= 0)
+        {
+            return false;
+        }
+        IncomingResource++;
+        return true;
+    }
+    public void RemoveIncomingResource()
+    {
+        IncomingResource--;
+        IncomingResource = Mathf.Max(IncomingResource, 0);
+    }
+
+    public bool InventoryFull
+    {
+        get
+        {
+            return resources >= MaxResources;
+        }
+    }
+
+    public bool InventoryEmpty
+    {
+        get
+        {
+            return resources == 0;
+        }
+    }
+
+    public bool HasSpace
+    {
+        get
+        {
+            return Health < MaxHealth;
+        }
+    }
+
+    public bool HasResources
+    {
+        get
+        {
+            return !InventoryEmpty;
+        }
+    }
+
+    public int AvailableSpace
+    {
+        get
+        {
+            return MaxHealth - Health;
+        }
+    }
+
+    public virtual void OnResourcesChanged(int amount)
+    {
+
+    }
+
+    public virtual void OnHealed(int amount)
+    {
+
+    }
+
+    public int Heal(int amount)
+    {
+        if (amount <= 0)
+            return 0;
+
+        amount = Mathf.Min(amount, MaxHealthValue - health);
+        health += amount;
+
+        if (amount > 0)
+            OnHealed(amount);
+
+        return amount;
+    }
+
+    public int AddResources(int amount)
+    {
+        if (amount <= 0)
+            return 0;
+
+        int healAmount = Heal(amount);
+
+        int moreResourceAmount = Mathf.Min(amount - healAmount, MaxResources - resources);
+        resources += moreResourceAmount;
+
+        if (moreResourceAmount > 0)
+            OnResourcesChanged(moreResourceAmount);
+
+        return healAmount + moreResourceAmount;
+    }
+
+    public void DropResources(Worker target, int amount)
+    {
+        if (amount <= 0)
+            return;
+
+        amount = Mathf.Min(amount, resources);
+
+        if (amount == 0)
+            return;
+
+        for (int i = 0; i < amount; i++)
         {
             PriorityWorker_ResourceCube_Spawn.Create("ResourceCube", transform.position + Vector3.up, Quaternion.identity, null, target);
         }
-        resources = 0;
+        resources -= amount;
+        OnResourcesChanged(amount);
     }
     #endregion
 
@@ -65,6 +204,9 @@ public class Worker : Entity
     }
     public void AddJob(Job job)
     {
+        if (job == null)
+            return;
+
         jobQueue.Enqueue(job);
         if (CurrentJob == null)
             NextJob();
@@ -73,11 +215,25 @@ public class Worker : Entity
     {
 
     }
+
+    public bool HasJob
+    {
+        get
+        {
+            return CurrentJob != null;
+        }
+    }
+
+    public Job CurrentJob = null;
+    public Job LastJob = null;
+
     public void NextJob()
     {
+        LastJob = CurrentJob;
         if (jobQueue.Count == 0)
         {
             CurrentJob = null;
+            OnJobChanged();
             return;
         }
         CurrentJob = jobQueue.Dequeue();
@@ -85,25 +241,50 @@ public class Worker : Entity
         CurrentJob.Start();
     }
 
-    public Job CurrentJob
-    {
-        get;
-        protected set;
-    }
-
     public override void Reset()
     {
         base.Reset();
+        ClearJobs();
         CurrentJob = null;
+        LastJob = null;
+        health = StartHealth;
+
+        IncomingResource = 0;
     }
 
-    public virtual void Update()
+    public override void Update()
     {
-        if (CurrentJob != null && CurrentJob.Update())
+        base.Update();
+        if (HasJob)
         {
-            NextJob();
+            if (CurrentJob.Name == "")
+            {
+                NextJob();
+                return;
+            }
+
+            bool finished = CurrentJob.Update();
+
+            if (CurrentJob.Paused)
+                finished = true;
+
+            if (finished)
+                NextJob();
+        }
+        UpdateHealthBar();
+    }
+
+    private void OldThings()
+    {
+        bool finished = false;
+        if (CurrentJob.GetType() == typeof(Job_Mining))
+        {
+            Job_Mining job = ((Job_Mining)CurrentJob);
+            if (job.Paused)
+                finished = true;
         }
     }
+
     public virtual void PathFinished(Path newPath)
     {
 

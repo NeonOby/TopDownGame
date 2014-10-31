@@ -9,6 +9,8 @@ public class SimpleBullet : MonoBehaviour
         return ((mask.value & (1 << obj.layer)) > 0);
     }
 
+    public int Damage = 1;
+
     public float Impulse = 10f;
 
     public float LifeTime = 4f;
@@ -48,7 +50,7 @@ public class SimpleBullet : MonoBehaviour
             if (entity == null)
                 return;
 
-            entity.Hit(1f, Owner);
+            entity.Hit(Damage, Owner);
         }
         Explode();
     }

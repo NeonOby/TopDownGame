@@ -16,43 +16,58 @@ public class Job_Mining : Job
     public float cellX, cellZ;
     public Entity_ResourceBlock block;
 
-    private int StartResources = 0;
+    public int StartResources = 64;
 
     public override bool IsFinished
     {
         get
         {
-            return block.CurrentResources == 0;
+            return FinishedMining && Worker.IncomingResource == 0;
         }
     }
 
-    public override string Info
+    public bool FinishedMining
     {
         get
         {
-            return System.String.Format("{0} :{1:### %}", Name, Progression);
+            return (block == null || block.IsDead || block.CurResources == 0);
         }
     }
 
-    //Every job should implement this
-    //It tells KI if this job is broken or not avaible anymore
-    public override bool IsAvaible
+    public override bool Paused
     {
-        get;
-        protected set;
+        get
+        {
+            return Worker.InventoryFull && Worker.IncomingResource == 0;
+        }
     }
+
+    public float Timer = 0f;
+    public float Wait = 0.0f;
 
     public override void Start()
     {
-        StartResources = block.CurrentResources;
+        StartResources = 64;
+        Timer = Wait;
+        Entity.EntityDied += OnEntityDied;
+    }
+
+    public void OnEntityDied(Entity entity)
+    {
+        if (entity == block)
+        {
+            block = null;
+        }
     }
 
     public override void UpdateProgression()
     {
-        if (StartResources > 0)
-            Progression = (1f - (block.CurrentResources / StartResources));
-        else
-            Progression = 1f;
+        if (block == null || block.IsDead)
+            return;
+
+        Progression = (1f - (block.CurResources / (float)StartResources));
+
+        
     }
 }
 

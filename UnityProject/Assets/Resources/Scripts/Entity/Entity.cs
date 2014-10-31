@@ -2,6 +2,19 @@
 
 public class Entity : MonoBehaviour
 {
+    public static bool Friends(Entity entity1, Entity entity2)
+    {
+        if (entity1 == null || entity2 == null || entity1.Owner == null || entity2.Owner == null)
+            return false;
+        return entity1.Owner.PlayerID == entity2.Owner.PlayerID;
+    }
+    public static bool Enemies(Entity entity1, Entity entity2)
+    {
+        if (entity1 == null || entity2 == null || entity1.Owner == null || entity2.Owner == null)
+            return false;
+        return entity1.Owner.PlayerID != entity2.Owner.PlayerID;
+    }
+
     #region Pooling
     public string PoolName = "";
     public virtual void SetPoolName(string value)
@@ -17,7 +30,7 @@ public class Entity : MonoBehaviour
 
     public Collider colliderForRaycasts = null;
 
-    public Player Owner = null;
+    public EntityController Owner = null;
 
     public delegate void EntityEvent(Entity entity);
     public static event EntityEvent EntityDied;
@@ -34,34 +47,41 @@ public class Entity : MonoBehaviour
             return Transform.position;
         }
     }
-    void Awake()
+    public virtual void Awake()
     {
         Transform = transform;
         if (colliderForRaycasts == null)
             colliderForRaycasts = collider;
     }
 
-    public virtual float Health
+    public virtual int Health
     {
         get
         {
-            return 0f;
+            return 1;
         }
     }
     public virtual bool IsAlive
     {
         get
         {
-            return true;
+            return Health > 0;
+        }
+    }
+    public virtual bool IsDead
+    {
+        get
+        {
+            return Health == 0;
         }
     }
 
-    public virtual void GotHit(float value, Entity other)
+    public virtual void GotHit(int value, Entity other)
     {
 
     }
 
-    public void Hit(float value, Entity other)
+    public void Hit(int value, Entity other)
     {
         GotHit(value, other);
         if (!IsAlive) Die();
@@ -76,6 +96,38 @@ public class Entity : MonoBehaviour
     {
         OnDeath();
         GameObjectPool.Instance.Despawn(PoolName, gameObject);
+        TriggerEntityDied(this);
+    }
+
+    public bool Walkable = true;
+    public float lastCellX = 0, lastCellZ = 0;
+
+    public bool AddedEntityToLast = false;
+
+    public virtual void UpdateWalkable()
+    {
+        Cell tmp = null;
+        if (AddedEntityToLast)
+        {
+            tmp = LevelGenerator.Level.GetCell(lastCellX, lastCellZ);
+            if (tmp != null)
+                tmp.EntityLeave(this);
+        }
+
+        if (!Walkable)
+        {
+            lastCellX = Position.x;
+            lastCellZ = Position.z;
+            tmp = LevelGenerator.Level.GetCell(lastCellX, lastCellZ);
+            if (tmp != null)
+                tmp.EntityEnter(this);
+            AddedEntityToLast = tmp != null;
+        }
+    }
+
+    public virtual void Update()
+    {
+        UpdateWalkable();
     }
 }
 

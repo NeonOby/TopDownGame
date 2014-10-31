@@ -68,6 +68,14 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    void OnGUI()
+    {
+        foreach (var item in EntityController.Controller)
+        {
+            GUILayout.Label(System.String.Format("{0}: {1}: {2}", item.Value.PlayerID, item.Value.gameObject.name, item.Value.CurResources));
+        }
+    }
+
 	// Update is called once per frame
 	void Update () 
     {

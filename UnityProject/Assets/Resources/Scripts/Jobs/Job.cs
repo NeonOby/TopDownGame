@@ -29,7 +29,15 @@ public class Job
     {
         get
         {
-            return System.String.Format("{0} :{1:### %}", Name, Progression);
+            return System.String.Format("{0} :{1:##0 %}", Name, Progression);
+        }
+    }
+
+    public virtual bool Paused
+    {
+        get
+        {
+            return false;
         }
     }
 

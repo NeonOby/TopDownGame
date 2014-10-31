@@ -90,6 +90,8 @@ public class SearchingPath
 
     public bool Walkable(Cell cell)
     {
+        if (cell == null)
+            return false;
         return cell.Walkable;
     }
 }

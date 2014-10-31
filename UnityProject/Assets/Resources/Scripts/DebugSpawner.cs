@@ -6,6 +6,7 @@ public class SpawnPerButton
 {
     public string ButtonString = "";
     public string PoolName = "";
+    public int PlayerID = 0;
     public bool SpawnAtMousePos = true;
 }
 
@@ -48,6 +49,9 @@ public class DebugSpawner : MonoBehaviour
 
             position = ray.origin + ray.direction * distance;
         }
-        GameObjectPool.Instance.Spawn(info.PoolName, position, Quaternion.identity);
+        GameObject go = GameObjectPool.Instance.Spawn(info.PoolName, position, Quaternion.identity);
+
+        Entity entity = go.GetComponent<Entity>();
+        entity.Owner = EntityController.Get(info.PlayerID);
     }
 }

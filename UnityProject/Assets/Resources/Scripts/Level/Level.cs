@@ -21,6 +21,20 @@ public class Level
 
     public List<Chunk> loadedChunks = new List<Chunk>();
 
+    public void RemoveLevelEntity(float x, float z)
+    {
+        LevelEntity levelEntity = GetCell(x, z).LevelEntity;
+        if (levelEntity != null)
+        {
+            Cell cell = GetCell(x, z);
+            cell.LevelEntity = null;
+            if (ContainsChunkf(x, z))
+            {
+                chunks[GetKey(x, z)].RemoveLevelEntityFromList(levelEntity);
+            }
+        }
+    }
+
     public Level(int seed)
     {
         Seed = seed;
@@ -57,37 +71,6 @@ public class Level
             return true;
 
         return false;
-    }
-
-    //Astar "PathFinderFast.cs" was using this
-    //Copies complete grid to two dimensional Cell array
-    //to sloooooooooow
-    [Obsolete]
-    public Cell[,] GetCurrentGrid()
-    {
-        int width = (highestX) - (lowestX);
-        int height = (highestZ) - (lowestZ);
-        width *= LevelGenerator.ChunkSize;
-        height *= LevelGenerator.ChunkSize;
-
-        width = Mathf.NextPowerOfTwo(width);
-        height = Mathf.NextPowerOfTwo(height);
-
-        int lowestXCells = lowestX * LevelGenerator.ChunkSize;
-        int lowestZCells = lowestZ * LevelGenerator.ChunkSize;
-
-        Cell[,] grid = new Cell[width, height];
-        for (int x = 0; x < width; x++)
-        {
-            for (int z = 0; z < height; z++)
-            {
-                Cell cell = GetCell(x + lowestXCells, z + lowestZCells);
-                if (cell == null)
-                    cell = new Cell() { Walkable = false };
-                grid[x, z] = cell;
-            }
-        }
-        return grid;
     }
 
     public string GetKey(float x, float z)
@@ -137,6 +120,10 @@ public class Level
             }
         }
         return null;
+    }
+    public Cell FindNeighborWalkableCellRandom(Cell cell)
+    {
+        return cell.Neighbours.Where(p => p.Walkable == true).Random();
     }
     public Cell FindNeighborWalkableCell(Cell cell, Cell start)
     {

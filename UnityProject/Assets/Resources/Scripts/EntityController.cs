@@ -1,63 +1,35 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
-
-public class EntityController : MonoBehaviour
+public class EntityController : Worker
 {
     #region Instance
-    private static EntityController instance;
-    public static EntityController Instance
+    public override void Awake()
     {
-        get
-        {
-            if (instance == null)
-                instance = FindObjectOfType<EntityController>();
-            return instance;
-        }
-        protected set
-        {
-            instance = value;
-        }
-    }
-    void Awake()
-    {
-        Instance = this;
+        base.Awake();
+        Controller.Add(PlayerID, this);
     }
     #endregion
-    
+
+    public int PlayerID = 0;
+
+    public static Dictionary<int, EntityController> Controller = new Dictionary<int, EntityController>();
+
+    public static EntityController Get(int id)
+    {
+        return Controller[id];
+    }
+
+    public Entity_PlayerBase Base;
+
     #region Ressources
     //Inpsektor
     public int StartResources = 100;
      
-    private int resources = 0;
-    public virtual int Resources
-    {
-        get
-        {
-            return resources;
-        }
-        private set
-        {
-            resources = value;
-        }
-    }
-    public void AddResources(int amount)
-    {
-        instance.Resources += amount;
-    }
-    public bool HasResources(int amount)
-    {
-        return instance.Resources >= amount;
-    }
-    public bool TakeResources(int amount)
-    {
-        if (!HasResources(amount))
-            return false;
-        instance.Resources -= amount;
-        return true;
-    }
     #endregion
 
-    protected virtual void Start()
+
+    public virtual void Start()
     {
         AddResources(StartResources);
     }

@@ -291,66 +291,6 @@ public class LevelGenerator : MonoBehaviour
         Level.loadedChunks.Remove(chunk);
     }
 
-    //new one in "ChunkGenerator" Thread Safe?
-    [Obsolete]
-    private static Chunk GenerateChunk(int seed, int relX, int relZ, float randomizedMapPositionX, float randomizedMapPositionZ)
-    {
-        Chunk newChunk = new Chunk();
-        newChunk.posX = relX;
-        newChunk.posZ = relZ;
-        int startX = relX * ChunkSize;
-        int startZ = relZ * ChunkSize;
-
-        Vector3 zeroPos = Vector3.zero;
-        Vector3 currentPos = new Vector3(startX, 0, startZ);
-
-        float distance = Vector3.Distance(zeroPos, currentPos);
-
-        LevelEntity entity;
-        for (int x = 0; x < ChunkSize; x++)
-        {
-            for (int z = 0; z < ChunkSize; z++)
-            {
-                currentPos.x = startX + x;
-                currentPos.z = startZ + z;
-
-                currentPos.x += 0.5f;
-                currentPos.z += 0.5f;
-
-                newChunk.SetCell(x, z, new Cell());
-                newChunk.GetCell(x, z).X = currentPos.x;
-                newChunk.GetCell(x, z).Z = currentPos.z;
-
-                distance = Vector3.Distance(zeroPos, currentPos);
-                if (distance - SafeDistance < SafeDistance)
-                    continue;
-
-                float NoiseScale = 0.5f;
-
-                float NoiseX = (float)(randomizedMapPositionX + currentPos.x) * NoiseScale;
-                float NoiseY = (float)(randomizedMapPositionZ + currentPos.z) * NoiseScale;
-
-                float Noise = PerlinNoise2D(NoiseX, NoiseY);
-
-                //Versuche auf jedem meter dinge zu erstellen
-                if (Noise > 0.5f)
-                {
-                    entity = new LevelEntity_ResourceBlock();
-                    entity.PoolName = "ResourceCube";
-                    entity.Position.Value = currentPos;
-
-                    newChunk.GetCell(x, z).Walkable = false;
-                    newChunk.GetCell(x, z).Entity = entity;
-                    newChunk.GetCell(x, z).ContainsEntity = true;
-                    
-                    newChunk.AddEntity(entity);
-                }
-            }
-        }
-
-        return newChunk;
-    }
-
     #region Noise
     private static float persistence = 1f;
     private static int NumberOfOctaves = 2;

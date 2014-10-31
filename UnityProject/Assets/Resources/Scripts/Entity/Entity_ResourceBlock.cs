@@ -61,43 +61,70 @@ public class ResizeAbleArray<T>
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
-public class Entity_ResourceBlock : Entity
+[System.Serializable]
+public class Entity_ResourceBlock : Worker
 {
 
-	public override float Health
+	public override int Health
 	{
 		get
 		{
-			return CurrentResources;
+			return resources;
 		}
 	}
-	public override bool IsAlive
-	{
-		get
-		{
-			return CurrentResources > 0;
-		}
-	}
+    public override int MaxHealth
+    {
+        get
+        {
+            return MaxResources;
+        }
+    }
 
-	public override void GotHit(float value, Entity other)
+    private System.Object resLock = new System.Object();
+    public override int CurResources
+    {
+        get
+        {
+            lock (resLock)
+            {
+                return resources;
+            }
+        }
+    }
+
+
+	public override void GotHit(int value, Entity other)
 	{
-		value = Mathf.Min(CurrentResources, value);
-		CurrentResources -= (int)value;
-		UpdateMesh();
+		value = Mathf.Min(CurResources, value);
 
 		Worker worker = null;
 		if (other is Worker)
 			worker = (Worker)other;
 
-		for (int i = 0; i < (int)value; i++)
+		for (int i = 0; i < value; i++)
 		{
 			PriorityWorker_ResourceCube_Spawn.Create("ResourceCube", transform.position + Vector3.up, Quaternion.identity, null, worker);
 		}
+
+        ChangeResourceAmount(CurResources - value);
 	}
+
+    LevelEntity_ResourceBlock levelEntity = null;
+    public void SetLevelEntity(LevelEntity_ResourceBlock levelEntity_ResourceBlock)
+    {
+        levelEntity = levelEntity_ResourceBlock;
+    }
+
+    public void ChangeResourceAmount(int newAmount)
+    {
+        resources = newAmount;
+        if (levelEntity != null) levelEntity.Resources = resources;
+        UpdateMesh();
+    }
 
 	public void SetResourceAmount(int newAmount)
 	{
-		CurrentResources = newAmount;
+        resources = newAmount;
 		Reset();
 		UpdateMesh();
 	}
@@ -115,6 +142,12 @@ public class Entity_ResourceBlock : Entity
 			ChangeMesh();
 		}
 	}
+
+    public override void OnResourcesChanged(int amount)
+    {
+        base.OnResourcesChanged(amount);
+        ChangeResourceAmount(resources);
+    }
 
 	public void MeshUpdate()
 	{
@@ -154,6 +187,12 @@ public class Entity_ResourceBlock : Entity
 		generatingThread.Start();
 	}
 
+    public override void OnDeath()
+    {
+        base.OnDeath();
+        LevelGenerator.Level.RemoveLevelEntity(Position.x, Position.z);
+    }
+
 	#region MeshGeneration
 	private bool GetIsAir(int x, int y, int z)
 	{
@@ -167,7 +206,7 @@ public class Entity_ResourceBlock : Entity
 		if (y < 0)
 			return false;
 
-		if ((x + z * width + y * (width * length)) >= CurrentResources)
+		if ((x + z * width + y * (width * length)) >= CurResources)
 		{
 			return true;
 		}
@@ -217,31 +256,14 @@ public class Entity_ResourceBlock : Entity
 	{
 		get
 		{
-			return (int)(CurrentResources / (width * length)) + 1;
+			return (int)(CurResources / (width * length)) + 1;
 		}
 	}
 
 	private volatile Mesh mesh;
 
-	private System.Object resLock = new System.Object();
-	private volatile int resources = 0;
-	public int CurrentResources
-	{
-		get
-		{
-			lock (resLock)
-			{
-				return resources;
-			}
-		}
-		set
-		{
-			lock (resLock)
-			{
-				resources = value;
-			}
-		}
-	}
+	
+
 	private volatile int width = 4, length = 4;
 	private volatile int lastAmount = 0;
 
@@ -255,15 +277,11 @@ public class Entity_ResourceBlock : Entity
 	{
 		int layerCount = 0;
 
-		if (lastAmount == CurrentResources)
+		if (lastAmount == CurResources)
 			return;
 
-		lastAmount = CurrentResources;
+		lastAmount = CurResources;
 
-		if (CurrentResources > 64)
-			CurrentResources = 64;
-		if (CurrentResources < 0)
-			CurrentResources = 0;
 
 		generating = true;
 
@@ -511,5 +529,6 @@ public class Entity_ResourceBlock : Entity
 		mesh.tangents = tangents;
 	}
 	#endregion
+
 
 }

@@ -15,6 +15,8 @@ public class LevelEntity_ResourceBlock : LevelEntity
         if(cube)
         {
             cube.SetResourceAmount(Resources);
+            cube.SetLevelEntity(this);
+            cube.Owner = EntityController.Get(1);
         }
     }
 

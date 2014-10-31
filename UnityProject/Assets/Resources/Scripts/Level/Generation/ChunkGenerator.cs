@@ -139,6 +139,18 @@ public class ChunkGenerator
                     generatedChunk.GetCell(x, z).Z = currentPos.z;
                     generatedChunk.GetCell(x, z).Y = currentPos.y;
 
+                    if (currentPos.x == 0.5f && currentPos.z == 0.5f)
+                    {
+                        entity = new LevelEntity_PlayerBase();
+                        entity.PoolName = "PlayerBase";
+                        entity.Position.Value = currentPos;
+
+                        generatedChunk.GetCell(x, z).LevelEntity = entity;
+
+                        generatedChunk.AddEntity(entity);
+                        continue;
+                    }
+
                     distance = Vector3.Distance(zeroPos, currentPos);
                     if (distance < LevelGenerator.SafeDistance)
                         continue;
@@ -152,9 +164,7 @@ public class ChunkGenerator
                         entity.Position.Value = currentPos;
                         entity.Init(value);
 
-                        generatedChunk.GetCell(x, z).Walkable = false;
-                        generatedChunk.GetCell(x, z).ContainsEntity = true;
-                        generatedChunk.GetCell(x, z).Entity = entity;
+                        generatedChunk.GetCell(x, z).LevelEntity = entity;
 
                         generatedChunk.AddEntity(entity);
                     }

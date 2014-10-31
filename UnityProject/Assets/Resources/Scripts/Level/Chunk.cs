@@ -31,6 +31,14 @@ public class Chunk
         entities.Add(entity);
     }
 
+    public void RemoveLevelEntityFromList(LevelEntity entity)
+    {
+        if (entities.Contains(entity))
+        {
+            entities.Remove(entity);
+        }
+    }
+
     public Cell GetCell(float x, float z)
     {
         return GetCell((int)x, (int)z);

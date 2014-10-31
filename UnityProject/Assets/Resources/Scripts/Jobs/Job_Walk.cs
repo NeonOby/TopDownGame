@@ -29,22 +29,6 @@ public class Job_Walk : Job
         }
     }
 
-    public override string Info
-    {
-        get
-        {
-            return System.String.Format("{0} :{1:### %}", Name, Progression);
-        }
-    }
-
-    //Every job should implement this
-    //It tells KI if this job is broken or not avaible anymore
-    public override bool IsAvaible
-    {
-        get;
-        protected set;
-    }
-
     public override void Start()
     {
         StartDistance = Vector3.Distance(Worker.Position, WantedPosition);

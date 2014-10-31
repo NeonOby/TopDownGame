@@ -10,17 +10,76 @@ public class Cell
     public float X = 0, Z = 0;
     public float Y = 0;
 
-    public bool Walkable = true;
+    private bool walkAble = true;
+    public bool Walkable
+    {
+        get
+        {
+            if (!walkAble) return false;
+            if (ContainsEntity || ContainsLevelEntity) return false;
+            return true;
+        }
+    }
     public int WalkCost = 1;
 
     public bool BreakAble = false;
     public float BreakCost = 0f;
 
-    public bool ContainsEntity = false;
-    public LevelEntity Entity = null;
+    public bool ContainsEntity
+    {
+        get
+        {
+            return EntityCount > 0;
+        }
+    }
+    public int EntityCount = 0;
+
+    public bool ContainsLevelEntity
+    {
+        get
+        {
+            return LevelEntity != null;
+        }
+    }
+    public LevelEntity LevelEntity = null;
 
     //Not used yet
     public byte Layer = 0;
+
+    public void EntityEnter(Entity entity)
+    {
+        bool was = Walkable;
+        EntityCount++;
+        if (was)
+        {
+            //DirectNeighbourEntity(1);
+        }
+    }
+    public void EntityLeave(Entity entity)
+    {
+        EntityCount--;
+        if (Walkable)
+        {
+            //DirectNeighbourEntity(-1);
+        }
+    }
+
+    public void DirectNeighbourEntity(int value)
+    {
+        Cell top = LevelGenerator.Level.GetCell(X, (float)Z + 1f, false);
+        Cell bottom = LevelGenerator.Level.GetCell(X, (float)Z - 1f, false);
+        Cell right = LevelGenerator.Level.GetCell((float)X + 1f, Z, false);
+        Cell left = LevelGenerator.Level.GetCell((float)X - 1f, Z, false);
+
+        if (top)
+            top.EntityCount += value;
+        if (bottom)
+            bottom.EntityCount += value;
+        if (right)
+            right.EntityCount += value;
+        if (left)
+            left.EntityCount += value;
+    }
 
     public UnityEngine.Vector3 Position
     {
