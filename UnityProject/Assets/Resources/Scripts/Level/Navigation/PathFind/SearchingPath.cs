@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class SearchingPath
 {
     public delegate void PathFinished(EntityController controller, Path path);
