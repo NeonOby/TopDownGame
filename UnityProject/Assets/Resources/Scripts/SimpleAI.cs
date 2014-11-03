@@ -11,7 +11,7 @@ public class SimpleAI : Worker
 	public Entity TargetEntity = null;
 	public Entity TargetJobEntity = null;
 
-    public int Damage = 3;
+	public int Damage = 3;
 
 	public float ClimbSpeed = 4.0f;
 	public float FlyHeight = 2.0f;
@@ -23,7 +23,7 @@ public class SimpleAI : Worker
 	{
 		base.Reset();
 		NextNavigationPosition = transform.position;
-        WantedLookDirection = Vector3.forward;
+		WantedLookDirection = Vector3.forward;
 	}
 
 	#region PathFinding
@@ -31,6 +31,8 @@ public class SimpleAI : Worker
 	bool finished = false;
 
 	public Path path = null;
+
+
 
 	public void UpdatePathFinding()
 	{
@@ -41,9 +43,20 @@ public class SimpleAI : Worker
 				currentFindingPath.NextStepPath(out finished);
 				if (finished)
 				{
-					PathFinished(currentFindingPath.GeneratePath());
+					PathFinished(currentFindingPath.path);
 					break;
 				}
+			}
+		}
+
+		if (path != null && !path.IsEmpty)
+		{
+			Cell Last = null;
+			foreach (var item in path.path)
+			{
+				if (Last != null)
+					Debug.DrawLine(new Vector3(Last.X, 0, Last.Z), new Vector3(item.X, 0, item.Z));
+				Last = item;
 			}
 		}
 	}
@@ -59,7 +72,7 @@ public class SimpleAI : Worker
 
 		if (!end || !end.Walkable)
 		{
-            end = LevelGenerator.Level.FindNeighborWalkableCellRandom(end);
+			end = LevelGenerator.Level.FindNeighborWalkableCellRandom(end);
 		}
 
 		if (!end || !end.Walkable)
@@ -72,58 +85,58 @@ public class SimpleAI : Worker
 		return end;
 	}
 
-    public float WaitTimer = 0f;
+	public float WaitTimer = 0f;
 
 	public override void OnJobChanged()
 	{
 		base.OnJobChanged();
 		TargetJobEntity = null;
 
-        Job curLastJob = LastJob;
-        Job curJob = CurrentJob;
+		Job curLastJob = LastJob;
+		Job curJob = CurrentJob;
 
-        if (curJob == null)
-        {
-            if (curLastJob == null)
-                return;
+		if (curJob == null)
+		{
+			if (curLastJob == null)
+				return;
 
-            if (curLastJob.GetType() == typeof(Job_Mining) && !InventoryEmpty)
-            {
-                AddJob(new Job_GiveResources(Owner, this, "Giving Resources", Owner.Base, Owner.Base.Position.x, Owner.Base.Position.z));
+			if (curLastJob.GetType() == typeof(Job_Mining) && !InventoryEmpty)
+			{
+				AddJob(new Job_GiveResources(Owner, this, "Giving Resources", Owner.Base, Owner.Base.Position.x, Owner.Base.Position.z));
 
-                if (((Job_Mining)curLastJob).FinishedMining == false)
-                    AddJob(curLastJob);
-            }
-            return;
-        }
+				if (((Job_Mining)curLastJob).FinishedMining == false)
+					AddJob(curLastJob);
+			}
+			return;
+		}
 
-        if (curJob.GetType() == typeof(Job))
+		if (curJob.GetType() == typeof(Job))
 		{
 
 		}
-        else if (curJob.GetType() == typeof(Job_Walk))
+		else if (curJob.GetType() == typeof(Job_Walk))
 		{
-            Job_Walk tmp = ((Job_Walk)curJob);
+			Job_Walk tmp = ((Job_Walk)curJob);
 			Cell end = SetTargetPositionCell(tmp.cellX, tmp.cellZ);
-            if (end == null) return;
+			if (end == null) return;
 			tmp.SetTargetPos(end.Position);
 		}
-        else if (curJob.GetType() == typeof(Job_Mining))
+		else if (curJob.GetType() == typeof(Job_Mining))
 		{
-            Job_Mining tmp = ((Job_Mining)curJob);
+			Job_Mining tmp = ((Job_Mining)curJob);
 			TargetJobEntity = tmp.block;
 			SetTargetPositionCell(tmp.cellX, tmp.cellZ);
-        }
-        else if (curJob.GetType() == typeof(Job_GiveResources))
-        {
-            if (curLastJob != null && curLastJob.GetType() == typeof(Job_Mining))
-            {
-                WaitTimer += 1.0f;
-            }
-            Job_GiveResources tmp = ((Job_GiveResources)curJob);
-            TargetJobEntity = tmp.Target;
-            SetTargetPositionCell(tmp.cellX, tmp.cellZ);
-        }
+		}
+		else if (curJob.GetType() == typeof(Job_GiveResources))
+		{
+			if (curLastJob != null && curLastJob.GetType() == typeof(Job_Mining))
+			{
+				WaitTimer += 1.0f;
+			}
+			Job_GiveResources tmp = ((Job_GiveResources)curJob);
+			TargetJobEntity = tmp.Target;
+			SetTargetPositionCell(tmp.cellX, tmp.cellZ);
+		}
 	}
 
 	//Right Click
@@ -143,17 +156,17 @@ public class SimpleAI : Worker
 		else
 		{
 			Entity entity = destination.LevelEntity.SpawnedEntity;
-            bool friend = Entity.Friends(this, entity);
+			bool friend = Entity.Friends(this, entity);
 
-            if (entity.GetType() == typeof(Entity_ResourceBlock))
+			if (entity.GetType() == typeof(Entity_ResourceBlock))
 			{
 				AddJob(new Job_Mining(Owner, this, "Mining", ((Entity_ResourceBlock)entity), destination.X, destination.Z));
 			}
-            else if (entity.GetType() == typeof(Entity_PlayerBase))
-            {
-                if(friend)
-                    AddJob(new Job_GiveResources(Owner, this, "Giving Resources", ((Worker)entity), destination.X, destination.Z));
-            }
+			else if (entity.GetType() == typeof(Entity_PlayerBase))
+			{
+				if(friend)
+					AddJob(new Job_GiveResources(Owner, this, "Giving Resources", ((Worker)entity), destination.X, destination.Z));
+			}
 			else
 			{
 				//AddJob(new Job(Owner, this, "Standing"));
@@ -165,16 +178,18 @@ public class SimpleAI : Worker
 
 	public void NextWaypoint()
 	{
+		if (path.IsEmpty || path.IsLast)
+			return;
 		NextNavigationPosition = path.GetNext().Position;
 	}
 
-    public void CheckNextPosition()
-    {
-        if (LevelGenerator.Level.GetCell(NextNavigationPosition.x, NextNavigationPosition.z).Walkable == false)
-        {
-            Repath();
-        }
-    }
+	public void CheckNextPosition()
+	{
+		if (LevelGenerator.Level.GetCell(NextNavigationPosition.x, NextNavigationPosition.z).Walkable == false)
+		{
+			Repath();
+		}
+	}
 
 	public override void PathFinished(Path newPath)
 	{
@@ -188,14 +203,14 @@ public class SimpleAI : Worker
 		if (!path.IsLast)
 			NextWaypoint();
 
-        CheckNextPosition();
+		CheckNextPosition();
 	}
 	#endregion
 
-    public float DotDiffAngleRot = 0.8f;
+	public float DotDiffAngleRot = 0.8f;
 	public float DotDiffAngle = 0.75f;
 	
-    public bool WalkInTargetDir = false;
+	public bool WalkInTargetDir = false;
 	public float DistanceToNavPoint = 0.5f;
 
 	public float MinSpeed = 0.5f; //Backwards
@@ -205,29 +220,29 @@ public class SimpleAI : Worker
 	public float Acceleration = 2.0f;
 	public float Break = 5f;
 
-    public Vector3 RaycastPos
-    {
-        get
-        {
-            return transform.position + Vector3.up * 0.5f;
-        }
-    }
+	public Vector3 RaycastPos
+	{
+		get
+		{
+			return transform.position + Vector3.up * 0.5f;
+		}
+	}
 
-    public bool HasTarget
-    {
-        get
-        {
-            return TargetEntity != null;
-        }
-    }
+	public bool HasTarget
+	{
+		get
+		{
+			return TargetEntity != null;
+		}
+	}
 
-    
+	
 
 	// Update is called once per frame
 	public override void Update()
 	{
-        Walkable = !HasJob;
-        Walkable = false;
+		Walkable = !HasJob;
+		Walkable = false;
 		base.Update();
 
 		UpdatePathFinding();
@@ -237,14 +252,14 @@ public class SimpleAI : Worker
 			if (Vector3.Distance(transform.position, NextNavigationPosition + Vector3.up * FlyHeight) < DistanceToNavPoint)
 			{
 				NextWaypoint();
-                CheckNextPosition();
+				CheckNextPosition();
 			}
 		}
 
 		UpdateTarget();
 
 		WantedLookDirection = NextNavigationPosition - transform.position;
-        if (HasTarget && CanSeeTarget)
+		if (HasTarget && CanSeeTarget)
 		{
 			WantedLookDirection = TargetEntity.Position - transform.position;
 		}
@@ -252,7 +267,7 @@ public class SimpleAI : Worker
 		
 		if (WantedLookDirection.magnitude > 0.1f)
 		{
-            float dotRot = Mathf.Max(Vector3.Dot(transform.forward, WantedLookDirection.normalized) - DotDiffAngleRot, 0.0f) * (1f / DotDiffAngleRot);
+			float dotRot = Mathf.Max(Vector3.Dot(transform.forward, WantedLookDirection.normalized) - DotDiffAngleRot, 0.0f) * (1f / DotDiffAngleRot);
 			Quaternion wantedRotation = Quaternion.LookRotation(WantedLookDirection);
 
 			transform.rotation = Quaternion.RotateTowards(transform.rotation, wantedRotation, Time.deltaTime * RotationDamping * (1f - dotRot));        
@@ -270,19 +285,19 @@ public class SimpleAI : Worker
 
 		float dot = 1f;
 		if (DotDiffAngle > 0)
-            dot = Mathf.Max(Vector3.Dot(transform.forward, targetDiff.normalized) - DotDiffAngle, 0.0f) * (1f / DotDiffAngle);
+			dot = Mathf.Max(Vector3.Dot(transform.forward, targetDiff.normalized) - DotDiffAngle, 0.0f) * (1f / DotDiffAngle);
 
 		WantedSpeed *= dot;
 
-        bool isNearEnd = ((path != null && path.IsLast) && targetDistance < 1f);
+		bool isNearEnd = ((path != null && path.IsLast) && targetDistance < 1f);
 
-        if (isNearEnd)
-            WantedSpeed *= Mathf.Min(targetDistance * targetDistance, 1.0f);
+		if (isNearEnd)
+			WantedSpeed *= Mathf.Min(targetDistance * targetDistance, 1.0f);
 
-        WaitTimer -= Time.deltaTime;
-        WaitTimer = Mathf.Max(WaitTimer, 0f);
-        if (WaitTimer > 0)
-            WantedSpeed *= 0;
+		WaitTimer -= Time.deltaTime;
+		WaitTimer = Mathf.Max(WaitTimer, 0f);
+		if (WaitTimer > 0)
+			WantedSpeed *= 0;
 
 		float speedChange = WantedSpeed > Speed ? Acceleration : Break;
 		Speed = Mathf.Lerp(Speed, WantedSpeed, Time.deltaTime * speedChange);
@@ -291,28 +306,28 @@ public class SimpleAI : Worker
 		if (WalkInTargetDir)
 			walkDirection = targetDiff.normalized;
 
-        speedChange = 1f;
+		speedChange = 1f;
 
-        if (!isNearEnd)
-        {
-            RaycastHit hit;
-            if (Physics.Raycast(new Ray(RaycastPos, transform.forward), out hit, InMyWayDistance, NavigationMask))
-            {
-                speedChange = 0.0f;
-                SimpleAI ai = hit.collider.GetComponent<SimpleAI>();
-                if (ai != null)
-                {
-                    if (!ai.CanGoOutOfTheWay())
-                    {
-                        Repath();
-                    }
-                }
-            }
-        }        
+		if (!isNearEnd)
+		{
+			RaycastHit hit;
+			if (Physics.Raycast(new Ray(RaycastPos, transform.forward), out hit, InMyWayDistance, NavigationMask))
+			{
+				speedChange = 0.0f;
+				SimpleAI ai = hit.collider.GetComponent<SimpleAI>();
+				if (ai != null)
+				{
+					if (!ai.CanGoOutOfTheWay())
+					{
+						Repath();
+					}
+				}
+			}
+		}        
 
-        rigidbody.AddForce(walkDirection * Speed * Time.deltaTime * speedChange * 100f);
+		rigidbody.AddForce(walkDirection * Speed * Time.deltaTime * speedChange * 100f);
 
-        //transform.position += walkDirection * Speed * Time.deltaTime * speedChange;
+		//transform.position += walkDirection * Speed * Time.deltaTime * speedChange;
 
 		transform.position += Vector3.up * targetDiff.y * Time.deltaTime * ClimbSpeed;
 
@@ -320,97 +335,97 @@ public class SimpleAI : Worker
 		ShootTimer -= Time.deltaTime;
 		if (ShootTimer <= 0)
 		{
-            ShootTimer = ShootCD;
+			ShootTimer = ShootCD;
 			Shoot();
 		}
 
-        PathUpdateTimer -= Time.deltaTime;
-        if (HasJob && PathUpdateTimer <= 0)
-        {
-            PathUpdateTimer = PathUpdateTime;
+		PathUpdateTimer -= Time.deltaTime;
+		if (HasJob && PathUpdateTimer <= 0)
+		{
+			PathUpdateTimer = PathUpdateTime;
 
-            float Distance = 1000f;
+			float Distance = 1000f;
 
-            if (CurrentJob.GetType() == typeof(Job_Walk))
-            {
-                Job_Walk job = ((Job_Walk)CurrentJob);
-                Distance = Vector3.Distance(Position, new Vector3(job.cellX, 0, job.cellZ));
-                if (Distance > 1f)
-                {
-                    SetTargetPositionCell(job.cellX, job.cellZ);
-                }
-            }
-            else if (CurrentJob.GetType() == typeof(Job_Mining))
-            {
-                Job_Mining job = ((Job_Mining)CurrentJob);
-                Distance = Vector3.Distance(Position, new Vector3(job.cellX, 0, job.cellZ));
-                if (Distance > 1f)
-                {
-                    SetTargetPositionCell(job.cellX, job.cellZ);
-                }
-            }
-            else if (CurrentJob.GetType() == typeof(Job_GiveResources))
-            {
-                Job_GiveResources job = ((Job_GiveResources)CurrentJob);
-                Distance = Vector3.Distance(Position, new Vector3(job.cellX, 0, job.cellZ));
-                if (Distance > 1f)
-                {
-                    SetTargetPositionCell(job.cellX, job.cellZ);
-                }
-            }
-        }
-        
+			if (CurrentJob.GetType() == typeof(Job_Walk))
+			{
+				Job_Walk job = ((Job_Walk)CurrentJob);
+				Distance = Vector3.Distance(Position, new Vector3(job.cellX, 0, job.cellZ));
+				if (Distance > 1f)
+				{
+					SetTargetPositionCell(job.cellX, job.cellZ);
+				}
+			}
+			else if (CurrentJob.GetType() == typeof(Job_Mining))
+			{
+				Job_Mining job = ((Job_Mining)CurrentJob);
+				Distance = Vector3.Distance(Position, new Vector3(job.cellX, 0, job.cellZ));
+				if (Distance > 1f)
+				{
+					SetTargetPositionCell(job.cellX, job.cellZ);
+				}
+			}
+			else if (CurrentJob.GetType() == typeof(Job_GiveResources))
+			{
+				Job_GiveResources job = ((Job_GiveResources)CurrentJob);
+				Distance = Vector3.Distance(Position, new Vector3(job.cellX, 0, job.cellZ));
+				if (Distance > 1f)
+				{
+					SetTargetPositionCell(job.cellX, job.cellZ);
+				}
+			}
+		}
+		
 	}
 
-    public float InMyWayDistance = 1.0f;
+	public float InMyWayDistance = 1.0f;
 
-    public float OutOfWayTime = 1.0f;
-    public float OutOfWayTimer = 0f;
+	public float OutOfWayTime = 1.0f;
+	public float OutOfWayTimer = 0f;
 
-    public bool CanGoOutOfTheWay()
-    {
+	public bool CanGoOutOfTheWay()
+	{
 
-        OutOfWayTimer -= Time.deltaTime;
-        if (OutOfWayTimer > 0)
-            return true;
+		OutOfWayTimer -= Time.deltaTime;
+		if (OutOfWayTimer > 0)
+			return true;
 
-        Cell dest = LevelGenerator.Level.GetCell(Position.x, Position.z);
-        if(dest != null)
-            dest = LevelGenerator.Level.FindNeighborWalkableCellRandom(dest);
-        if(dest != null)
-            dest = SetTargetPositionCell(dest.X, dest.Z);
+		Cell dest = LevelGenerator.Level.GetCell(Position.x, Position.z);
+		if(dest != null)
+			dest = LevelGenerator.Level.FindNeighborWalkableCellRandom(dest);
+		if(dest != null)
+			dest = SetTargetPositionCell(dest.X, dest.Z);
 
-        if (dest == null)
-            return false;
+		if (dest == null)
+			return false;
 
-        OutOfWayTimer = OutOfWayTime;
-        return true;
-    }
+		OutOfWayTimer = OutOfWayTime;
+		return true;
+	}
 
-    public float PathUpdateTime = 1.0f;
-    public float PathUpdateTimer = 0f;
+	public float PathUpdateTime = 1.0f;
+	public float PathUpdateTimer = 0f;
 
-    public void Repath()
-    {
-        if (path == null)
-            return;
+	public void Repath()
+	{
+		if (path == null)
+			return;
 
-        Cell dest = SetTargetPositionCell(path.Destination.X, path.Destination.Z);
-        if(dest == null)
-        {
-            return;
-        }
+		Cell dest = SetTargetPositionCell(path.Destination.X, path.Destination.Z);
+		if(dest == null)
+		{
+			return;
+		}
 
-        return;
-        if (HasJob)
-        {
-            if (CurrentJob.GetType() == typeof(Job_Walk))
-            {
-                //((Job_Walk)CurrentJob).SetTargetPos(dest.Position);
-                CurrentJob.Start();
-            }
-        }
-    }
+		return;
+		if (HasJob)
+		{
+			if (CurrentJob.GetType() == typeof(Job_Walk))
+			{
+				//((Job_Walk)CurrentJob).SetTargetPos(dest.Position);
+				CurrentJob.Start();
+			}
+		}
+	}
 
 	void OnGUI()
 	{
@@ -419,7 +434,7 @@ public class SimpleAI : Worker
 			Vector3 pos = Camera.main.WorldToScreenPoint(Position);
 			GUI.Label(new Rect(pos.x, Screen.height - pos.y, 200, 25), CurrentJob.Info);
 		}
-        if (HasTarget)
+		if (HasTarget)
 		{
 			Vector3 pos = Camera.main.WorldToScreenPoint(TargetEntity.Position);
 			GUI.Label(new Rect(pos.x, Screen.height - pos.y, 200, 25), "Target");
@@ -430,21 +445,21 @@ public class SimpleAI : Worker
 	public LayerMask FindMask;
 	public LayerMask AttackMask;
 
-    public LayerMask NavigationMask;
+	public LayerMask NavigationMask;
 
 	public float ShootCD = 1.0f;
 	private float ShootTimer = 0f;
 
-    public bool CanSeeSomething = false;
+	public bool CanSeeSomething = false;
 	public bool CanSeeTarget = false;
 
 	public Collider otherCollider = null;
 
-    public bool NeedsTargetInAttackThing = false;
+	public bool NeedsTargetInAttackThing = false;
 
 	public void Shoot()
 	{
-        if (!HasTarget || !CanSeeTarget)
+		if (!HasTarget || !CanSeeTarget)
 			return;
 
 		Vector3 direction = (TargetEntity.Position - transform.position).normalized;
@@ -452,83 +467,83 @@ public class SimpleAI : Worker
 		if (dot < 0.5f)
 			return;
 
-        if(TargetEntity.GetType() == typeof(Entity_ResourceBlock) && AvailableSpace == 0)
-        {
-            TargetEntity = null;
-            return;
-        }
+		if(TargetEntity.GetType() == typeof(Entity_ResourceBlock) && AvailableSpace == 0)
+		{
+			TargetEntity = null;
+			return;
+		}
 
-        if (NeedsTargetInAttackThing)
-        {
-            RaycastHit hit;
-            if (!Physics.Raycast(new Ray(RaycastPos, transform.forward), out hit, AttackRange, AttackMask))
-                return;
-        }
-        
+		if (NeedsTargetInAttackThing)
+		{
+			RaycastHit hit;
+			if (!Physics.Raycast(new Ray(RaycastPos, transform.forward), out hit, AttackRange, AttackMask))
+				return;
+		}
+		
 
 		GameObject go = GameObjectPool.Instance.Spawn("SimpleBullet", transform.position + transform.forward, Quaternion.LookRotation(direction));
 		SimpleBullet bullet = go.GetComponent<SimpleBullet>();
 		bullet.mask = AttackMask;
 		bullet.Owner = this;
-        bullet.Damage = Damage;
+		bullet.Damage = Damage;
 	}
 
-    public bool IsInRange(Entity other)
-    {
-        if (other == null) return false;
-        if (Vector3.Distance(other.Position, Position) < AttackRange)
-            return true;
-        return false;
-        
-    }
+	public bool IsInRange(Entity other)
+	{
+		if (other == null) return false;
+		if (Vector3.Distance(other.Position, Position) < AttackRange)
+			return true;
+		return false;
+		
+	}
 
 	public void UpdateTarget()
 	{
-        CanSeeTarget = false;
-        CanSeeSomething = false;
+		CanSeeTarget = false;
+		CanSeeSomething = false;
 
-        if (HasTarget && !TargetEntity.IsAlive)
+		if (HasTarget && !TargetEntity.IsAlive)
 		{
 			TargetEntity = null;
 		}
-        if (IsInRange(TargetJobEntity))
+		if (IsInRange(TargetJobEntity))
 		{
-            if (Entity.Enemies(this, TargetJobEntity))
-			    TargetEntity = TargetJobEntity;
+			if (Entity.Enemies(this, TargetJobEntity))
+				TargetEntity = TargetJobEntity;
 		}
-        if (HasTarget && !IsInRange(TargetEntity))
+		if (HasTarget && !IsInRange(TargetEntity))
 		{
-            TargetEntity = null;
+			TargetEntity = null;
 		}
 
-        if (!HasTarget)
-        {
-            //Find new Target
-            Collider[] collider = Physics.OverlapSphere(transform.position, AttackRange, FindMask);
-            for (int i = 0; i < collider.Length; i++)
-            {
-                Entity entity = collider[i].GetComponent<Entity>();
-                if (entity != null && Entity.Enemies(this, entity))
-                {
-                    TargetEntity = entity;
-                    break;
-                }
-            }
-        }
+		if (!HasTarget)
+		{
+			//Find new Target
+			Collider[] collider = Physics.OverlapSphere(transform.position, AttackRange, FindMask);
+			for (int i = 0; i < collider.Length; i++)
+			{
+				Entity entity = collider[i].GetComponent<Entity>();
+				if (entity != null && Entity.Enemies(this, entity))
+				{
+					TargetEntity = entity;
+					break;
+				}
+			}
+		}
 
-        if (!HasTarget)
-            return;
+		if (!HasTarget)
+			return;
 
-        Vector3 direction = (TargetEntity.Position - transform.position).normalized;
-        RaycastHit hit;
-        CanSeeSomething = Physics.Raycast(new Ray(RaycastPos, direction), out hit, AttackRange, AttackMask);
-        if (CanSeeSomething)
-            otherCollider = hit.collider;
+		Vector3 direction = (TargetEntity.Position - transform.position).normalized;
+		RaycastHit hit;
+		CanSeeSomething = Physics.Raycast(new Ray(RaycastPos, direction), out hit, AttackRange, AttackMask);
+		if (CanSeeSomething)
+			otherCollider = hit.collider;
 
-        if (CanSeeSomething || hit.collider == TargetEntity.colliderForRaycasts)
-        {
-            CanSeeTarget = true;
-        }
+		if (CanSeeSomething || hit.collider == TargetEntity.colliderForRaycasts)
+		{
+			CanSeeTarget = true;
+		}
 
 	}
 }

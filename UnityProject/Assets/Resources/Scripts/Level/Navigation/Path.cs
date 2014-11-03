@@ -24,6 +24,14 @@ public class Path
             return currentIndex == 0;
         }
     }
+
+    public Cell GetLast()
+    {
+        if (IsEmpty)
+            return null;
+        return path[path.Count-1];
+    }
+
     public Cell GetNext()
     {
         if (path.Count == 0)
