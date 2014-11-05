@@ -2,21 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
-
 [JsonObject(MemberSerialization.OptIn)]
 public class Chunk
 {
     public bool Loaded = false;
-
-    //TODO change save system to two dimensional array with different type of grid-information
-    //This should make it possible to implement an easy A* into the levelgeneration system.
-
+    
     [JsonProperty]
     public Cell[,] cells;
 
     [JsonProperty]
-    public List<LevelEntity> entities = new List<LevelEntity>();
+    public List<LevelEntity> spawnedEntities = new List<LevelEntity>();
 
     [JsonProperty]
     public int posX = 0, posZ = 0;
@@ -28,14 +23,14 @@ public class Chunk
 
     public void AddEntity(LevelEntity entity)
     {
-        entities.Add(entity);
+        spawnedEntities.Add(entity);
     }
 
     public void RemoveLevelEntityFromList(LevelEntity entity)
     {
-        if (entities.Contains(entity))
+        if (spawnedEntities.Contains(entity))
         {
-            entities.Remove(entity);
+            spawnedEntities.Remove(entity);
         }
     }
 
@@ -129,9 +124,9 @@ public class Chunk
             return;
 
         LevelEntity entity;
-        for (int i = 0; i < entities.Count; i++)
+        for (int i = 0; i < spawnedEntities.Count; i++)
         {
-            entity = entities[i];
+            entity = spawnedEntities[i];
             if (entity == null)
                 continue;
             entity.Spawn();
@@ -148,9 +143,9 @@ public class Chunk
             return;
 
         LevelEntity entity;
-        for (int i = 0; i < entities.Count; i++)
+        for (int i = 0; i < spawnedEntities.Count; i++)
         {
-            entity = entities[i];
+            entity = spawnedEntities[i];
             if (entity == null)
                 continue;
             entity.Despawn();

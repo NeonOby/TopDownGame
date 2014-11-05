@@ -10,11 +10,7 @@ public class TransformInspector : Editor
 	
 	public override void OnInspectorGUI()
 	{
- 
 		Transform t = (Transform)target;
- 
-		// Replicate the standard transform inspector gui
-		//EditorGUIUtility.LookLikeControls();
 		EditorGUI.indentLevel = 0;
 
 		EditorGUILayout.BeginHorizontal();
@@ -121,9 +117,6 @@ public class TransformInspector : Editor
 			Vector3FieldEx("Scale", t.lossyScale);
 		}
 		
-		//EditorGUIUtility.LookLikeInspector();
-
-		
 		if (GUI.changed)
 		{
             Undo.RecordObject(t, "Transform Change");
@@ -154,11 +147,9 @@ public class TransformInspector : Editor
 	public static Vector3 Vector3FieldEx(string label, Vector3 value) {
 	    EditorGUILayout.BeginHorizontal();
 			GUILayout.Label(label);
-	       // ++EditorGUI.indentLevel;
+
 	        EditorGUILayout.LabelField("X", GUILayout.Width (12));
 	        value.x = EditorGUILayout.FloatField(value.x);
-	
-	       // --EditorGUI.indentLevel;
 	
 	        EditorGUILayout.LabelField("Y", GUILayout.Width (12));
 	        value.y = EditorGUILayout.FloatField(value.y);
