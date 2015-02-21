@@ -3,13 +3,21 @@ using System.Collections;
 using System;
 using System.Threading;
 using System.Collections.Generic;
+using SimpleLibrary;
 
-public class LevelGenerator : MonoBehaviour
+public class LevelGenerator : Singleton<LevelGenerator>
 {
     public int chunkSize = 16;
     public int chunkLoadDistance = 4;
 
     public float safeDistance = 2f;
+
+	public PoolInfo LoadedChunk;
+	public PoolInfo UnloadedChunk;
+	public PoolInfo ResourceBlock;
+	public PoolInfo ResourceCube;
+	public PoolInfo PlayerBase;
+
 
     #region ThreadedMapGeneration
     private static volatile System.Object fastLock = new System.Object();

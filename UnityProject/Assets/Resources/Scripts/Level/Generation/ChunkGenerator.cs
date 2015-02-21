@@ -143,6 +143,7 @@ public class ChunkGenerator
                     {
                         entity = new LevelEntity_PlayerBase();
                         entity.PoolName = "PlayerBase";
+						entity.pool = LevelGenerator.Instance.PlayerBase;
                         entity.Position.Value = currentPos;
 
                         generatedChunk.GetCell(x, z).LevelEntity = entity;
@@ -161,6 +162,7 @@ public class ChunkGenerator
 
                         entity = new LevelEntity_ResourceBlock();
                         entity.PoolName = "ResourceBlock";
+						entity.pool = LevelGenerator.Instance.ResourceBlock;
                         entity.Position.Value = currentPos;
                         entity.Init(value);
 

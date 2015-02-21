@@ -55,39 +55,36 @@ public class Chunk
     }
 
     #region DEBUG
-    private GameObjectInfo chunkInfoInfo = new GameObjectInfo("", null);
+    private GameObject chunkInfoInfo;
 
     private int currentState = -1;
 
     public bool finishedGenerating = false;
 
-    private string loadedPool = "LoadedChunk";
-    private string unloadedPool = "UnLoadedChunk";
-
-    public void DespawnChunkInfo(GameObjectInfo info)
+    public void DespawnChunkInfo(GameObject info)
     {
-        if (info.poolName == "")
+        if (info == null)
             return;
-        PriorityWorker_Entity_Despawn.Create(info.poolName, info.gameObject, null);
+		PriorityWorker_SimplePool_Despawn.Create(info, null);
     }
-    public void SpawnChunkInfo(string poolName)
+    public void SpawnChunkInfo(SimpleLibrary.PoolInfo poolName)
     {
-        GameObject go = GameObjectPool.Instance.Spawn(poolName, new Vector3(posX * LevelGenerator.ChunkSize, 0, posZ * LevelGenerator.ChunkSize), Quaternion.identity);
-        chunkInfoInfo = new GameObjectInfo(poolName, go);
+        GameObject go = SimpleLibrary.SimplePool.Spawn(poolName, new Vector3(posX * LevelGenerator.ChunkSize, 0, posZ * LevelGenerator.ChunkSize), Quaternion.identity);
+        chunkInfoInfo = go;
     }
 
     private void ShowLoadedGrid()
     {
         if (currentState == -1)
         {
-            SpawnChunkInfo(loadedPool);
+            SpawnChunkInfo(LevelGenerator.Instance.LoadedChunk);
         }
         else
         {
             if (currentState == 0)
             {
                 DespawnChunkInfo(chunkInfoInfo);
-                SpawnChunkInfo(loadedPool);
+				SpawnChunkInfo(LevelGenerator.Instance.LoadedChunk);
             }
         }
         currentState = 1;
@@ -96,14 +93,14 @@ public class Chunk
     {
         if (currentState == -1)
         {
-            SpawnChunkInfo(unloadedPool);
+            SpawnChunkInfo(LevelGenerator.Instance.UnloadedChunk);
         }
         else
         {
             if (currentState == 1)
             {
                 DespawnChunkInfo(chunkInfoInfo);
-                SpawnChunkInfo(unloadedPool);
+				SpawnChunkInfo(LevelGenerator.Instance.UnloadedChunk);
             }
         }
         currentState = 0;

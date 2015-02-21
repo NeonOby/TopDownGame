@@ -30,10 +30,13 @@ public class PriorityWorkerQueue : MonoBehaviour
 
 	public static void AddWorker(int priority, PriorityWorker worker)
 	{
-        lock (fastLock)
-        {
-            queue.Enqueue(priority, worker);
-        }
+		using (var tryLock = new TryLock(fastLock))
+		{
+			if (tryLock.HasLock)
+			{
+				queue.Enqueue(priority, worker);
+			}
+		}
 	}
 
     private static System.Object fastLock = new System.Object();
@@ -44,33 +47,45 @@ public class PriorityWorkerQueue : MonoBehaviour
 	public int WorkerPerUpdate = 1;
 
 	private int frameCounter = 0;
-	
+
+
+	public float StartTime = 0f;
+	public float CurrentUsedTime = 0f;
+	public float MaxUsedDeltaTimePerFrame = 0.02f;
+
+	private bool HasMoreTime
+	{
+		get
+		{
+			return TimeDiff(StartTime) < MaxUsedDeltaTimePerFrame;
+		}
+	}
+	private float TimeDiff(float last)
+	{
+		return Time.realtimeSinceStartup - last;
+	}
+
 	// Update is called once per frame
 	void Update ()
 	{
-		frameCounter = Mathf.Max(frameCounter-1, 0);
-		if(frameCounter == 0)
-		{
-            using (var tryLock = new TryLock(fastLock))
+		StartTime = Time.realtimeSinceStartup;
+        using (var tryLock = new TryLock(fastLock))
+        {
+            if (tryLock.HasLock)
             {
-                if (tryLock.HasLock)
+                if (!queue.IsEmpty)
                 {
-                    if (!queue.IsEmpty)
-                    {
-                        PriorityWorker worker;
+                    PriorityWorker worker;
+                    while (HasMoreTime)
+					{
+						worker = queue.Dequeue();
+						worker.Work();
 
-                        for (int i = 0; i < WorkerPerUpdate; i++)
-                        {
-                            worker = queue.Dequeue();
-                            worker.Work();
-
-                            if (queue.IsEmpty)
-                                break;
-                        }
-                    }
-                    frameCounter = WorkEveryXFrames;
+						if (queue.IsEmpty)
+							break;
+					}
                 }
             }
-		}
+        }
 	}
 }

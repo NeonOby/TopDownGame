@@ -4,6 +4,7 @@
 public class LevelEntity
 {
     public string PoolName = "";
+	public SimpleLibrary.PoolInfo pool;
 
     public Vector3Position Position = new Vector3Position();
     public QuaternionRotation Rotation = new QuaternionRotation();
@@ -26,11 +27,11 @@ public class LevelEntity
 
     public void Spawn()
     {
-        PriorityWorker_Entity_Spawn.Create(PoolName, Position.Value, Rotation.Value, AfterSpawn);
+		PriorityWorker_SimplePool_Spawn.Create(pool, Position.Value, Rotation.Value, AfterSpawn);
     }
     public void Despawn()
     {
-        PriorityWorker_Entity_Despawn.Create(PoolName, gameObject, AfterDespawn);
+		PriorityWorker_SimplePool_Despawn.Create(gameObject, AfterDespawn);
     }
 
     public virtual void Init(float value)
