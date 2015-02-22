@@ -240,6 +240,46 @@ namespace SimpleLibrary
 			Instance.UpdatePoolNames();
 		}
 
+		public static GameObject Spawn(string PoolName)
+		{
+			foreach (var pool in Instance.Pools)
+			{
+				if (pool.PoolName.Equals(PoolName, System.StringComparison.Ordinal))
+				{
+					GameObject go = pool.Spawn();
+					pool.AfterSpawn(go);
+					return go;
+				}
+			}
+			return null;
+		}
+		public static GameObject Spawn(string PoolName, Vector3 position)
+		{
+			foreach (var pool in Instance.Pools)
+			{
+				if (pool.PoolName.Equals(PoolName, System.StringComparison.Ordinal))
+				{
+					GameObject go = pool.Spawn(position);
+					pool.AfterSpawn(go);
+					return go;
+				}
+			}
+			return null;
+		}
+		public static GameObject Spawn(string PoolName, Vector3 position, Quaternion rotation)
+		{
+			foreach (var pool in Instance.Pools)
+			{
+				if (pool.PoolName.Equals(PoolName, System.StringComparison.Ordinal))
+				{
+					GameObject go = pool.Spawn(position, rotation);
+					pool.AfterSpawn(go);
+					return go;
+				}
+			}
+			return null;
+		}
+
 		/// <summary>
 		/// Spawns GameObject from first pool containing given prefab
 		/// </summary>

@@ -66,6 +66,7 @@ public class SearchingPath
         
         return (b1 || b2);
 
+		/*
         //return Physics.SphereCast(ray, 0.4f, direction.magnitude);
 
 
@@ -93,7 +94,7 @@ public class SearchingPath
                 }
             }
         }
-        return false;
+        return false;*/
     }
 
     public static float DistancePointLine(Vector3 point, Vector3 lineStart, Vector3 lineEnd)

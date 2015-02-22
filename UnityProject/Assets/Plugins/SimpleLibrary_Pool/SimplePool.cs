@@ -32,6 +32,20 @@ namespace SimpleLibrary
 		}
 
 		#region Static
+		public static GameObject Spawn(string PoolName)
+		{
+			return SimplePoolManager.Spawn(PoolName);
+		}
+		public static GameObject Spawn(string PoolName, Vector3 position)
+		{
+			return SimplePoolManager.Spawn(PoolName, position);
+		}
+		public static GameObject Spawn(string PoolName, Vector3 position, Quaternion rotation)
+		{
+			return SimplePoolManager.Spawn(PoolName, position, rotation);
+		}
+
+
 		//If you forget how to use it :P
 		public static GameObject Spawn(PoolInfo info)
 		{

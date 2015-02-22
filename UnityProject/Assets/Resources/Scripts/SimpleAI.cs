@@ -1,12 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
+using SimpleLibrary;
 
 public class SimpleAI : Worker 
 {
-	public override void SetPoolName(string value)
-	{
-		base.SetPoolName(value);
-	}
 
 	public Entity TargetEntity = null;
 	public Entity TargetJobEntity = null;
@@ -19,9 +16,9 @@ public class SimpleAI : Worker
 	public float RotationDamping = 5.0f;
 	private Vector3 WantedLookDirection = Vector3.zero;
 
-	public override void Reset()
+	public override void OnSpawn()
 	{
-		base.Reset();
+		base.OnSpawn();
 		NextNavigationPosition = transform.position;
 		WantedLookDirection = Vector3.forward;
 	}
@@ -457,6 +454,8 @@ public class SimpleAI : Worker
 
 	public bool NeedsTargetInAttackThing = false;
 
+	public PoolInfo Bullet;
+
 	public void Shoot()
 	{
 		if (!HasTarget || !CanSeeTarget)
@@ -479,9 +478,9 @@ public class SimpleAI : Worker
 			if (!Physics.Raycast(new Ray(RaycastPos, transform.forward), out hit, AttackRange, AttackMask))
 				return;
 		}
-		
 
-		GameObject go = GameObjectPool.Instance.Spawn("SimpleBullet", transform.position + transform.forward, Quaternion.LookRotation(direction));
+
+		GameObject go = SimplePool.Spawn(Bullet, transform.position + transform.forward, Quaternion.LookRotation(direction));
 		SimpleBullet bullet = go.GetComponent<SimpleBullet>();
 		bullet.mask = AttackMask;
 		bullet.Owner = this;

@@ -3,8 +3,6 @@ using System.Collections;
 
 public class Healthbar : MonoBehaviour 
 {
-	private Transform mainCam;
-
 	public Transform bar;
 
     public float scale = 0.1f;
@@ -18,9 +16,6 @@ public class Healthbar : MonoBehaviour
 		wantedProcent = procent;
 	}
 
-	void Start(){
-		mainCam = Camera.main.transform;
-	}
 
     public Texture barTex;
     public Texture overlayTex;

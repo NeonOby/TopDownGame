@@ -42,13 +42,7 @@ public class PriorityWorkerQueue : MonoBehaviour
     private static System.Object fastLock = new System.Object();
 
 	public static PriorityQueue<int, PriorityWorker> queue = new PriorityQueue<int, PriorityWorker>();
-
-	public int WorkEveryXFrames = 2;
-	public int WorkerPerUpdate = 1;
-
-	private int frameCounter = 0;
-
-
+	
 	public float StartTime = 0f;
 	public float CurrentUsedTime = 0f;
 	public float MaxUsedDeltaTimePerFrame = 0.02f;

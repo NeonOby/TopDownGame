@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using SimpleLibrary;
 
 [System.Serializable]
 public class SpawnPerButton
@@ -49,7 +50,7 @@ public class DebugSpawner : MonoBehaviour
 
             position = ray.origin + ray.direction * distance;
         }
-        GameObject go = GameObjectPool.Instance.Spawn(info.PoolName, position, Quaternion.identity);
+        GameObject go = SimplePool.Spawn(info.PoolName, position, Quaternion.identity);
 
         Entity entity = go.GetComponent<Entity>();
         entity.Owner = EntityController.Get(info.PlayerID);

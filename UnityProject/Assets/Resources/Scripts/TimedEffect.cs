@@ -6,7 +6,6 @@ public class TimedEffect : MonoBehaviour
 
     public float LifeTime = 0.5f;
     private float LifeTimer = 0f;
-    private string poolName = "";
 
     public bool Enabled = false;
 
@@ -15,11 +14,6 @@ public class TimedEffect : MonoBehaviour
         LifeTimer = 0f;
         Enabled = true;
 	}
-
-    public void SetPoolName(string value)
-    {
-        poolName = value;
-    }
 
     public void Disable()
     {
@@ -35,7 +29,7 @@ public class TimedEffect : MonoBehaviour
         LifeTimer += Time.deltaTime;
         if (LifeTimer >= LifeTime)
         {
-            GameObjectPool.Instance.Despawn(poolName, gameObject);
+            SimpleLibrary.SimplePool.Despawn(gameObject);
         }
 	}
 }

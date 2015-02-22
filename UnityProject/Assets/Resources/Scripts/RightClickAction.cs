@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using SimpleLibrary;
 
 
 /*
@@ -11,7 +12,7 @@ public class RightClickAction : MonoBehaviour
 
 	public Vector3 lastClickedPosition = Vector3.zero;
 
-	public string RightClickEffectPool = "RightClickEffect";
+	public PoolInfo RightClickEffekt;
 
 	// Update is called once per frame
 	void Update () 
@@ -40,7 +41,7 @@ public class RightClickAction : MonoBehaviour
 		}
 
 		//Effekt
-		GameObjectPool.Instance.Spawn(RightClickEffectPool, lastClickedPosition, Quaternion.identity);
+		SimplePool.Spawn(RightClickEffekt, lastClickedPosition, Quaternion.identity);
 	}
 
 }

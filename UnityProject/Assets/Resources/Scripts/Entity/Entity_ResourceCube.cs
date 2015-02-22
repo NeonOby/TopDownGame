@@ -19,9 +19,9 @@ public class Entity_ResourceCube : Entity
     
     public LayerMask FindMask;
 
-    public override void Reset()
+    public override void OnSpawn()
     {
-        base.Reset();
+        base.OnSpawn();
         Speed = 0f;
         rigidbody.velocity = Vector3.zero;
         target = null;
@@ -41,22 +41,21 @@ public class Entity_ResourceCube : Entity
         {
             if (!target.AddIncomingResource())
             {
-                
                 //Doesn't want new Resource :D
                 target = null;
             }
         }
     }
 
-	void Update ()
-    {
-        if (!CheckTarget())
-        {
-            NextTarget();
-            return;
-        }
+	public override void Update()
+	{
+		if (!CheckTarget())
+		{
+			NextTarget();
+			return;
+		}
 
-        Speed = Mathf.Min(Speed + Acceleration * Time.deltaTime, MaxSpeed);
+		Speed = Mathf.Min(Speed + Acceleration * Time.deltaTime, MaxSpeed);
 	}
 
     public bool CheckTarget()
@@ -76,11 +75,12 @@ public class Entity_ResourceCube : Entity
             return false;
         }
 
+		/*
         if (Vector3.Distance(Position, target.Position) > Range)
         {
             RemoveTarget();
             return false;
-        }
+        }*/
 
         return true;
     }
@@ -117,7 +117,7 @@ public class Entity_ResourceCube : Entity
             if (taken > 0)
             {
                 RemoveTarget();
-                Die();
+                Despawn();
             }
             else
                 RemoveTarget();

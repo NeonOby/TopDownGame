@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using SimpleLibrary;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Worker : Entity
 {
     public Healthbar healthBar = null;
+	public PoolInfo ResourceCube;
 
     public virtual void UpdateHealthBar()
     {
@@ -48,7 +50,7 @@ public class Worker : Entity
 
         for (int i = 0; i < value; i++)
         {
-            PriorityWorker_ResourceCube_Spawn.Create("ResourceCube", transform.position + Vector3.up, Quaternion.identity, null, worker);
+			PriorityWorker_ResourceCube_Spawn.Create(ResourceCube, transform.position + Vector3.up, Quaternion.identity, null, worker);
         }
 
         int lostResources = Mathf.Min(resources, value);
@@ -180,7 +182,7 @@ public class Worker : Entity
 
         for (int i = 0; i < amount; i++)
         {
-            PriorityWorker_ResourceCube_Spawn.Create("ResourceCube", transform.position + Vector3.up, Quaternion.identity, null, target);
+			PriorityWorker_ResourceCube_Spawn.Create(ResourceCube, transform.position + Vector3.up, Quaternion.identity, null, target);
         }
         resources -= amount;
         OnResourcesChanged(amount);
@@ -241,9 +243,9 @@ public class Worker : Entity
         CurrentJob.Start();
     }
 
-    public override void Reset()
+    public override void OnSpawn()
     {
-        base.Reset();
+        base.OnSpawn();
         ClearJobs();
         CurrentJob = null;
         LastJob = null;
@@ -272,17 +274,6 @@ public class Worker : Entity
                 NextJob();
         }
         UpdateHealthBar();
-    }
-
-    private void OldThings()
-    {
-        bool finished = false;
-        if (CurrentJob.GetType() == typeof(Job_Mining))
-        {
-            Job_Mining job = ((Job_Mining)CurrentJob);
-            if (job.Paused)
-                finished = true;
-        }
     }
 
     public virtual void PathFinished(Path newPath)

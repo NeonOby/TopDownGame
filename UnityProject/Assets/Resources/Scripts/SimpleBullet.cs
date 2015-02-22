@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using SimpleLibrary;
 
 public class SimpleBullet : MonoBehaviour 
 {
@@ -18,18 +19,11 @@ public class SimpleBullet : MonoBehaviour
 
     public LayerMask mask;
 
-    private string poolName = "";
-
-    public void Reset()
+    public void OnSpawn()
     {
         LifeTimer = 0f;
         rigidbody.velocity = Vector3.zero;
         rigidbody.AddForce(transform.forward * Impulse, ForceMode.Impulse);
-    }
-
-    public void SetPoolName(string newPoolName)
-    {
-        poolName = newPoolName;
     }
 
     void Update()
@@ -57,6 +51,6 @@ public class SimpleBullet : MonoBehaviour
 
     void Explode()
     {
-        GameObjectPool.Instance.Despawn(poolName, gameObject);
+        SimplePool.Despawn(gameObject);
     }
 }

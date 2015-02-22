@@ -17,6 +17,14 @@ namespace SimpleLibrary
         //Never use this directly, thats why its private NOT protected
         private static ChildType instance = null;
 
+		public static bool HasInstance
+		{
+			get
+			{
+				return instance != null;
+			}
+		}
+
         //Use this to get the current single instance of this type
         public static ChildType Instance
         {

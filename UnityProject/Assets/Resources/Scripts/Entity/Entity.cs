@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SimpleLibrary;
+using UnityEngine;
 
 public class Entity : MonoBehaviour
 {
@@ -15,18 +16,10 @@ public class Entity : MonoBehaviour
         return entity1.Owner.PlayerID != entity2.Owner.PlayerID;
     }
 
-    #region Pooling
-    public string PoolName = "";
-    public virtual void SetPoolName(string value)
-    {
-        PoolName = value;
-    }
+	public virtual void OnSpawn()
+	{
 
-    public virtual void Reset()
-    {
-
-    }
-    #endregion
+	}
 
     public Collider colliderForRaycasts = null;
 
@@ -84,7 +77,7 @@ public class Entity : MonoBehaviour
     public void Hit(int value, Entity other)
     {
         GotHit(value, other);
-        if (!IsAlive) Die();
+        if (!IsAlive) Despawn();
     }
 
     public virtual void OnDeath()
@@ -92,10 +85,10 @@ public class Entity : MonoBehaviour
         
     }
 
-    public void Die()
+    public void Despawn()
     {
         OnDeath();
-        GameObjectPool.Instance.Despawn(PoolName, gameObject);
+        SimplePool.Despawn(gameObject);
         TriggerEntityDied(this);
     }
 

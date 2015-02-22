@@ -6,6 +6,10 @@ using System;
 [System.Serializable]
 public class Level 
 {
+	public static object LevelLock = new System.Object();
+
+
+
     public static char split = '.';
 
     public System.Random random;

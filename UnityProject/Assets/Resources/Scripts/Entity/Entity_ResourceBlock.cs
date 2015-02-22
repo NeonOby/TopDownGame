@@ -103,7 +103,7 @@ public class Entity_ResourceBlock : Worker
 
 		for (int i = 0; i < value; i++)
 		{
-			PriorityWorker_ResourceCube_Spawn.Create("ResourceCube", transform.position + Vector3.up, Quaternion.identity, null, worker);
+			PriorityWorker_ResourceCube_Spawn.Create(ResourceCube, transform.position + Vector3.up, Quaternion.identity, null, worker);
 		}
 
         ChangeResourceAmount(CurResources - value);
@@ -125,17 +125,17 @@ public class Entity_ResourceBlock : Worker
 	public void SetResourceAmount(int newAmount)
 	{
         resources = newAmount;
-		Reset();
+		OnSpawn();
 		UpdateMesh();
 	}
 
-	public override void Reset()
+	public override void OnSpawn()
 	{
-		base.Reset();
+		base.OnSpawn();
 		renderer.enabled = false;
 	}
 
-	void Update()
+	public override void Update()
 	{
 		if (MeshNeedsUpdate && !generating)
 		{
